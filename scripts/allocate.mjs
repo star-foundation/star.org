@@ -54,7 +54,11 @@ function readStdin() {
 export function allocateWithinLock(order, { poolFile = PATHS.pool, registrationsDir = PATHS.registrations } = {}) {
   const pool = readPool(poolFile);
   const secret = process.env.STARORG_SLUG_SECRET || '';
-  let slug = order.orderId ? deterministicSlug(order.orderId, secret) : randomSlug();
+  let slug = order.slug && isValidSlug(order.slug)
+    ? order.slug
+    : order.orderId
+      ? deterministicSlug(order.orderId, secret)
+      : randomSlug();
   if (!isValidSlug(slug)) slug = randomSlug();
 
   // 幂等：同一笔订单重复触发时，返回既有登记而不是再分配一颗星（TC-ERR-04）

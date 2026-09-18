@@ -25,8 +25,12 @@ export function normalizeOrder(input = {}) {
   const truncated = [...rawDedication].length > maxDedication;
   const dedication = truncated ? [...rawDedication].slice(0, maxDedication).join('') : rawDedication;
 
+  const slug = String(input.slug ?? '').trim();
+
   return {
     orderId: input.order_id ?? input.orderId ?? null,
+    // 人工指定登记编号（改文案重发场景）；为空时由订单号派生
+    slug: slug || null,
     displayName,
     email: email || null,
     dedication: dedication || null,

@@ -33,7 +33,8 @@ async function main() {
   if (args.slug && !isValidSlug(args.slug)) throw new Error(`slug 格式不正确：${args.slug}`);
 
   const order = normalizeOrder({
-    order_id: args.orderId || (args.slug ? `manual-slug-${args.slug}` : null),
+    order_id: args.orderId || null,
+    slug: args.slug || null,
     display_name: args.name,
     email: args.email,
     dedication: args.dedication,
@@ -44,7 +45,8 @@ async function main() {
   if (args.slug) {
     const existing = findRegistration(args.slug);
     if (!existing) throw new Error(`找不到登记记录：${args.slug}`);
-    process.env.STARORG_SLUG_SECRET = process.env.STARORG_SLUG_SECRET || '';
+  } else if (!args.orderId) {
+    throw new Error('必须提供 --order-id（按订单补单）或 --slug（重发既有登记）');
   }
 
   const result = await runRegistration(order, {

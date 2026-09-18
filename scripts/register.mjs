@@ -13,7 +13,8 @@ import { existsSync } from 'node:fs';
 import { loadConfig, assertConfig, registrationUrl, certificateUrl, ogImageUrl, PATHS } from './lib/config.mjs';
 import { normalizeOrder } from './lib/order.mjs';
 import { readOrderInput, allocate, attachArtifacts } from './allocate.mjs';
-import { findRegistration, buildRegistryIndex } from './lib/registry.mjs';
+import { findRegistration, buildRegistryIndex, registrationPath } from './lib/registry.mjs';
+import { writeJsonAtomic } from './lib/fsx.mjs';
 import { buildStarView } from './lib/view.mjs';
 import { renderCertificate, renderOg, artifactsExist } from './lib/artifacts.mjs';
 import { renderEmail } from './lib/render.mjs';
@@ -45,7 +46,20 @@ export async function runRegistration(order, args = {}) {
   }
 
   const slug = allocation.slug;
-  const record = findRegistration(slug);
+  let record = findRegistration(slug);
+
+  // 人工修改后重发（--force）：按传入内容更新公开记录，再重新渲染证书与 OG 图
+  if (args.force && allocation.status === 'replay') {
+    const updated = {
+      ...record,
+      owner_display_name: record.anonymous ? null : order.displayName || record.owner_display_name,
+      dedication_message: order.dedication ?? record.dedication_message,
+    };
+    writeJsonAtomic(registrationPath(slug), updated);
+    record = updated;
+    steps.push({ step: 'record_update', status: 'updated' });
+  }
+
   const star = record.star;
   const view = buildStarView({
     star,
