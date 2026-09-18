@@ -70,6 +70,7 @@ npm run allocate        # 只做分配（stdin 传订单 JSON）
 npm run register        # 全链路：分配 → 证书 → OG 图 → 记录 → 邮件
 npm run build:site      # 生成 _site/ 静态站点
 npm run serve           # 本地预览 _site/
+npm run demo            # 一键本地演示：沙盒跑一笔登记 → 建站 → 启动预览（见第 5 节）
 npm run verify          # 登记表自检（查重 / 隐私字段 / 产物哈希）
 npm run check:compliance# 合规文案扫描（禁用词 / 收款渠道 / 必备声明）
 npm test                # 全部测试用例（含 TC-ALLOC-03 防超卖并发测试 3 轮）
@@ -80,7 +81,70 @@ node scripts/reconcile.mjs                                                      
 
 本地不配置任何密钥也能跑通全链路：邮件会写入 `outbox/`，站点可用 `npm run serve` 预览。
 
-## 5. 部署
+## 5. 本地启动
+
+### 5.1 一键演示（推荐先跑这个）
+
+```bash
+npm run demo
+```
+
+它会做三件事：在临时沙盒里跑一笔**真实的完整登记**（分配恒星 → 渲染证书 PDF 与 OG 图 →
+写入登记记录 → 邮件落盘），用这份数据构建静态站点，然后启动本地预览。
+
+浏览器打开 http://127.0.0.1:4321/ 就能看到落地页、公开登记表，以及这一笔登记的永久链接页、
+证书 PDF 和分享图。邮件不会真发（`EMAIL_PROVIDER=outbox`），写入沙盒的 `outbox/` 目录。
+
+演示数据全部写在系统临时目录（形如 `/tmp/starorg-demo`），**不会写入仓库的
+`data/registrations/`、`certificates/`、`og/`**，可以反复随便跑。
+
+可选参数（注意 `--` 后面的参数会原样传给脚本）：
+
+```bash
+npm run demo -- --name "For 小满" --dedication "生日快乐"   # 换称呼与献词
+npm run demo -- --anonymous                                # 匿名登记
+npm run demo -- --keep                                     # 保留上次演示数据，再追加一笔
+npm run demo -- --port 5000                                # 换端口
+npm run demo -- --no-serve                                 # 只生成，不启动预览
+```
+
+### 5.2 只看站点（不生成登记数据）
+
+```bash
+npm run build:site      # 生成 _site/
+npm run serve           # http://127.0.0.1:4321/
+```
+
+此时登记表是空的、购买入口显示为"准备中"（`site.config.json` 里还没填结算链接），
+适合改文案 / 样式时快速预览。改完 `site/` 下的文件重新执行 `npm run build:site` 再刷新即可。
+
+### 5.3 写进仓库（模拟真实订单落库）
+
+```bash
+STARORG_SLUG_SECRET=dev-secret EMAIL_PROVIDER=outbox \
+  node scripts/manual-order.mjs --order-id LOCAL-1 --name "For Anna" --email a@b.com
+npm run build:site && npm run serve
+```
+
+这条会真的把记录写进 `data/registrations/`、证书写进 `certificates/`，用来验证"仓库即数据库"
+的完整形态。验证完用 `git status` 找出这些演示文件删掉，别提交上去。
+
+### 5.4 跑测试与自检
+
+```bash
+npm test                # 48 个用例，约 1-2 分钟（含防超卖并发测试 3 轮）
+npm run check           # 登记表自检 + 合规扫描
+```
+
+### 5.5 环境要求
+
+- **Node ≥ 20**，仓库零 npm 依赖，不需要 `npm install`；
+- 本机需安装 **Google Chrome**（渲染证书 PDF 与 OG 图用）。装在非默认位置时用
+  `CHROME_PATH=/path/to/chrome` 指定，缺失时演示脚本会直接提示；
+- 可选：复制 `.env.example` 为 `.env` 填写结算链接与邮件密钥。脚本读取的是进程环境变量，
+  可用 `export $(grep -v '^#' .env | xargs)` 载入。
+
+## 6. 部署
 
 见 `docs/DEPLOY.md`（Lemon Squeezy → Zapier → GitHub Secrets → 域名，逐步操作）。
 日常运维、补单、售罄处理、隐私执行见 `docs/OPERATIONS.md`。
@@ -89,7 +153,7 @@ node scripts/reconcile.mjs                                                      
 每条都标注了对应文件或测试编号；页面顶部的"下一步"面板会自动汇总仍需人工完成的环节
 （外部账号、真实收款、真实域名相关）。
 
-## 6. 与文档的两处实现说明
+## 7. 与文档的两处实现说明
 
 1. **静态生成器**：技术说明书提到 Jekyll。本实现用 `scripts/build-site.mjs`（零依赖 Node 脚本）
    读取 `data/` 生成同一套静态产物，部署方式仍是 GitHub Pages（Actions 构建 + 部署），
@@ -98,7 +162,7 @@ node scripts/reconcile.mjs                                                      
    文件锁与"拿到锁后重读候选库"，使本地、脚本调用、并发进程等所有路径都不会超卖
    （测试用例说明书要求"至少 3 轮独立测试"，已在 `tests/alloc-concurrency.test.mjs` 实现）。
 
-## 7. 合规红线（自动化保障）
+## 8. 合规红线（自动化保障）
 
 - 禁用措辞（投资 / 升值 / 资产 / 交易 / 所有权凭证 / 数字货币等）由 `check-compliance.mjs` 扫描，
   命中即 CI 失败；
