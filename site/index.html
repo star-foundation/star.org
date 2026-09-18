@@ -43,13 +43,13 @@
         <a class="btn btn-ghost" href="/registry/">先看看公开登记表</a>
         {{/if}}
         {{#unless checkoutReady}}
-        <span class="btn btn-primary is-disabled">购买入口暂时关闭</span>
+        <span class="btn btn-primary is-disabled">{{entryLabel}}</span>
         <a class="btn btn-ghost" href="/registry/">查看公开登记表</a>
         {{/unless}}
       </div>
       <div class="price-note">{{priceDisplay}} · {{priceNote}}</div>
       {{#unless checkoutReady}}
-      <div class="notice">{{soldOutMessage}}{{#if soldOut}}（当前候选库剩余 0 颗，补货后入口会自动恢复）{{/if}}</div>
+      <div class="notice">{{entryMessage}}{{#if soldOut}}（当前候选库剩余 0 颗，补货后入口会自动恢复）{{/if}}</div>
       {{/unless}}
     </div>
   </section>
@@ -149,8 +149,8 @@
       <a class="btn btn-primary" href="{{checkoutUrl}}">前往结算页</a>
       {{/if}}
       {{#unless checkoutReady}}
-      <span class="btn btn-primary is-disabled">购买入口暂时关闭</span>
-      <p class="muted" style="margin-top:14px;font-size:14px;">{{soldOutMessage}}</p>
+      <span class="btn btn-primary is-disabled">{{entryLabel}}</span>
+      <p class="muted" style="margin-top:14px;font-size:14px;">{{entryMessage}}</p>
       {{/unless}}
     </div>
   </section>

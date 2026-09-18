@@ -19,7 +19,8 @@
   "policy": {
     "certificatesPublic": true,
     "anonymousNameInCertificate": true,
-    "soldOutMessage": "恒星候选库正在补充中，购买入口暂时关闭"
+    "soldOutMessage": "恒星候选库正在补充中，购买入口暂时关闭",
+    "checkoutPendingMessage": "支付通道正在接入，开放后此处可以直接完成登记"
   },
   "email": {
     "fromName": "Star.org",

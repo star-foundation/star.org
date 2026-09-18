@@ -101,7 +101,13 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
   const records = sortedRegistrations();
   const available = pool.stars.filter((s) => s.status === 'available').length;
   const soldOut = available === 0;
-  const checkoutReady = cfg.checkoutReady && !soldOut;
+  const checkoutConfigured = Boolean(cfg.site.checkoutUrl);
+  const checkoutReady = checkoutConfigured && !soldOut;
+  // 购买入口有三种状态，文案必须分开：售罄（补货后自动恢复）与「通道尚未接入」
+  // 是两件完全不同的事，混用会让访客以为候选库空了，而实际库存是充足的。
+  const checkoutPending = !checkoutConfigured;
+  const entryLabel = soldOut ? '候选库已售罄' : '购买通道接入中';
+  const entryMessage = soldOut ? cfg.policy.soldOutMessage : cfg.policy.checkoutPendingMessage;
   const latest = records[0] ?? null;
 
   const common = {
@@ -118,7 +124,11 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
     priceNote: cfg.product.priceNote,
     checkoutUrl: cfg.site.checkoutUrl,
     checkoutReady,
+    checkoutConfigured,
+    checkoutPending,
     soldOut,
+    entryLabel,
+    entryMessage,
     soldOutMessage: cfg.policy.soldOutMessage,
     registryCount: index.count,
     availableCount: available,
@@ -235,8 +245,14 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
   } else {
     warnings.push('未配置自定义域名，跳过 CNAME（GitHub Pages 默认域名下无法使用 star.org 永久链接）');
   }
-  if (!cfg.site.checkoutUrl) warnings.push('未配置 Lemon Squeezy 结算链接，落地页购买入口显示为"准备中"');
-  if (soldOut) warnings.push('候选库已售罄，落地页购买入口自动下线');
+  if (checkoutPending) {
+    warnings.push(
+      '未配置结算链接，落地页购买入口显示为「购买通道接入中」；'
+      + '设置 LEMON_SQUEEZY_CHECKOUT_URL（或 site.config.json 的 product.checkoutUrl）后自动开启，'
+      + '执行 npm run check:launch 可查看上线前还缺哪些配置',
+    );
+  }
+  if (soldOut) warnings.push('候选库已售罄，落地页购买入口自动下线（补货后自动恢复）');
 
   const ogDefault = await buildDefaultOg(cfg, outDir);
 
@@ -247,6 +263,8 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
     available,
     soldOut,
     checkoutReady,
+    checkoutPending,
+    entryLabel,
     ogDefault: ogDefault.status,
     warnings,
   };
@@ -257,7 +275,12 @@ async function main() {
   console.log(`站点已生成：${result.outDir}`);
   console.log(`  页面数：${result.pages}（含登记永久页 ${result.registryCount} 个）`);
   console.log(`  候选库剩余：${result.available} 颗`);
-  console.log(`  购买入口：${result.checkoutReady ? '已开启' : '未开启'}`);
+  const entryState = result.checkoutReady
+    ? '已开启'
+    : result.soldOut
+      ? '已下线（候选库售罄，补货后自动恢复）'
+      : '接入中（未配置结算链接，见 npm run check:launch）';
+  console.log(`  购买入口：${entryState}`);
   for (const warning of result.warnings) console.log(`  ⚠ ${warning}`);
 }
 

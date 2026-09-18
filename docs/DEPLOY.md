@@ -65,6 +65,28 @@ git push -u origin main
    - Events：`order_created`
    - Signing secret：保存好，Zapier 侧可用于校验（可选但推荐）
 
+### 落地页购买入口的三种状态
+
+落地页 CTA 不是简单的"开/关"，构建时按下面三种情况分别出文案，避免把
+"还没接支付"说成"候选库空了"：
+
+| 状态 | 触发条件 | 落地页表现 |
+| --- | --- | --- |
+| 已开启 | 结算链接已配置且候选库有货 | 按钮「登记一颗星 · US$29」直接跳结算页 |
+| 购买通道接入中 | 候选库有货，但结算链接为空 | 按钮置灰「购买通道接入中」+ 说明文案 |
+| 候选库已售罄 | 候选库可用数为 0 | 按钮置灰「候选库已售罄」+ 补货说明（补货后自动恢复） |
+
+对应的文案在 `site.config.json` 的 `policy.soldOutMessage` 与
+`policy.checkoutPendingMessage`；结算链接来自仓库变量
+`LEMON_SQUEEZY_CHECKOUT_URL`（优先）或 `product.checkoutUrl`。
+
+配置完成后执行：
+
+```bash
+npm run check:launch        # 一次看清还缺哪些配置
+npm run build:site          # 本地确认购买入口已变为「已开启」
+```
+
 ## 4. Zapier / Make 配置（唯一的"胶水"环节）
 
 以 Zapier 为例：
@@ -117,7 +139,11 @@ git push -u origin main
 npm test                 # 全部测试用例，含防超卖并发测试 3 轮
 npm run verify           # 登记表无重复、无隐私字段
 npm run check:compliance # 无禁用措辞、无违规收款渠道、必备声明齐全
+npm run check:secrets    # 没有密钥或隐私数据被提交进公开仓库
+npm run check:launch     # 上线就绪：结算链接 / SLUG 密钥 / 邮件通道 / 域名可达性
 ```
+
+`npm run check:launch -- --strict` 在存在阻塞项时以退出码 1 结束，可挂到发布流水线做卡口。
 
 - [ ] 用 Lemon Squeezy 测试卡完成一笔完整下单，5 分钟内收到邮件（TC-PAY-01 / TC-MAIL-01）
 - [ ] 仓库里出现本次登记的 commit，且记录中没有邮箱（TC-REG-02 / TC-REG-03）

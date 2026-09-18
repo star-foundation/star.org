@@ -301,8 +301,8 @@ const DATA = [
         note: "另含 hip/hd/proper_name/bayer/constellation/assigned_slug；坐标单位已统一为度（HYG 原始 ra 列是小时）" },
       { t: "搭建 Jekyll 项目基础结构", tag: "", done: true,
         note: "改用零依赖 Node 构建 scripts/build-site.mjs，静态产物与 Jekyll 方案等价（理由见 docs/DECISIONS.md D1）" },
-      { t: "确认 GitHub Pages 可正常构建出一个空白页面", tag: "", done: false,
-        note: "workflow 已就绪（.github/workflows/deploy-pages.yml），本地已构建并通过 HTTP 验收；推送到 GitHub 后确认首次 Pages 构建" },
+      { t: "确认 GitHub Pages 可正常构建出一个空白页面", tag: "", done: true,
+        note: "已改为 GitHub Actions 方式发布（build_type=workflow），线上两条流水线 success；实测 / 、/registry/ 、资源文件均 200" },
     ],
   },
   {
@@ -328,7 +328,11 @@ const DATA = [
       { t: "结算页字段：姓名 / 邮箱 / 献词（选填，限100字）/ 匿名展示选项", tag: "", done: false,
         note: "接收侧已实现（scripts/lib/order.mjs：姓名必填、献词按 100 字截断、匿名开关）；Lemon Squeezy 后台字段需按 docs/DEPLOY.md 配置" },
       { t: "购买按钮正确跳转结算页", tag: "p0", done: true,
-        note: "配置 LEMON_SQUEEZY_CHECKOUT_URL 后生效；未配置或候选库售罄时入口自动下线（TC-LP-02 已测）" },
+        note: "配置 LEMON_SQUEEZY_CHECKOUT_URL 后生效，按钮直接指向结算页（TC-LP-02 已测）" },
+      { t: "购买入口三种状态文案分离（未配置 / 售罄 / 已开启）", tag: "p0", done: true,
+        note: "原先三态共用一句「候选库正在补充中」，库存充足时也这么显示，属于误导；现已拆分为「购买通道接入中」「候选库已售罄」「立即登记」，TC-LP-08 锁死文案" },
+      { t: "上线就绪自检脚本（npm run check:launch）", tag: "p1", done: true,
+        note: "一次列清阻塞项：结算链接、SLUG 密钥、邮件通道、告警邮箱、站点域名可达性；--strict 可作为上线卡口" },
       { t: "Zapier / Make 账号注册，创建 Webhook 接收流程", tag: "", done: false,
         note: "外部账号事项；载荷格式与鉴权方式已在 docs/DEPLOY.md 第 4 节写明" },
       { t: "确认 Lemon Squeezy 支付成功 Webhook 能被 Zapier/Make 正确接收", tag: "p0", done: false,
@@ -414,7 +418,7 @@ const DATA = [
     desc: "域名、正式收款、发布",
     items: [
       { t: "自定义域名 CNAME 绑定至 GitHub Pages", tag: "p0", done: false,
-        note: "CNAME 文件由构建自动写入；DNS 解析与 HTTPS 需在 GitHub Pages 后台人工完成（docs/DEPLOY.md 第 6 节）" },
+        note: "DNSPod 上 www 的 CNAME 已指向 star-foundation.github.io，但 apex 仍无 A 记录；Pages 自定义域名当前被移除，站点暂时跑在 star-foundation.github.io/star.org/（docs/DEPLOY.md 第 6 节）" },
       { t: "Lemon Squeezy 切换至正式模式（真实收款）", tag: "p0", done: false,
         note: "外部账号事项" },
       { t: "完成一笔真实小额自测订单，确认全链路无误", tag: "p0", done: false,
@@ -457,7 +461,7 @@ const DATA = [
 
 const FINAL_ITEMS = [
   { t: "用户可在落地页完成一次完整真实支付", done: false,
-    note: "需要 Lemon Squeezy 正式模式 + 结算链接" },
+    note: "当前落地页显示「购买通道接入中」：候选库有 800 颗可用，缺的是结算链接。执行 npm run check:launch 可看到全部阻塞项" },
   { t: "支付成功后 5 分钟内收到含 PDF 证书和永久链接的邮件", done: false,
     note: "邮件内容与链接已在本地核对；真实送达待发信域名与 SPF/DKIM" },
   { t: "并发测试通过：同一颗恒星不会被分配给两个不同订单", done: true,
