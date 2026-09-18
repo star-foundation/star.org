@@ -85,6 +85,10 @@ node scripts/reconcile.mjs                                                      
 见 `docs/DEPLOY.md`（Lemon Squeezy → Zapier → GitHub Secrets → 域名，逐步操作）。
 日常运维、补单、售罄处理、隐私执行见 `docs/OPERATIONS.md`。
 
+进度追踪：用浏览器打开 `docs/star-org-checklist.html`。默认勾选状态即代码仓库的真实实现进度，
+每条都标注了对应文件或测试编号；页面顶部的"下一步"面板会自动汇总仍需人工完成的环节
+（外部账号、真实收款、真实域名相关）。
+
 ## 6. 与文档的两处实现说明
 
 1. **静态生成器**：技术说明书提到 Jekyll。本实现用 `scripts/build-site.mjs`（零依赖 Node 脚本）
