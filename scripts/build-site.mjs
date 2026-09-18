@@ -36,6 +36,22 @@ function copyAssets(outDir) {
   copyDir(path.join(PATHS.siteSrc, 'assets'), path.join(outDir, 'assets'));
 }
 
+/**
+ * 把根绝对路径（/assets/…、/registry/…）改写为相对路径。
+ *
+ * GitHub Pages 的项目页托管在 /<repo>/ 子路径下（例如 /star.org/），此时根绝对路径
+ * 会指向域名根并 404，导致样式与脚本全部加载失败；相对路径在「自定义域名根路径」与
+ * 「项目子路径」两种部署下都能正确解析。
+ * depth = 页面相对站点根的层级：落地页与 404 为 0，/registry/ 为 1，/s/{slug}/ 为 2。
+ */
+export function relativize(html, depth) {
+  const prefix = depth === 0 ? './' : '../'.repeat(depth);
+  return html.replace(
+    /(\s(?:href|src)=")\/(?!\/)([^"]*)"/g,
+    (_, head, target) => `${head}${prefix}${target}"`,
+  );
+}
+
 function sampleView(cfg) {
   return {
     starId: 'HIP-91262',
@@ -110,6 +126,9 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
     latestSlug: latest?.slug ?? null,
     latestUrl: latest ? registrationUrl(latest.slug) : null,
     defaultOgImage: `${cfg.site.baseUrl}/og/default.png`,
+    // GitHub Pages 项目页的部署子路径（如 /star.org/）：404 页会在任意路径下被展示，
+    // 需要用它在运行时定位站点根。
+    projectBase: `/${cfg.site.registryRepoUrl.split('/').filter(Boolean).pop() || 'star.org'}/`,
   };
 
   // 落地页
@@ -118,7 +137,7 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
     sample: sampleView(cfg),
     registryPreview: index.entries.slice(0, 5),
   });
-  writeFileAtomic(path.join(outDir, 'index.html'), landing);
+  writeFileAtomic(path.join(outDir, 'index.html'), relativize(landing, 0));
 
   // 公开登记表
   const registryHtml = render(tpl('registry.html'), {
@@ -130,7 +149,7 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
     generatedAt: index.generated_at,
   });
   ensureDir(path.join(outDir, 'registry'));
-  writeFileAtomic(path.join(outDir, 'registry', 'index.html'), registryHtml);
+  writeFileAtomic(path.join(outDir, 'registry', 'index.html'), relativize(registryHtml, 1));
 
   // 每条登记的永久链接页面
   let pages = 0;
@@ -153,12 +172,12 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
       shareUrl: encodeURIComponent(view.permalink),
     });
     ensureDir(path.join(outDir, 's', slug));
-    writeFileAtomic(path.join(outDir, 's', slug, 'index.html'), page);
+    writeFileAtomic(path.join(outDir, 's', slug, 'index.html'), relativize(page, 2));
     pages += 1;
   }
 
   // 404
-  writeFileAtomic(path.join(outDir, '404.html'), render(tpl('404.html'), common));
+  writeFileAtomic(path.join(outDir, '404.html'), relativize(render(tpl('404.html'), common), 0));
 
   // 静态资源
   copyAssets(outDir);
