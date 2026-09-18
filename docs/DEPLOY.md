@@ -23,8 +23,25 @@ git push -u origin main
 仓库 **Settings → Pages → Build and deployment → Source 选择 "GitHub Actions"**。
 推送后 `.github/workflows/deploy-pages.yml` 会自动构建并发布站点。
 
-仓库 **Settings → Actions → General → Workflow permissions 选择 "Read and write permissions"**，
-登记流水线需要 commit 回仓库。
+> **权限说明**：仓库默认的 Workflow permissions 保持 **Read** 即可，不需要改成
+> "Read and write permissions"。`register.yml` 在自己的 `permissions:` 里声明了
+> `contents: write`，只会给登记流水线放开写权限，其余流水线仍是只读——这样默认值
+> 最安全，出问题时影响面也最小。
+
+### 三个 workflow 的分工
+
+| 文件 | 触发 | 职责 |
+| --- | --- | --- |
+| `deploy-pages.yml` | push（`site/`、`data/`、`templates/`、`scripts/`、站点配置有变更）+ 手动 | 构建 `_site` 并发布到 Pages |
+| `register.yml` | `repository_dispatch(star_registration)` + 手动补单 | 分配恒星、生成证书与 OG 图、发邮件、提交登记记录 |
+| `verify.yml` | push / PR / 每天 03:00 / 手动 | 全部测试用例 + 登记表、合规、密钥三项扫描 |
+
+证书 PDF 与 OG 分享图靠无头 Chrome 渲染，三个 workflow 统一引用
+`.github/actions/setup-render-env`（安装 Noto CJK 字体 + Google Chrome 并校验）。
+
+> 这段安装逻辑原先被复制了三份，其中 `register.yml` 那份装的是 Ubuntu 24.04 上
+> 不可用的 `chromium-browser` snap 占位包，会让第一笔真实订单卡在证书渲染这一步。
+> 现在收敛成一份 composite action，以后只需改一处。
 
 ## 2. 配置密钥与变量（Settings → Secrets and variables → Actions）
 

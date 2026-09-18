@@ -9,6 +9,11 @@ on:
     - cron: '0 3 * * *'
   workflow_dispatch:
 
+# 连续推送时取消上一次未跑完的自检，避免白烧 CI 时间
+concurrency:
+  group: verify-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -17,22 +22,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: 安装中文字体与 Chrome（渲染证书与分享图所需）
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends fonts-noto-cjk
-          # Ubuntu 24.04 的 chromium-browser 是 snap 占位包，无法在 CI 中直接使用，
-          # 因此改用 Google 官方 apt 源安装 google-chrome-stable（提供 /usr/bin/google-chrome）
-          # 注意：gpg 不能以 sudo 运行（无 TTY 时会报 cannot open /dev/tty），
-          # 改为普通用户解钥、再用 sudo install 落盘
-          wget -q -O /tmp/google-chrome.pub https://dl-ssl.google.com/linux/linux_signing_key.pub
-          gpg --no-tty --batch --yes --dearmor -o /tmp/google-chrome.gpg /tmp/google-chrome.pub
-          sudo install -D -m 0644 /tmp/google-chrome.gpg /usr/share/keyrings/google-chrome.gpg
-          echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] https://dl.google.com/linux/chrome/deb/ stable main" \
-            | sudo tee /etc/apt/sources.list.d/google-chrome.list > /dev/null
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends google-chrome-stable
-          google-chrome --version
+      - name: 准备渲染环境（中文字体 + Chrome）
+        uses: ./.github/actions/setup-render-env
       - name: 登记表自检（TC-REG-03 / TC-REG-04）
         run: node scripts/verify-registry.mjs
       - name: 合规文案扫描（TC-COMP-01~04）

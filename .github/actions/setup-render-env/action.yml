@@ -1,0 +1,40 @@
+name: 准备渲染环境（中文字体 + Chrome）
+description: >-
+  安装 Noto CJK 字体与 Google Chrome，供证书 PDF 与 OG 分享图渲染使用。
+  三个 workflow 共用同一份安装逻辑：这段逻辑原先被复制了三份，
+  其中 register.yml 那份悄悄走偏成了 snap 占位包，导致证书渲染会失败。
+
+runs:
+  using: composite
+  steps:
+    - name: 安装中文字体
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends fonts-noto-cjk
+        fc-list | grep -i noto | head -3
+
+    - name: 安装 Google Chrome
+      shell: bash
+      run: |
+        # Ubuntu 24.04 上 chromium-browser 是 snap 占位包（装了也跑不起来），
+        # chromium 包已不存在，因此统一改用 Google 官方 apt 源。
+        # 注意：gpg 不能以 sudo 运行（无 TTY 时会报 cannot open /dev/tty），
+        # 改为普通用户解钥、再用 sudo install 落盘。
+        wget -q -O /tmp/google-chrome.pub https://dl-ssl.google.com/linux/linux_signing_key.pub
+        gpg --no-tty --batch --yes --dearmor -o /tmp/google-chrome.gpg /tmp/google-chrome.pub
+        sudo install -D -m 0644 /tmp/google-chrome.gpg /usr/share/keyrings/google-chrome.gpg
+        echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] https://dl.google.com/linux/chrome/deb/ stable main" \
+          | sudo tee /etc/apt/sources.list.d/google-chrome.list > /dev/null
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends google-chrome-stable
+        google-chrome --version
+
+    - name: 校验渲染环境可用
+      shell: bash
+      run: |
+        if [ ! -x /usr/bin/google-chrome ]; then
+          echo "::error::/usr/bin/google-chrome 不存在，证书与 OG 图将无法渲染"
+          exit 1
+        fi
+        echo "Noto 字体 $(fc-list | grep -ci noto) 条"
