@@ -64,6 +64,8 @@ header.site {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
   padding: 13px 26px; border-radius: 999px; border: 1px solid transparent;
   font-size: 15px; font-weight: 500; cursor: pointer; font-family: inherit;
+  /* 按钮文字永不折行：窄屏下 flex 会把按钮压窄，折行后按钮会撑出 header */
+  white-space: nowrap;
   transition: transform .15s ease, opacity .15s ease;
 }
 .btn:hover { text-decoration: none; transform: translateY(-1px); }
@@ -185,3 +187,16 @@ footer.site .disclaimer { max-width: 620px; line-height: 1.8; }
 .muted { color: var(--ink-faint); }
 .empty { padding: 40px 0; color: var(--ink-faint); text-align: center; }
 .share-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+
+/* 窄屏导航：品牌 + 链接 + 购买按钮在 320~430px 里挤不下，flex 会把购买按钮压到折行
+   （390px 折成两行、320px 折成四行并撑出 header）。这里收窄间距与字号，配合按钮
+   white-space: nowrap，保证购买入口始终单行可点；「常见问题」是页内锚点，
+   窄屏下从导航收起，正文往下滚即可到达。 */
+@media (max-width: 560px) {
+  .wrap { padding: 0 16px; }
+  .nav { gap: 10px; }
+  .brand { font-size: 12.5px; letter-spacing: 0.18em; }
+  .nav-links { gap: 12px; font-size: 13px; }
+  .nav .btn { padding: 8px 14px; font-size: 13px; }
+  .nav-links a[href="#faq"] { display: none; }
+}

@@ -17,6 +17,10 @@ test('TC-LP-05 移动端：所有页面声明 viewport 且样式含响应式规�
   assert.ok(css.includes('@media (prefers-color-scheme: dark)'), '需支持深色模式');
   assert.ok(css.includes('clamp('), '标题需使用流体字号以适配小屏');
   assert.ok(css.includes('grid-template-columns: repeat(auto-fit'), '栅格需自适应换行');
+  // 窄屏导航曾把购买按钮压到折行（390px 两行、320px 四行并撑出 header），
+  // 这两个规则是当时的修复，锁住避免回退
+  assert.match(css, /@media \(max-width: \d+px\)/, '需有窄屏断点');
+  assert.match(css, /\.btn \{[^}]*white-space: nowrap/, '按钮文字不得折行');
 });
 
 test('站点基础文件齐全（favicon / 交互脚本 / 站点配置）', () => {
