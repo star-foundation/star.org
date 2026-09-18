@@ -21,10 +21,13 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends fonts-noto-cjk
-          # Ubuntu 24.04 的 chromium-browser 是 snap 占位包，无法在 CI 中使用，
+          # Ubuntu 24.04 的 chromium-browser 是 snap 占位包，无法在 CI 中直接使用，
           # 因此改用 Google 官方 apt 源安装 google-chrome-stable（提供 /usr/bin/google-chrome）
-          wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub \
-            | sudo gpg --dearmor -o /usr/share/keyrings/google-chrome.gpg
+          # 注意：gpg 不能以 sudo 运行（无 TTY 时会报 cannot open /dev/tty），
+          # 改为普通用户解钥、再用 sudo install 落盘
+          wget -q -O /tmp/google-chrome.pub https://dl-ssl.google.com/linux/linux_signing_key.pub
+          gpg --no-tty --batch --yes --dearmor -o /tmp/google-chrome.gpg /tmp/google-chrome.pub
+          sudo install -D -m 0644 /tmp/google-chrome.gpg /usr/share/keyrings/google-chrome.gpg
           echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] https://dl.google.com/linux/chrome/deb/ stable main" \
             | sudo tee /etc/apt/sources.list.d/google-chrome.list > /dev/null
           sudo apt-get update
@@ -39,7 +42,10 @@ jobs:
       - name: 测试用例（含 TC-ALLOC-03 防超卖并发测试 3 轮）
         env:
           CHROME_PATH: /usr/bin/google-chrome
-        run: npm test
+        run: |
+          # 若官方源不可用导致 google-chrome 缺失，给出明确提示而不是让测试莫名失败
+          if [ ! -x "$CHROME_PATH" ]; then echo "::error::Chrome 未安装成功：$CHROME_PATH 不存在"; exit 1; fi
+          npm test
       - name: 候选库状态
         run: |
           node -e "
