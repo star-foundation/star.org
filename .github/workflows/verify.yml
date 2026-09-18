@@ -17,13 +17,19 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: 安装中文字体与浏览器
+      - name: 安装中文字体与 Chrome（渲染证书与分享图所需）
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends fonts-noto-cjk
-          if ! command -v google-chrome >/dev/null 2>&1; then
-            sudo apt-get install -y --no-install-recommends chromium-browser || sudo apt-get install -y --no-install-recommends chromium
-          fi
+          # Ubuntu 24.04 的 chromium-browser 是 snap 占位包，无法在 CI 中使用，
+          # 因此改用 Google 官方 apt 源安装 google-chrome-stable（提供 /usr/bin/google-chrome）
+          wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub \
+            | sudo gpg --dearmor -o /usr/share/keyrings/google-chrome.gpg
+          echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] https://dl.google.com/linux/chrome/deb/ stable main" \
+            | sudo tee /etc/apt/sources.list.d/google-chrome.list > /dev/null
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends google-chrome-stable
+          google-chrome --version
       - name: 登记表自检（TC-REG-03 / TC-REG-04）
         run: node scripts/verify-registry.mjs
       - name: 合规文案扫描（TC-COMP-01~04）

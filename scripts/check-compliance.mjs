@@ -73,29 +73,60 @@ export function scanFiles(dirs) {
   return { fileCount: files.length, violations };
 }
 
-export function checkRequiredDisclosures(siteDir = PATHS.out) {
+/**
+ * 必备声明的校验对象。
+ *
+ * 站点源文件（site/）是提交进仓库的事实来源，必须始终校验；
+ * 构建产物（_site/）存在时一并校验，防止"源码合规但产物跑偏"。
+ * 这样在没有执行构建的环境（例如只跑测试的流水线）里也不会误报。
+ */
+export function disclosureTargets() {
+  const landing = [
+    path.join(PATHS.siteSrc, 'index.html'),
+    path.join(PATHS.out, 'index.html'),
+  ].filter((file) => existsSync(file));
+  const registry = [
+    path.join(PATHS.siteSrc, 'registry.html'),
+    path.join(PATHS.out, 'registry', 'index.html'),
+  ].filter((file) => existsSync(file));
+  return { landing, registry };
+}
+
+/** 去掉标签与多余空白，便于按整句判断声明是否存在 */
+function plainText(html) {
+  return html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+export function checkRequiredDisclosures() {
+  const { landing, registry } = disclosureTargets();
+  const landingRaw = landing.map((file) => readFileSync(file, 'utf8'));
+  const landingTexts = landingRaw.map(plainText);
+  const registryTexts = registry.map((file) => plainText(readFileSync(file, 'utf8')));
+  // 每个校验对象都必须满足，缺文件即视为不通过
+  const every = (texts, predicate) => texts.length > 0 && texts.every(predicate);
+
   const checks = [];
-  const landing = path.join(siteDir, 'index.html');
-  const landingText = existsSync(landing) ? readFileSync(landing, 'utf8') : '';
   checks.push({
     id: 'IAU_DISCLAIMER',
-    ok: landingText.includes('IAU') && /不是|非/.test(landingText),
+    // 必须是完整的一句澄清，而不只是出现了 "IAU" 三个字母
+    ok: every(landingTexts, (text) => /(不构成|不是|并非|非)[^。]{0,40}IAU[^。]{0,20}(官方|命名)/.test(text)),
     message: '落地页需明确澄清不是 IAU 官方命名（TC-COMP-02）',
   });
   checks.push({
     id: 'REFUND_POLICY',
-    ok: landingText.includes('退款'),
+    // 既要提到退款，也要给出具体规则（不退的情形或退款承诺）
+    ok: every(landingTexts, (text) => text.includes('退款') && /(不支持退款|无条件退款)/.test(text)),
     message: '落地页 FAQ 需展示退款政策（TC-COMP-04）',
   });
   checks.push({
     id: 'VERIFY_ENTRY',
-    ok: landingText.includes('/registry/'),
+    // 必须是真实可点的链接（href），而不是正文里提一句
+    ok: every(landingRaw, (html) => /href=["'][^"']*\/registry\/["']/.test(html)),
     message: '落地页需提供公开登记表入口（信任背书区块）',
   });
-  const registry = path.join(siteDir, 'registry', 'index.html');
   checks.push({
     id: 'REGISTRY_NO_LOGIN',
-    ok: existsSync(registry) && !/登录后|请先登录|sign in to view/i.test(readFileSync(registry, 'utf8')),
+    ok: every(registryTexts, (text) => !/登录后|请先登录|sign in to view/i.test(text)),
     message: '公开登记表不得设置访问门槛（TC-REG-01）',
   });
   return checks;
@@ -108,7 +139,11 @@ function main() {
   const disclosures = checkRequiredDisclosures();
   const failed = disclosures.filter((check) => !check.ok);
 
+  const targets = disclosureTargets();
+  const label = (file) => path.relative(PATHS.root, file);
+
   console.log(`合规扫描：检查 ${fileCount} 个文件`);
+  console.log(`  声明校验对象：${[...targets.landing, ...targets.registry].map(label).join('、') || '（未找到落地页/登记表文件）'}`);
   if (violations.length === 0) console.log('  ✓ 未发现禁用措辞或违规收款渠道');
   for (const violation of violations) {
     console.log(`  ✗ [${violation.type}] ${path.relative(PATHS.root, violation.file)}:${violation.line} 命中「${violation.term}」→ ${violation.text}`);
