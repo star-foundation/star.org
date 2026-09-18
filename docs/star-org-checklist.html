@@ -247,7 +247,7 @@
   <header>
     <h1>⭐ Star.org 开发进度 CheckList</h1>
     <p class="subtitle">依据《技术需求说明书 v0.2》《产品需求文档 v1.0》《测试用例说明书 v1.0》整理 · 勾选状态自动保存在本机浏览器</p>
-    <p class="meta-line">进度已同步至代码仓库当前实现：48 个自动化测试全部通过，端到端验收、登记表自检与合规扫描均通过。</p>
+    <p class="meta-line">进度已同步至代码仓库当前实现：52 个自动化测试全部通过，端到端验收、登记表自检与合规扫描均通过；站点已绑定 www.star.org 并开启购买入口。</p>
   </header>
 
   <div class="progress-card">
@@ -326,7 +326,7 @@ const DATA = [
       { t: "Lemon Squeezy 测试模式（Test Mode）账号配置", tag: "", done: false,
         note: "外部账号事项，操作步骤见 docs/DEPLOY.md 第 3 节" },
       { t: "结算页字段：姓名 / 邮箱 / 献词（选填，限100字）/ 匿名展示选项", tag: "", done: false,
-        note: "接收侧已实现（scripts/lib/order.mjs：姓名必填、献词按 100 字截断、匿名开关）；Lemon Squeezy 后台字段需按 docs/DEPLOY.md 配置" },
+        note: "接收侧已实现（scripts/lib/order.mjs：姓名必填、献词按 100 字截断、匿名开关）；结算链接已上线，但结算页是 Cloudflare 后的 JS 应用，字段配置无法从静态 HTML 核实——需在 Lemon Squeezy 后台核对（docs/DEPLOY.md 第 3 节）或实际下单时确认" },
       { t: "购买按钮正确跳转结算页", tag: "p0", done: true,
         note: "配置 LEMON_SQUEEZY_CHECKOUT_URL 后生效，按钮直接指向结算页（TC-LP-02 已测）" },
       { t: "购买入口三种状态文案分离（未配置 / 售罄 / 已开启）", tag: "p0", done: true,
@@ -376,7 +376,7 @@ const DATA = [
       { t: "OG 分享图静态渲染脚本（Actions 内生成 PNG）", tag: "p0", done: true,
         note: "og/{slug}.png，1200×630，实测约 325KB；TC-PAGE-02 已测" },
       { t: "X 分享卡片正确显示测试", tag: "p0", done: false,
-        note: "OG / Twitter 标签与图片均已就绪（HTTP 验收通过），需部署到真实域名后在 X 上实测" },
+        note: "以 Twitterbot UA 抓取 https://www.star.org/ 验证：og:title / og:description / og:url / og:image 齐全，og:image 为 1200×630 PNG（200）；twitter:card=summary_large_image。剩余：发一条带链接的推文确认时间线渲染" },
       { t: "公开登记表 JSON 写入逻辑（复用主仓库 /data/registrations/）", tag: "", done: true,
         note: "data/registrations/{slug}.json + 索引 data/registry-index.json" },
       { t: "确认登记记录中不包含邮箱等隐私字段", tag: "p0", done: true,
@@ -407,8 +407,8 @@ const DATA = [
         note: "scripts/manual-order.mjs + scripts/reconcile.mjs；TC-ERR-02/03/04 已测（含幂等与改文重发）" },
       { t: "全站合规文案审查（禁用词/免责声明/支付渠道核查）", tag: "p0", done: true,
         note: "scripts/check-compliance.mjs：禁用词 + 违规收款渠道 + 4 项必备声明，命中即 CI 失败" },
-      { t: "移动端展示测试", tag: "p1", done: false,
-        note: "响应式样式与 viewport 已有自动化断言（TC-LP-05），真机 / 浏览器移动视图需人工确认" },
+      { t: "移动端展示测试", tag: "p1", done: true,
+        note: "用无头 Chrome（CDP）在 320 / 360 / 390 / 430 / 560 / 768px 六档实测：均无横向溢出，导航与首屏购买按钮单行可点（高 41~54px，触控目标达标）。过程中修掉一个真实缺陷：窄屏下导航按钮被 flex 压到折行（390px 两行、320px 四行并撑出 header），现由 @media (max-width:560px) + white-space:nowrap 修复，TC-LP-05 已加断言锁死" },
     ],
   },
   {
@@ -417,8 +417,10 @@ const DATA = [
     days: "Day 13-14",
     desc: "域名、正式收款、发布",
     items: [
-      { t: "自定义域名 CNAME 绑定至 GitHub Pages", tag: "p0", done: false,
-        note: "DNSPod 上 www 的 CNAME 已指向 star-foundation.github.io，但 apex 仍无 A 记录；Pages 自定义域名当前被移除，站点暂时跑在 star-foundation.github.io/star.org/（docs/DEPLOY.md 第 6 节）" },
+      { t: "自定义域名 CNAME 绑定至 GitHub Pages", tag: "p0", done: true,
+        note: "已在 Pages 设置绑定 www.star.org（注意：Actions 发布模式下仓库里的 CNAME 文件不生效，必须绑设置）。实测 https://star.org/ → 301 → https://www.star.org/ → 200；证书 CN=www.star.org（Let's Encrypt，有效至 2026-12-17）；SITE_BASE_URL 已切到正式域名，站点内 github.io 引用 0 处" },
+      { t: "落地页购买入口在生产环境正式开启", tag: "p0", done: true,
+        note: "配置仓库变量 LEMON_SQUEEZY_CHECKOUT_URL 后线上入口变为「登记一颗星 · US$29」直连结算页；实测结算链接 200 并正常跳转购物车（落地页 3 处入口）" },
       { t: "Lemon Squeezy 切换至正式模式（真实收款）", tag: "p0", done: false,
         note: "外部账号事项" },
       { t: "完成一笔真实小额自测订单，确认全链路无误", tag: "p0", done: false,
@@ -437,7 +439,7 @@ const DATA = [
     days: "已完成",
     desc: "代码实现之外的验证证据：测试、端到端、合规、数据核对",
     items: [
-      { t: "48 个自动化测试全部通过（npm test）", tag: "", done: true,
+      { t: "52 个自动化测试全部通过（npm test）", tag: "", done: true,
         note: "覆盖 TC-ALLOC / TC-PDF / TC-PAGE / TC-REG / TC-MAIL / TC-COMP / TC-PAY / TC-LP / TC-ERR" },
       { t: "防超卖并发测试连续 3 轮通过", tag: "", done: true,
         note: "6 个真实子进程抢 1 颗星：恰好 1 笔成功、5 笔判定售罄、零重复记录" },
@@ -455,13 +457,15 @@ const DATA = [
         note: "按订单号补单可复现同一登记编号；重复补单不占第二颗星；改献词后重发会更新记录并重渲染证书" },
       { t: "仓库已初始化并提交", tag: "", done: true,
         note: "git main 分支，含 3 条 CI 流水线（登记 / 发布 / 自检）与部署、运维手册" },
+      { t: "部署配置审查与修复（渲染环境 / 权限 / 并发 / 推送）", tag: "p0", done: true,
+        note: "查出并修掉一个会让首单失败的缺陷：register.yml 装的是 Ubuntu 24.04 上不可用的 chromium-browser snap 占位包，证书渲染必然失败——现三个 workflow 统一引用 .github/actions/setup-render-env；另加登记提交的 rebase 重试、verify 并发控制，并在 DEPLOY.md 写明权限分层（仓库默认 Read 即可）" },
     ],
   },
 ];
 
 const FINAL_ITEMS = [
   { t: "用户可在落地页完成一次完整真实支付", done: false,
-    note: "当前落地页显示「购买通道接入中」：候选库有 800 颗可用，缺的是结算链接。执行 npm run check:launch 可看到全部阻塞项" },
+    note: "购买入口已在生产开启（结算链接已配置、按钮直连结算页），差的只剩 Lemon Squeezy 切正式模式并跑一笔真实订单；执行 npm run check:launch 可看到全部阻塞项（当前：SLUG 密钥、邮件通道、域名可达性）" },
   { t: "支付成功后 5 分钟内收到含 PDF 证书和永久链接的邮件", done: false,
     note: "邮件内容与链接已在本地核对；真实送达待发信域名与 SPF/DKIM" },
   { t: "并发测试通过：同一颗恒星不会被分配给两个不同订单", done: true,
