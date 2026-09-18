@@ -1,0 +1,109 @@
+name: 登记（支付成功后自动执行）
+
+# 触发方式：
+#   1. repository_dispatch —— Lemon Squeezy Webhook → Zapier/Make → GitHub API（正式链路）
+#   2. workflow_dispatch   —— 人工补单 / 重发证书（对应 TC-ERR-02 的补单能力）
+on:
+  repository_dispatch:
+    types: [star_registration]
+  workflow_dispatch:
+    inputs:
+      order_id:
+        description: '订单号（Lemon Squeezy 订单 ID，用于幂等与补单追溯）'
+        required: false
+      display_name:
+        description: '登记人姓名/称呼（会展示在证书与永久页面）'
+        required: true
+      email:
+        description: '接收证书的邮箱'
+        required: false
+      dedication:
+        description: '献词（选填，超过 100 字自动截断）'
+        required: false
+      anonymous:
+        description: '匿名展示（true/false）'
+        required: false
+        default: 'false'
+
+# 关键：同一时刻只允许一个登记流程在跑，天然避免两笔订单抢到同一颗星（TC-ALLOC-03）
+concurrency:
+  group: star-registration
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  register:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: 取出仓库
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 准备 Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 准备中文字体与无头浏览器
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends fonts-noto-cjk
+          if ! command -v google-chrome >/dev/null 2>&1; then
+            sudo apt-get install -y --no-install-recommends chromium-browser || sudo apt-get install -y --no-install-recommends chromium
+          fi
+          fc-list | grep -i noto | head -3
+
+      - name: 分配恒星 · 生成证书与 OG 图 · 发送邮件
+        env:
+          # Webhook 载荷（Zapier/Make 通过 client_payload 传入）
+          STARORG_ORDER_JSON: ${{ toJSON(github.event.client_payload) }}
+          # 人工补单时的输入（仅 workflow_dispatch 生效）
+          INPUT_ORDER_ID: ${{ inputs.order_id }}
+          INPUT_DISPLAY_NAME: ${{ inputs.display_name }}
+          INPUT_EMAIL: ${{ inputs.email }}
+          INPUT_DEDICATION: ${{ inputs.dedication }}
+          INPUT_ANONYMOUS: ${{ inputs.anonymous }}
+          # 密钥：一律来自 Actions Secrets，不写入代码库
+          STARORG_SLUG_SECRET: ${{ secrets.STARORG_SLUG_SECRET }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          OPERATOR_EMAIL: ${{ secrets.OPERATOR_EMAIL }}
+          SITE_BASE_URL: ${{ vars.SITE_BASE_URL || 'https://star.org' }}
+          REGISTRY_REPO_URL: ${{ github.server_url }}/${{ github.repository }}
+          CHROME_PATH: /usr/bin/google-chrome
+        run: |
+          if [ -n "${{ inputs.display_name }}" ]; then
+            export STARORG_ORDER_JSON=$(jq -n \
+              --arg order_id "$INPUT_ORDER_ID" \
+              --arg display_name "$INPUT_DISPLAY_NAME" \
+              --arg email "$INPUT_EMAIL" \
+              --arg dedication "$INPUT_DEDICATION" \
+              --argjson anonymous "${INPUT_ANONYMOUS:-false}" \
+              '{order_id:$order_id, display_name:$display_name, email:$email, dedication:$dedication, anonymous:$anonymous, source:"manual"}')
+          fi
+          node scripts/register.mjs | tee register-result.json
+
+      - name: 提交登记记录（每次登记产生一次独立 commit）
+        run: |
+          SLUG=$(node -e "const r=require('./register-result.json'); console.log(r.slug||'')")
+          if [ -z "$SLUG" ]; then echo "未产生登记（可能候选库售罄），跳过提交"; exit 0; fi
+          git config user.name "star-org-bot"
+          git config user.email "bot@star.org"
+          git add data/stars_pool.json data/registrations data/registry-index.json certificates og
+          if git diff --cached --quiet; then
+            echo "没有变化，跳过提交"
+          else
+            git commit -m "登记 $SLUG"
+            git push
+          fi
+
+      - name: 失败时留档（便于人工补单）
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: register-failure-log
+          path: register-result.json
+          if-no-files-found: ignore

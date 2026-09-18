@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{siteName}} · {{tagline}}</title>
+<meta name="description" content="登记一颗真实存在的恒星，获得包含真实天文数据的 PDF 证书与永久链接。所有登记记录同步到公开登记表，任何人都可以自行核实是否被重复登记。">
+<link rel="canonical" href="{{baseUrl}}/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="{{siteName}}">
+<meta property="og:title" content="{{siteName}} · {{tagline}}">
+<meta property="og:description" content="登记一颗真实存在的恒星，获得包含真实天文数据的 PDF 证书与永久链接。所有登记记录都可被公开核实。">
+<meta property="og:url" content="{{baseUrl}}/">
+<meta property="og:image" content="{{defaultOgImage}}">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+</head>
+<body>
+<header class="site">
+  <div class="wrap nav">
+    <div class="brand"><a href="/">{{siteName}}</a></div>
+    <nav class="nav-links">
+      <a href="/registry/">公开登记表</a>
+      <a href="#faq">常见问题</a>
+      {{#if checkoutReady}}<a class="btn btn-primary btn-sm" href="{{checkoutUrl}}">立即登记</a>{{/if}}
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero plain">
+    <div class="wrap">
+      <div class="eyebrow">可公开验证的恒星登记</div>
+      <h1>{{tagline}}</h1>
+      <p class="lede">
+        为纪念、告白，或人生里的某个节点，登记一颗真实存在的恒星。
+        你会得到一份载有真实天文数据的证书，以及一个可以长久分享的永久链接。
+      </p>
+      <div class="hero-actions">
+        {{#if checkoutReady}}
+        <a class="btn btn-primary" href="{{checkoutUrl}}">登记一颗星 · {{priceDisplay}}</a>
+        <a class="btn btn-ghost" href="/registry/">先看看公开登记表</a>
+        {{/if}}
+        {{#unless checkoutReady}}
+        <span class="btn btn-primary is-disabled">购买入口暂时关闭</span>
+        <a class="btn btn-ghost" href="/registry/">查看公开登记表</a>
+        {{/unless}}
+      </div>
+      <div class="price-note">{{priceDisplay}} · {{priceNote}}</div>
+      {{#unless checkoutReady}}
+      <div class="notice">{{soldOutMessage}}{{#if soldOut}}（当前候选库剩余 0 颗，补货后入口会自动恢复）{{/if}}</div>
+      {{/unless}}
+    </div>
+  </section>
+
+  <section id="trust">
+    <div class="wrap">
+      <h2>为什么这份登记可以被核实</h2>
+      <p class="section-lede">
+        同类纪念服务最让人不安的地方是"无法验证"：你不知道自己的名字会不会被重复卖给下一个人，
+        也不知道这些记录还能存在多久。我们把整份登记表公开出来解决第一个问题。
+      </p>
+      <div class="grid grid-3">
+        <div class="card">
+          <div class="num">{{registryCount}}</div>
+          <div class="stat">已登记恒星</div>
+          <p class="muted" style="font-size:14px;margin:12px 0 0;">
+            每一次登记都会即时写入公开登记表，任何人都能查阅。
+          </p>
+        </div>
+        <div class="card">
+          <div class="num">{{availableCount}}</div>
+          <div class="stat">候选库剩余待登记</div>
+          <p class="muted" style="font-size:14px;margin:12px 0 0;">
+            一颗恒星只会被分配一次，分配后立即从候选库移出。
+          </p>
+        </div>
+        <div class="card">
+          <div class="num">0</div>
+          <div class="stat">需要登录才能查阅的记录</div>
+          <p class="muted" style="font-size:14px;margin:12px 0 0;">
+            登记表是纯文本文件，不需要账号、不需要付费即可翻阅。
+          </p>
+        </div>
+      </div>
+      <p style="margin-top:24px;">
+        <a class="btn btn-ghost" href="/registry/">立即查看登记表</a>
+        {{#if registryDirUrl}}<a class="btn btn-ghost" href="{{registryDirUrl}}" rel="noopener">查看原始记录文件</a>{{/if}}
+      </p>
+    </div>
+  </section>
+
+  <section id="sample">
+    <div class="wrap">
+      <h2>你会拿到什么</h2>
+      <p class="section-lede">下面是一份永久链接页面的样式示例（示例数据），购买前就可以先看清楚最终交付物长什么样。</p>
+      <div class="sample">
+        <div class="sample-head">
+          <div class="kicker">恒星登记 · 永久链接页面示例</div>
+          <h3>{{sample.starTitle}}</h3>
+          <div class="sub">{{sample.starSubtitle}}</div>
+        </div>
+        <div class="sample-body">
+          <div><dt>赤经</dt><dd class="mono">{{sample.raText}}</dd></div>
+          <div><dt>赤纬</dt><dd class="mono">{{sample.decText}}</dd></div>
+          <div><dt>视星等</dt><dd>{{sample.magnitudeText}}</dd></div>
+          <div><dt>距地球</dt><dd>{{sample.distanceText}}</dd></div>
+          <div><dt>登记人</dt><dd>{{sample.displayName}}</dd></div>
+          <div><dt>登记日期</dt><dd>{{sample.registeredDateZh}}</dd></div>
+        </div>
+        <div class="sample-quote">「{{sample.dedication}}」</div>
+      </div>
+      <p style="margin-top:20px;">
+        {{#if latestUrl}}<a class="btn btn-ghost" href="{{latestUrl}}">查看一条真实登记记录</a>{{/if}}
+        <a class="btn btn-ghost" href="/registry/">浏览全部登记</a>
+      </p>
+    </div>
+  </section>
+
+  <section id="how">
+    <div class="wrap">
+      <h2>登记流程</h2>
+      <div class="steps" style="margin-top:26px;">
+        <div class="step">
+          <h3>填写并付款</h3>
+          <p class="muted" style="font-size:14.5px;">在结算页填写展示用的称呼、可选的献词和接收证书的邮箱。可以选择匿名展示。</p>
+        </div>
+        <div class="step">
+          <h3>系统自动分配</h3>
+          <p class="muted" style="font-size:14.5px;">系统按亮度顺序为你分配一颗尚未被登记的恒星，生成 PDF 证书与永久链接页面。</p>
+        </div>
+        <div class="step">
+          <h3>收邮件、分享</h3>
+          <p class="muted" style="font-size:14.5px;">几分钟内你会收到包含证书与永久链接的邮件，链接在社交平台分享时会显示卡片。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="buy">
+    <div class="wrap narrow center">
+      <h2>登记一颗属于你的恒星</h2>
+      <p class="section-lede" style="margin-left:auto;margin-right:auto;">
+        {{priceDisplay}} · {{priceNote}}。结算由 Lemon Squeezy 作为记录商户（Merchant of Record）处理，
+        仅支持信用卡等常规法币结算方式。
+      </p>
+      {{#if checkoutReady}}
+      <a class="btn btn-primary" href="{{checkoutUrl}}">前往结算页</a>
+      {{/if}}
+      {{#unless checkoutReady}}
+      <span class="btn btn-primary is-disabled">购买入口暂时关闭</span>
+      <p class="muted" style="margin-top:14px;font-size:14px;">{{soldOutMessage}}</p>
+      {{/unless}}
+    </div>
+  </section>
+
+  <section id="faq">
+    <div class="wrap narrow">
+      <h2>常见问题</h2>
+      <div class="faq">
+        <details open>
+          <summary>这是国际天文学联合会（IAU）的官方命名吗？</summary>
+          <div class="answer">
+            不是。恒星的科学命名由国际天文学联合会统一管理，我们无法、也不会声称提供官方命名。
+            本服务提供的是<strong>纪念性质的公开可验证登记</strong>：恒星本身是真实存在的，
+            证书上的坐标、星等、光谱型、距离都来自公开天文星表；但这份登记不代表任何天体命名权，
+            也不会被天文学界作为官方名称使用。请在下单前确认这一点符合你的预期。
+          </div>
+        </details>
+        <details>
+          <summary>我的星星会不会被别人重复登记？</summary>
+          <div class="answer">
+            不会。候选库中的每颗恒星只会被分配一次，分配完成后立即写入公开登记表，
+            并且登记流程是串行执行的，不会出现两颗星被同一时刻的两笔订单抢到的情况。
+            任何人都可以在<a href="/registry/">公开登记表</a>中检索恒星编号，确认它只有一条记录。
+            如果因为我们的失误出现重复，我们会无条件退款或重新处理。
+          </div>
+        </details>
+        <details>
+          <summary>登记之后我可以做什么？</summary>
+          <div class="answer">
+            你可以下载 PDF 证书（可打印、可摆放）、把永久链接分享到社交平台（已针对 X 的分享卡片优化）、
+            或者只是把它留作一份只属于你们两个人的记录。永久链接不会被删除，也不依赖你保留邮件。
+          </div>
+        </details>
+        <details>
+          <summary>支持退款吗？</summary>
+          <div class="answer">
+            本服务交付的是即时生成的数字化纪念品，非质量问题不支持退款，这一点请在购买前确认。
+            如果问题出在我们这边——例如重复分配、证书内容错误、付款成功却没有收到证书——
+            我们会在 24 小时内主动联系你，并无条件退款或重新处理。
+          </div>
+        </details>
+        <details>
+          <summary>付款之后多久能收到证书？</summary>
+          <div class="answer">
+            通常在 1-3 分钟内，最长不超过 5 分钟。结算完成页也会明确提示证书将发送到你的邮箱。
+            如果 24 小时内仍未收到，请来信 {{supportEmail}}，并附上结算时使用的邮箱，我们会人工补发。
+          </div>
+        </details>
+        <details>
+          <summary>我的个人信息会被公开吗？</summary>
+          <div class="answer">
+            公开登记表里只有恒星编号、展示用的称呼、献词（如有）和登记日期。
+            邮箱与订单信息不会写入任何公开文件。结算时你可以选择匿名展示，
+            那样连称呼也不会出现在公开页面和登记表中。
+          </div>
+        </details>
+        <details>
+          <summary>为什么不能自己挑星星？</summary>
+          <div class="answer">
+            系统按亮度从亮到暗的顺序自动分配，更亮的星会优先分配给更早的登记人，
+            这样每一份登记都对应一颗真实、明亮、肉眼可见的恒星，
+            也避免了"挑星"环节带来的犹豫和等待。
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site">
+  <div class="wrap foot-grid">
+    <div class="disclaimer">
+      {{siteName}} 提供纪念性质的公开可验证恒星登记服务，不构成国际天文学联合会（IAU）官方命名，
+      亦不代表任何天体命名权。证书所载天文数据来自公开星表。
+      <br>联系：<a href="mailto:{{supportEmail}}">{{supportEmail}}</a>
+    </div>
+    <div>
+      <a href="/registry/">公开登记表</a> ·
+      <a href="#faq">常见问题</a>
+      {{#if registryRepoUrl}}· <a href="{{registryRepoUrl}}" rel="noopener">公开仓库</a>{{/if}}
+      <div class="muted" style="margin-top:8px;">© {{year}} {{siteName}}</div>
+    </div>
+  </div>
+</footer>
+<script src="/assets/js/site.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+name: 自检（测试用例 + 合规扫描）
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    # 每天巡检一次：确认登记表没有重复分配、没有隐私字段泄漏
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: 安装中文字体与浏览器
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends fonts-noto-cjk
+          if ! command -v google-chrome >/dev/null 2>&1; then
+            sudo apt-get install -y --no-install-recommends chromium-browser || sudo apt-get install -y --no-install-recommends chromium
+          fi
+      - name: 登记表自检（TC-REG-03 / TC-REG-04）
+        run: node scripts/verify-registry.mjs
+      - name: 合规文案扫描（TC-COMP-01~04）
+        run: node scripts/check-compliance.mjs
+      - name: 测试用例（含 TC-ALLOC-03 防超卖并发测试 3 轮）
+        env:
+          CHROME_PATH: /usr/bin/google-chrome
+        run: npm test
+      - name: 候选库状态
+        run: |
+          node -e "
+          const pool = require('./data/stars_pool.json');
+          const available = pool.stars.filter((s) => s.status === 'available').length;
+          console.log('候选库总数', pool.stars.length, '可登记', available);
+          if (available < 50) console.log('::warning::候选库剩余不足 50 颗，请及时扩充 stars_pool.json');
+          "

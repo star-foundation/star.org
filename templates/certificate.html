@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>恒星登记证书 · {{starTitle}}</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    width: 297mm; height: 210mm; background: #fcfaf5; color: #1d2330;
+    font-family: "PingFang SC", "Noto Sans CJK SC", "Source Han Sans SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  .frame { position: relative; width: 297mm; height: 210mm; padding: 16mm 18mm; }
+  .frame .rule-outer { position: absolute; inset: 9mm; border: 1px solid #cfc6b4; }
+  .frame .rule-inner { position: absolute; inset: 11.5mm; border: 0.6px solid #e4ddcd; }
+  .corner { position: absolute; width: 12mm; height: 12mm; border: 1.4px solid #2b3a55; }
+  .corner.tl { top: 9mm; left: 9mm; border-right: 0; border-bottom: 0; }
+  .corner.tr { top: 9mm; right: 9mm; border-left: 0; border-bottom: 0; }
+  .corner.bl { bottom: 9mm; left: 9mm; border-right: 0; border-top: 0; }
+  .corner.br { bottom: 9mm; right: 9mm; border-left: 0; border-top: 0; }
+
+  header { text-align: center; }
+  .brand { font-size: 11pt; letter-spacing: 0.42em; color: #2b3a55; font-weight: 600; text-transform: uppercase; }
+  h1 { font-size: 25pt; margin: 5mm 0 1.5mm; letter-spacing: 0.16em; font-weight: 500;
+       font-family: "Songti SC", "Noto Serif CJK SC", "Source Han Serif SC", "Times New Roman", serif; }
+  .subtitle-en { font-size: 8.5pt; letter-spacing: 0.3em; color: #8b8577; text-transform: uppercase; }
+  .divider { margin: 6mm auto 0; width: 46mm; height: 1px; background: linear-gradient(90deg, transparent, #c9c0ad, transparent); }
+
+  .body { display: flex; gap: 12mm; margin-top: 8mm; }
+  .left { width: 118mm; }
+  .right { flex: 1; display: flex; flex-direction: column; }
+
+  .chart { border: 1px solid #e6dfd0; background: #fbf9f5; padding: 3mm; }
+  .chart svg { display: block; width: 100%; height: auto; }
+  .chart-caption { margin-top: 2mm; font-size: 7.5pt; color: #8b8577; text-align: center; letter-spacing: 0.04em; }
+
+  .data { margin-top: 5mm; width: 100%; border-collapse: collapse; }
+  .data td { padding: 2.1mm 0; border-bottom: 0.6px solid #ece6d9; font-size: 9.5pt; }
+  .data td.k { color: #8b8577; width: 34mm; letter-spacing: 0.06em; }
+  .data td.v { color: #1d2330; font-weight: 500; }
+  .data tr:last-child td { border-bottom: 0; }
+
+  .owner-label { font-size: 8.5pt; color: #8b8577; letter-spacing: 0.22em; text-transform: uppercase; }
+  .owner-name {
+    font-size: 21pt; margin-top: 2.5mm; line-height: 1.3; font-weight: 500;
+    font-family: "Songti SC", "Noto Serif CJK SC", "Source Han Serif SC", "Times New Roman", serif;
+  }
+  .dedication {
+    margin-top: 5mm; padding: 4mm 5mm; background: #f6f2e9; border-left: 2px solid #c9bda2;
+    font-size: 10pt; line-height: 1.85; color: #3a4050; white-space: pre-wrap;
+    font-family: "Songti SC", "Noto Serif CJK SC", "Source Han Serif SC", serif;
+  }
+  .meta { margin-top: 6mm; font-size: 9.5pt; color: #4a5162; line-height: 1.9; }
+  .meta .k { color: #8b8577; }
+
+  .verify { margin-top: auto; padding-top: 5mm; border-top: 0.6px solid #e4ddcd; }
+  .verify h2 { font-size: 9pt; margin: 0 0 2mm; letter-spacing: 0.18em; color: #2b3a55; text-transform: uppercase; }
+  .verify p { margin: 0 0 1.6mm; font-size: 8.5pt; line-height: 1.75; color: #4a5162; }
+  .verify code { font-family: "SFMono-Regular", Menlo, Consolas, monospace; font-size: 8pt; color: #1d2330; }
+
+  footer { position: absolute; left: 18mm; right: 18mm; bottom: 15mm; }
+  .disclaimer { font-size: 7.5pt; color: #8b8577; line-height: 1.7; text-align: center; }
+  .issued { text-align: center; font-size: 8pt; color: #a29a8b; margin-bottom: 2mm; letter-spacing: 0.05em; }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="rule-outer"></div>
+  <div class="rule-inner"></div>
+  <div class="corner tl"></div><div class="corner tr"></div>
+  <div class="corner bl"></div><div class="corner br"></div>
+
+  <header>
+    <div class="brand">{{brandName}}</div>
+    <h1>恒星登记证书</h1>
+    <div class="subtitle-en">Certificate of Stellar Registration</div>
+    <div class="divider"></div>
+  </header>
+
+  <div class="body">
+    <div class="left">
+      <div class="chart">
+        {{skyChartSvg!}}
+        <div class="chart-caption">{{starTitle}} 在天球上的位置（赤经 / 赤纬 等距投影）</div>
+      </div>
+      <table class="data">
+        <tr><td class="k">恒星标识</td><td class="v">{{starId}}</td></tr>
+        <tr><td class="k">星座与命名</td><td class="v">{{starSubtitle}}</td></tr>
+        <tr><td class="k">赤经</td><td class="v">{{raText}}</td></tr>
+        <tr><td class="k">赤纬</td><td class="v">{{decText}}</td></tr>
+        <tr><td class="k">视星等</td><td class="v">{{magnitudeText}}</td></tr>
+        <tr><td class="k">光谱型</td><td class="v">{{spectralText}}（{{spectralLabel}}）</td></tr>
+        <tr><td class="k">距地球</td><td class="v">{{distanceText}}</td></tr>
+      </table>
+    </div>
+
+    <div class="right">
+      <div class="owner-label">登记人</div>
+      <div class="owner-name">{{ownerName}}</div>
+      {{#if dedication}}
+      <div class="dedication">{{dedication}}</div>
+      {{/if}}
+      <div class="meta">
+        <div><span class="k">登记日期：</span>{{registeredDateZh}}</div>
+        <div><span class="k">登记编号：</span><code>{{slug}}</code></div>
+        <div><span class="k">永久链接：</span><code>{{permalink}}</code></div>
+      </div>
+      <div class="verify">
+        <h2>如何自行核实</h2>
+        <p>1. 打开永久链接 {{permalink}} ，页面上的登记编号与本证书一致。</p>
+        <p>2. 在公开登记表 {{registryUrl}} 中检索恒星标识 {{starId}}，应只出现一条记录；若同一颗恒星出现两条，说明登记表出现异常，可来信反馈。</p>
+        <p>3. 登记记录以文本文件形式存放于公开仓库的 data/registrations/ 目录，任何人无需注册即可查阅。</p>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="issued">{{issuedLine}}</div>
+    <div class="disclaimer">{{disclaimer}}</div>
+  </footer>
+</div>
+</body>
+</html>

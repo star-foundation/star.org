@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Star.org 开发进度 CheckList</title>
+<style>
+  :root {
+    --bg: #f7f5f2;
+    --card-bg: #ffffff;
+    --text: #1c1a17;
+    --text-secondary: #6b6459;
+    --border: #e5e0d8;
+    --accent: #2b3a55;
+    --accent-soft: #e8ecf2;
+    --success: #3c6e47;
+    --success-bg: #e7f0e8;
+    --danger: #9a3b3b;
+    --danger-bg: #f5e8e8;
+    --warn: #8a6d1f;
+    --warn-bg: #f6efdc;
+    --radius: 10px;
+  }
+  :root:not([data-theme="light"]) {
+    @media (prefers-color-scheme: dark) {
+      --bg: #16151a;
+      --card-bg: #1f1e24;
+      --text: #eceae6;
+      --text-secondary: #9c9791;
+      --border: #33313a;
+      --accent: #8fa6d1;
+      --accent-soft: #2a3242;
+      --success: #7fbf8e;
+      --success-bg: #223327;
+      --danger: #d98787;
+      --danger-bg: #3a2323;
+      --warn: #d9be7f;
+      --warn-bg: #3a3020;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #16151a;
+    --card-bg: #1f1e24;
+    --text: #eceae6;
+    --text-secondary: #9c9791;
+    --border: #33313a;
+    --accent: #8fa6d1;
+    --accent-soft: #2a3242;
+    --success: #7fbf8e;
+    --success-bg: #223327;
+    --danger: #d98787;
+    --danger-bg: #3a2323;
+    --warn: #d9be7f;
+    --warn-bg: #3a3020;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    line-height: 1.6;
+    padding: 24px 16px 80px;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; }
+
+  header { margin-bottom: 24px; }
+  h1 { font-size: 1.5rem; margin: 0 0 4px; }
+  .subtitle { color: var(--text-secondary); font-size: 0.9rem; margin: 0 0 20px; }
+
+  .progress-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    margin-bottom: 24px;
+  }
+  .progress-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .progress-num { font-size: 1.6rem; font-weight: 600; }
+  .progress-label { color: var(--text-secondary); font-size: 0.85rem; }
+  .bar-track {
+    width: 100%;
+    height: 10px;
+    background: var(--accent-soft);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 999px;
+    transition: width 0.3s ease;
+    width: 0%;
+  }
+  .p0-alert {
+    margin-top: 12px;
+    font-size: 0.85rem;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: var(--warn-bg);
+    color: var(--warn);
+    display: none;
+  }
+  .p0-alert.show { display: block; }
+
+  .toolbar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  button {
+    font-family: inherit;
+    font-size: 0.8rem;
+    padding: 7px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    color: var(--text);
+    cursor: pointer;
+  }
+  button:hover { border-color: var(--accent); }
+  button.primary { background: var(--accent); color: var(--card-bg); border-color: var(--accent); }
+
+  .phase {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .phase-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .phase-head:hover { background: var(--accent-soft); }
+  .phase-title-group { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .phase-title { font-weight: 600; font-size: 0.98rem; }
+  .phase-days { font-size: 0.78rem; color: var(--text-secondary); background: var(--accent-soft); padding: 2px 9px; border-radius: 999px; }
+  .phase-count { font-size: 0.82rem; color: var(--text-secondary); white-space: nowrap; }
+  .chevron { transition: transform 0.2s ease; color: var(--text-secondary); font-size: 0.75rem; }
+  .phase.collapsed .chevron { transform: rotate(-90deg); }
+  .phase-body {
+    padding: 4px 18px 14px;
+    border-top: 1px solid var(--border);
+  }
+  .phase.collapsed .phase-body { display: none; }
+  .phase.collapsed .phase-head { border-bottom: none; }
+
+  .item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 9px 0;
+    border-bottom: 1px dashed var(--border);
+  }
+  .item:last-child { border-bottom: none; }
+  .item input[type="checkbox"] {
+    margin-top: 3px;
+    width: 17px;
+    height: 17px;
+    flex-shrink: 0;
+    accent-color: var(--success);
+    cursor: pointer;
+  }
+  .item label { cursor: pointer; flex: 1; font-size: 0.92rem; }
+  .item.checked label { color: var(--text-secondary); text-decoration: line-through; }
+  .item .tag {
+    font-size: 0.68rem;
+    font-weight: 600;
+    padding: 1px 7px;
+    border-radius: 999px;
+    margin-left: 6px;
+    white-space: nowrap;
+    vertical-align: middle;
+  }
+  .tag.p0 { background: var(--danger-bg); color: var(--danger); }
+  .tag.p1 { background: var(--warn-bg); color: var(--warn); }
+
+  .final-section {
+    background: var(--card-bg);
+    border: 2px solid var(--accent);
+    border-radius: var(--radius);
+    padding: 18px;
+    margin-top: 24px;
+  }
+  .final-section h2 { margin-top: 0; font-size: 1.05rem; }
+  .final-section .note { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 12px; }
+
+  footer {
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.78rem;
+    margin-top: 32px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>⭐ Star.org 开发进度 CheckList</h1>
+    <p class="subtitle">依据《技术需求说明书 v0.2》《产品需求文档 v1.0》《测试用例说明书 v1.0》整理 · 勾选状态自动保存在本机浏览器</p>
+  </header>
+
+  <div class="progress-card">
+    <div class="progress-top">
+      <span class="progress-num" id="progressNum">0%</span>
+      <span class="progress-label" id="progressLabel">0 / 0 项已完成</span>
+    </div>
+    <div class="bar-track"><div class="bar-fill" id="barFill"></div></div>
+    <div class="p0-alert" id="p0Alert"></div>
+  </div>
+
+  <div class="toolbar">
+    <button id="expandAll">全部展开</button>
+    <button id="collapseAll">全部折叠</button>
+    <button id="resetAll">清空重置</button>
+  </div>
+
+  <div id="phaseContainer"></div>
+
+  <div class="final-section">
+    <h2>🚀 上线前最终检查（全部 P0，一票否决）</h2>
+    <p class="note">对应测试用例说明书第 7 章："P0 用例必须在上线前全部通过，无一例外"。这些不通过就不要上线。</p>
+    <div id="finalContainer"></div>
+  </div>
+
+  <footer>提示：清空重置会清除本机保存的全部勾选记录，操作前请确认。</footer>
+</div>
+
+<script>
+const DATA = [
+  {
+    id: "d1",
+    title: "Day 1-2：数据与项目结构",
+    days: "Day 1-2",
+    items: [
+      { t: "从 Hipparcos 星表筛选视星等 ≤6.5 的恒星子集（500-1000颗）", tag: "" },
+      { t: "整理为仓库内 stars_pool.json，字段含 id/ra/dec/magnitude/spectral_type/distance_ly/status", tag: "" },
+      { t: "搭建 Jekyll 项目基础结构", tag: "" },
+      { t: "确认 GitHub Pages 可正常构建出一个空白页面", tag: "" },
+    ],
+  },
+  {
+    id: "d2",
+    title: "Day 3-5：落地页 + 支付接入",
+    days: "Day 3-5",
+    items: [
+      { t: "落地页文案：一句话价值主张（不含禁用措辞）", tag: "p0" },
+      { t: "落地页信任背书区块（含跳转登记表的链接）", tag: "" },
+      { t: "落地页样例展示模块", tag: "" },
+      { t: "FAQ 区块：IAU 澄清声明", tag: "p0" },
+      { t: "FAQ 区块：查重机制说明", tag: "" },
+      { t: "FAQ 区块：退款政策", tag: "p1" },
+      { t: "Lemon Squeezy 测试模式（Test Mode）账号配置", tag: "" },
+      { t: "结算页字段：姓名 / 邮箱 / 献词（选填，限100字）/ 匿名展示选项", tag: "" },
+      { t: "购买按钮正确跳转结算页", tag: "p0" },
+      { t: "Zapier / Make 账号注册，创建 Webhook 接收流程", tag: "" },
+      { t: "确认 Lemon Squeezy 支付成功 Webhook 能被 Zapier/Make 正确接收", tag: "p0" },
+    ],
+  },
+  {
+    id: "d3",
+    title: "Day 6-8：分配逻辑 + PDF 生成",
+    days: "Day 6-8",
+    items: [
+      { t: "GitHub Actions workflow：repository_dispatch 触发配置", tag: "p0" },
+      { t: "分配逻辑：从 available 记录中选取并置为 assigned", tag: "p0" },
+      { t: "concurrency 分组配置，确保排队执行", tag: "p0" },
+      { t: "slug 唯一性生成逻辑", tag: "" },
+      { t: "候选库售罄的异常处理（无可用恒星时的告警）", tag: "p1" },
+      { t: "PDF 证书 HTML 模板设计", tag: "" },
+      { t: "Puppeteer（或等效工具）集成到 Actions 环境", tag: "" },
+      { t: "证书字段完整性：姓名/献词/恒星数据/日期/永久链接/验证说明", tag: "p0" },
+      { t: "中文及特殊字符渲染测试", tag: "p1" },
+    ],
+  },
+  {
+    id: "d4",
+    title: "Day 9-10：永久链接页 + 登记表 + 邮件",
+    days: "Day 9-10",
+    items: [
+      { t: "Jekyll 自动生成每条记录的独立永久页面", tag: "p0" },
+      { t: "OG 分享图静态渲染脚本（Actions 内生成 PNG）", tag: "p0" },
+      { t: "X 分享卡片正确显示测试", tag: "p0" },
+      { t: "公开登记表 JSON 写入逻辑（复用主仓库 /data/registrations/）", tag: "" },
+      { t: "确认登记记录中不包含邮箱等隐私字段", tag: "p0" },
+      { t: "登记表 README 编写（非技术用户也能看懂验证方法）", tag: "p1" },
+      { t: "邮件服务（Resend/Postmark）账号配置", tag: "" },
+      { t: "邮件模板：证书链接 + 永久链接", tag: "" },
+      { t: "邮件送达测试（含垃圾箱检查）", tag: "p1" },
+    ],
+  },
+  {
+    id: "d5",
+    title: "Day 11-12：联调测试",
+    days: "Day 11-12",
+    items: [
+      { t: "全链路联调：下单 → 分配 → 证书 → 邮件 → 页面上线", tag: "p0" },
+      { t: "并发测试：连续快速下单验证防超卖（至少3轮独立测试）", tag: "p0" },
+      { t: "支付失败场景测试", tag: "p0" },
+      { t: "Webhook 转发失败场景的人工补单流程验证", tag: "p1" },
+      { t: "全站合规文案审查（禁用词/免责声明/支付渠道核查）", tag: "p0" },
+      { t: "移动端展示测试", tag: "p1" },
+    ],
+  },
+  {
+    id: "d6",
+    title: "Day 13-14：上线",
+    days: "Day 13-14",
+    items: [
+      { t: "自定义域名 CNAME 绑定至 GitHub Pages", tag: "p0" },
+      { t: "Lemon Squeezy 切换至正式模式（真实收款）", tag: "p0" },
+      { t: "完成一笔真实小额自测订单，确认全链路无误", tag: "p0" },
+      { t: "清理测试阶段产生的测试数据/记录", tag: "" },
+      { t: "准备首批 X 推广内容（demo 帖 + 评论区互动素材）", tag: "" },
+      { t: "正式发布", tag: "" },
+    ],
+  },
+];
+
+const FINAL_ITEMS = [
+  "用户可在落地页完成一次完整真实支付",
+  "支付成功后 5 分钟内收到含 PDF 证书和永久链接的邮件",
+  "并发测试通过：同一颗恒星不会被分配给两个不同订单",
+  "永久链接页面在 X 上分享时正确显示 OG 卡片",
+  "登记记录已 commit 至仓库，且确认不含用户邮箱等隐私信息",
+  "落地页/证书/邮件文案中不含禁用措辞（投资/升值/资产/交易/所有权凭证）",
+  "支付渠道确认仅为法币结算，不存在任何数字货币收款入口",
+];
+
+const STORAGE_KEY = "starorg_checklist_v1";
+let state = {};
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    state = raw ? JSON.parse(raw) : {};
+  } catch (e) {
+    state = {};
+  }
+}
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (e) {
+    // 存储不可用时静默失败，不影响页面使用
+  }
+}
+
+function itemKey(phaseId, idx) { return phaseId + "_" + idx; }
+
+function render() {
+  const container = document.getElementById("phaseContainer");
+  container.innerHTML = "";
+  let totalAll = 0, checkedAll = 0;
+  let p0Total = 0, p0Checked = 0;
+
+  DATA.forEach(phase => {
+    const phaseDiv = document.createElement("div");
+    phaseDiv.className = "phase";
+    phaseDiv.dataset.phaseId = phase.id;
+
+    const checkedCount = phase.items.filter((it, idx) => state[itemKey(phase.id, idx)]).length;
+
+    const head = document.createElement("div");
+    head.className = "phase-head";
+    head.innerHTML = `
+      <div class="phase-title-group">
+        <span class="chevron">▾</span>
+        <span class="phase-title">${phase.title}</span>
+        <span class="phase-days">${phase.days}</span>
+      </div>
+      <span class="phase-count">${checkedCount}/${phase.items.length}</span>
+    `;
+    head.addEventListener("click", () => {
+      phaseDiv.classList.toggle("collapsed");
+    });
+
+    const body = document.createElement("div");
+    body.className = "phase-body";
+
+    phase.items.forEach((it, idx) => {
+      totalAll++;
+      const key = itemKey(phase.id, idx);
+      const checked = !!state[key];
+      if (checked) checkedAll++;
+      if (it.tag === "p0") {
+        p0Total++;
+        if (checked) p0Checked++;
+      }
+
+      const row = document.createElement("div");
+      row.className = "item" + (checked ? " checked" : "");
+      const cbId = "cb_" + key;
+
+      const tagHtml = it.tag === "p0" ? '<span class="tag p0">P0</span>'
+        : it.tag === "p1" ? '<span class="tag p1">P1</span>' : "";
+
+      row.innerHTML = `
+        <input type="checkbox" id="${cbId}" ${checked ? "checked" : ""} />
+        <label for="${cbId}">${it.t}${tagHtml}</label>
+      `;
+
+      row.querySelector("input").addEventListener("change", (e) => {
+        state[key] = e.target.checked;
+        saveState();
+        render();
+      });
+
+      body.appendChild(row);
+    });
+
+    phaseDiv.appendChild(head);
+    phaseDiv.appendChild(body);
+    container.appendChild(phaseDiv);
+  });
+
+  // 最终检查区
+  const finalContainer = document.getElementById("finalContainer");
+  finalContainer.innerHTML = "";
+  FINAL_ITEMS.forEach((text, idx) => {
+    const key = "final_" + idx;
+    totalAll++;
+    const checked = !!state[key];
+    if (checked) checkedAll++;
+    p0Total++;
+    if (checked) p0Checked++;
+
+    const row = document.createElement("div");
+    row.className = "item" + (checked ? " checked" : "");
+    const cbId = "cb_" + key;
+    row.innerHTML = `
+      <input type="checkbox" id="${cbId}" ${checked ? "checked" : ""} />
+      <label for="${cbId}">${text}<span class="tag p0">P0</span></label>
+    `;
+    row.querySelector("input").addEventListener("change", (e) => {
+      state[key] = e.target.checked;
+      saveState();
+      render();
+    });
+    finalContainer.appendChild(row);
+  });
+
+  const pct = totalAll ? Math.round((checkedAll / totalAll) * 100) : 0;
+  document.getElementById("progressNum").textContent = pct + "%";
+  document.getElementById("progressLabel").textContent = `${checkedAll} / ${totalAll} 项已完成`;
+  document.getElementById("barFill").style.width = pct + "%";
+
+  const alertBox = document.getElementById("p0Alert");
+  const p0Remaining = p0Total - p0Checked;
+  if (p0Remaining > 0) {
+    alertBox.textContent = `⚠️ 还有 ${p0Remaining} 项 P0（关键）任务未完成，这些是上线前不能跳过的部分`;
+    alertBox.classList.add("show");
+  } else if (p0Total > 0) {
+    alertBox.textContent = `✅ 全部 P0 关键任务已完成`;
+    alertBox.classList.add("show");
+    alertBox.style.background = "var(--success-bg)";
+    alertBox.style.color = "var(--success)";
+  } else {
+    alertBox.classList.remove("show");
+  }
+}
+
+document.getElementById("expandAll").addEventListener("click", () => {
+  document.querySelectorAll(".phase").forEach(p => p.classList.remove("collapsed"));
+});
+document.getElementById("collapseAll").addEventListener("click", () => {
+  document.querySelectorAll(".phase").forEach(p => p.classList.add("collapsed"));
+});
+document.getElementById("resetAll").addEventListener("click", () => {
+  if (confirm("确认要清空全部勾选记录吗？此操作不可撤销。")) {
+    state = {};
+    saveState();
+    render();
+  }
+});
+
+loadState();
+render();
+</script>
+</body>
+</html>

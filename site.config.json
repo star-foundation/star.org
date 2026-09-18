@@ -1,0 +1,30 @@
+{
+  "site": {
+    "name": "Star.org",
+    "tagline": "每一次登记，都可以被公开验证",
+    "lang": "zh-CN",
+    "domain": "star.org",
+    "baseUrl": "https://star.org",
+    "registryRepoUrl": "https://github.com/star-org/star.org",
+    "supportEmail": "support@star.org",
+    "operatorName": "Star.org",
+    "founded": "2026"
+  },
+  "product": {
+    "priceDisplay": "US$29",
+    "priceNote": "一次性付款，含 PDF 证书与永久链接页面",
+    "checkoutUrl": "",
+    "maxDedicationChars": 100
+  },
+  "policy": {
+    "certificatesPublic": true,
+    "anonymousNameInCertificate": true,
+    "soldOutMessage": "恒星候选库正在补充中，购买入口暂时关闭"
+  },
+  "email": {
+    "fromName": "Star.org",
+    "fromAddress": "certificate@star.org",
+    "replyTo": "support@star.org",
+    "subject": "您的星星证书已生成 · {{starName}}"
+  }
+}

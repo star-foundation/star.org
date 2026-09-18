@@ -1,0 +1,63 @@
+name: 构建并发布站点（GitHub Pages）
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'site/**'
+      - 'data/**'
+      - 'templates/**'
+      - 'scripts/**'
+      - 'site.config.json'
+      - '.github/workflows/deploy-pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: 安装中文字体与浏览器（用于生成默认 OG 图）
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends fonts-noto-cjk
+          if ! command -v google-chrome >/dev/null 2>&1; then
+            sudo apt-get install -y --no-install-recommends chromium-browser || sudo apt-get install -y --no-install-recommends chromium
+          fi
+      - name: 生成静态站点
+        env:
+          SITE_BASE_URL: ${{ vars.SITE_BASE_URL || 'https://star.org' }}
+          LEMON_SQUEEZY_CHECKOUT_URL: ${{ vars.LEMON_SQUEEZY_CHECKOUT_URL }}
+          REGISTRY_REPO_URL: ${{ github.server_url }}/${{ github.repository }}
+          CHROME_PATH: /usr/bin/google-chrome
+        run: node scripts/build-site.mjs
+      - name: 上线前自检（登记表完整性 + 合规文案）
+        run: |
+          node scripts/verify-registry.mjs
+          node scripts/check-compliance.mjs
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

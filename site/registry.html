@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>公开登记表 · {{siteName}}</title>
+<meta name="description" content="所有已登记的恒星记录，任何人无需登录即可查阅，用来确认一颗恒星是否已经被登记过。">
+<link rel="canonical" href="{{registryUrl}}">
+<meta property="og:type" content="website">
+<meta property="og:title" content="公开登记表 · {{siteName}}">
+<meta property="og:description" content="已登记 {{registryCount}} 条记录，无需登录即可查阅与核实。">
+<meta property="og:url" content="{{registryUrl}}">
+<meta property="og:image" content="{{defaultOgImage}}">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+</head>
+<body>
+<header class="site">
+  <div class="wrap nav">
+    <div class="brand"><a href="/">{{siteName}}</a></div>
+    <nav class="nav-links">
+      <a href="/">返回首页</a>
+      {{#if checkoutReady}}<a class="btn btn-primary btn-sm" href="{{checkoutUrl}}">立即登记</a>{{/if}}
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="plain" style="padding-top:52px;">
+    <div class="wrap">
+      <h1 style="font-size:clamp(28px,4vw,40px);">公开登记表</h1>
+      <p class="lede">
+        这里是全部已登记的恒星记录，共 <strong>{{registryCount}}</strong> 条。
+        不需要注册、不需要付费，任何人都可以查阅——这份登记表存在的意义就是让"是否被重复登记"这件事可以被你自己核实。
+      </p>
+
+      {{#if hasDuplicates}}
+      <div class="banner warn">
+        检测到 {{duplicates.length}} 组重复的恒星编号，我们正在处理，请联系 {{supportEmail}}。
+      </div>
+      {{/if}}
+      {{#unless hasDuplicates}}
+      <div class="banner ok">
+        自动检查结果：当前没有任何一颗恒星被登记两次（登记表生成于 {{generatedAt}}）。
+      </div>
+      {{/unless}}
+
+      <div class="grid grid-3" style="margin-bottom:30px;">
+        <div class="card soft"><div class="num">{{registryCount}}</div><div class="stat">已登记记录</div></div>
+        <div class="card soft"><div class="num">{{availableCount}}</div><div class="stat">候选库剩余可登记</div></div>
+        <div class="card soft"><div class="num">{{poolTotal}}</div><div class="stat">候选库总恒星数</div></div>
+      </div>
+
+      <h2>怎么算核实成功</h2>
+      <p class="section-lede" style="margin-bottom:16px;">
+        不需要会用 GitHub，照下面三步做即可：
+      </p>
+      <div class="steps">
+        <div class="step">
+          <h3>拿到恒星编号</h3>
+          <p class="muted" style="font-size:14.5px;">证书或永久链接页面上写着一个编号，形如 <span class="mono">HIP-91262</span>。</p>
+        </div>
+        <div class="step">
+          <h3>在下表里搜这个编号</h3>
+          <p class="muted" style="font-size:14.5px;">用下面的搜索框输入编号。如果只搜到一条记录，说明这颗恒星只被登记过一次。</p>
+        </div>
+        <div class="step">
+          <h3>想看原始文件也可以</h3>
+          <p class="muted" style="font-size:14.5px;">每条记录都是一个纯文本文件，放在公开仓库里，任何人都能打开、下载、长期留存。</p>
+        </div>
+      </div>
+
+      <h2 style="margin-top:44px;">登记记录</h2>
+      <div class="search-row">
+        <input type="search" placeholder="搜索恒星编号、星座、登记编号或日期，例如 HIP-91262" data-registry-search aria-label="搜索登记记录">
+        <span class="muted" style="align-self:center;font-size:14px;">匹配 <span data-registry-count>{{registryCount}}</span> 条</span>
+      </div>
+
+      {{#if entries.length}}
+      <div style="overflow-x:auto;">
+        <table class="registry">
+          <thead>
+            <tr>
+              <th>恒星编号</th>
+              <th>恒星</th>
+              <th>视星等</th>
+              <th>登记人</th>
+              <th>登记日期</th>
+              <th>登记编号</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each entries}}
+            <tr data-registry-row data-search="{{star_id}} {{star_name}} {{constellation}} {{slug}} {{registered_at}} {{owner_display_name}}">
+              <td class="mono">{{star_id}}</td>
+              <td>{{#if star_name}}{{star_name}}{{/if}}{{#unless star_name}}—{{/unless}}</td>
+              <td>{{magnitude}}</td>
+              <td>{{#if anonymous}}<span class="tag muted">匿名</span>{{/if}}{{#unless anonymous}}{{#if owner_display_name}}{{owner_display_name}}{{/if}}{{#unless owner_display_name}}—{{/unless}}{{/unless}}</td>
+              <td class="mono">{{registered_at}}</td>
+              <td class="mono"><a href="/s/{{slug}}/">{{slug}}</a></td>
+              <td><a href="/s/{{slug}}/">查看</a></td>
+            </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      </div>
+      <p class="empty" data-registry-empty hidden>没有匹配的记录，请检查编号是否正确。</p>
+      {{/if}}
+      {{#unless entries.length}}
+      <p class="empty">还没有任何登记记录。第一条记录会出现在这里。</p>
+      {{/unless}}
+
+      <div class="verify-box">
+        <strong>给技术用户的说明</strong>
+        <p class="muted" style="font-size:14.5px;margin:8px 0 0;">
+          每条登记的原始记录是 <span class="mono">data/registrations/{slug}.json</span>，
+          索引文件是 <a href="{{indexJsonUrl}}">{{indexJsonUrl}}</a>。
+          记录中不包含邮箱、订单号等任何可识别信息；恒星编号与登记记录一一对应，可用于程序化查重。
+          {{#if registryDirUrl}}完整目录见 <a href="{{registryDirUrl}}" rel="noopener">公开仓库</a>。{{/if}}
+        </p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site">
+  <div class="wrap foot-grid">
+    <div class="disclaimer">
+      {{siteName}} 提供纪念性质的公开可验证恒星登记服务，不构成国际天文学联合会（IAU）官方命名。
+      <br>联系：<a href="mailto:{{supportEmail}}">{{supportEmail}}</a>
+    </div>
+    <div class="muted">© {{year}} {{siteName}}</div>
+  </div>
+</footer>
+<script src="/assets/js/site.js" defer></script>
+</body>
+</html>

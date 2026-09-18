@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{starTitle}} · 恒星登记证书 · {{siteName}}</title>
+<meta name="description" content="{{starTitle}}（{{starId}}）的恒星登记记录：{{starSubtitle}}，视星等 {{magnitudeText}}，距地球 {{distanceText}}。登记编号 {{slug}}，可在公开登记表中核实。">
+<link rel="canonical" href="{{permalink}}">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="{{siteName}}">
+<meta property="og:title" content="{{starTitle}} · 恒星登记证书">
+<meta property="og:description" content="{{#if dedication}}{{dedication}}{{/if}}{{#unless dedication}}{{starSubtitle}} · 视星等 {{magnitudeText}} · 距地球 {{distanceText}}{{/unless}}">
+<meta property="og:url" content="{{permalink}}">
+<meta property="og:image" content="{{ogImageUrl}}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{starTitle}} · 恒星登记证书">
+<meta name="twitter:description" content="{{#if dedication}}{{dedication}}{{/if}}{{#unless dedication}}{{starSubtitle}}{{/unless}}">
+<meta name="twitter:image" content="{{ogImageUrl}}">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+</head>
+<body>
+<header class="site">
+  <div class="wrap nav">
+    <div class="brand"><a href="/">{{siteName}}</a></div>
+    <nav class="nav-links">
+      <a href="/registry/">公开登记表</a>
+      {{#if checkoutReady}}<a class="btn btn-primary btn-sm" href="{{checkoutUrl}}">我也要登记一颗</a>{{/if}}
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="plain" style="padding-top:48px;">
+    <div class="wrap narrow">
+      <div class="muted" style="font-size:13px;letter-spacing:.16em;text-transform:uppercase;">恒星登记 · 编号 {{slug}}</div>
+      <div class="star-card" style="margin-top:16px;">
+        <div class="star-head">
+          <h1 class="star-name">{{starTitle}}</h1>
+          <div class="star-sub">{{starSubtitle}}</div>
+        </div>
+
+        <dl class="data-grid">
+          <div><dt>恒星标识</dt><dd class="mono">{{starId}}</dd></div>
+          <div><dt>赤经</dt><dd class="mono">{{raText}}</dd></div>
+          <div><dt>赤纬</dt><dd class="mono">{{decText}}</dd></div>
+          <div><dt>视星等</dt><dd>{{magnitudeText}}</dd></div>
+          <div><dt>光谱型</dt><dd><span class="dot" style="background:{{spectralColor}}"></span>{{spectralText}}（{{spectralLabel}}）</dd></div>
+          <div><dt>距地球</dt><dd>{{distanceText}}</dd></div>
+          <div><dt>登记人</dt><dd>{{#if anonymous}}匿名登记人{{/if}}{{#unless anonymous}}{{displayName}}{{/unless}}</dd></div>
+          <div><dt>登记日期</dt><dd>{{registeredDateZh}}</dd></div>
+        </dl>
+
+        {{#if dedication}}
+        <div class="dedication">{{dedication}}</div>
+        {{/if}}
+
+        <div class="chart">
+          {{skyChartSvg!}}
+        </div>
+
+        <div class="actions">
+          <a class="btn btn-primary" href="https://twitter.com/intent/tweet?text={{shareText}}&url={{shareUrl}}" rel="noopener">分享到 X</a>
+          <button class="btn btn-ghost" type="button" data-copy="{{permalink}}">复制永久链接</button>
+          {{#if certificatePublic}}
+          <a class="btn btn-ghost" href="/certificates/{{slug}}.pdf">下载 PDF 证书</a>
+          {{/if}}
+        </div>
+
+        <div class="verify-box">
+          <strong>自行核实这条记录</strong>
+          <ol>
+            <li>打开<a href="/registry/">公开登记表</a>，搜索恒星标识 <span class="mono">{{starId}}</span>。</li>
+            <li>应当只出现一条记录，登记编号为 <span class="mono">{{slug}}</span>；若出现两条，说明登记表异常，请来信告知。</li>
+            <li>{{#if registryDirUrl}}也可以直接打开公开仓库的 <span class="mono">data/registrations/{{slug}}.json</span> 查看原始记录。{{/if}}</li>
+          </ol>
+        </div>
+      </div>
+
+      <p class="muted" style="font-size:13.5px;margin-top:22px;">
+        本登记为纪念性质的公开可验证登记服务，不构成国际天文学联合会（IAU）官方命名，
+        亦不代表任何天体命名权。
+      </p>
+    </div>
+  </section>
+</main>
+
+<footer class="site">
+  <div class="wrap foot-grid">
+    <div class="disclaimer">
+      {{siteName}} · 永久链接不会被删除，也不依赖邮件保存。
+      <br>联系：<a href="mailto:{{supportEmail}}">{{supportEmail}}</a>
+    </div>
+    <div class="muted">© {{year}} {{siteName}}</div>
+  </div>
+</footer>
+<script src="/assets/js/site.js" defer></script>
+</body>
+</html>

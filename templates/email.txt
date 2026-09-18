@@ -1,0 +1,24 @@
+{{brandName}} · 您的恒星登记已完成
+
+您好{{#if displayName}}，{{displayName}}{{/if}}：
+
+感谢您的登记。这颗恒星已经分配给您。
+
+恒星：{{starTitle}}（{{starId}}）
+星座：{{starSubtitle}}
+坐标：赤经 {{raText}} / 赤纬 {{decText}}
+视星等：{{magnitudeText}}（{{spectralText}}）
+距离：{{distanceText}}
+登记日期：{{registeredDateZh}}
+{{#if dedication}}
+献词：{{dedication}}
+{{/if}}
+永久链接：{{permalink}}
+{{#if certificatePublic}}PDF 证书：{{certificateUrl}}
+{{/if}}登记编号：{{slug}}
+
+如何自行核实：
+任何人（无需登录）都可以在公开登记表 {{registryUrl}} 中检索恒星标识 {{starId}}，确认它只被登记过一次。
+
+本登记为纪念性质的公开可验证登记服务，不构成国际天文学联合会（IAU）官方命名。
+如需修改姓名或献词，或有任何疑问，请回复本邮件或联系 {{supportEmail}}。

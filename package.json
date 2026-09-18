@@ -1,0 +1,23 @@
+{
+  "name": "star-org",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Star.org MVP — 可公开验证的星星登记服务（全 GitHub 托管）",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build:pool": "node scripts/build-pool.mjs",
+    "build:site": "node scripts/build-site.mjs",
+    "allocate": "node scripts/allocate.mjs",
+    "register": "node scripts/register.mjs",
+    "manual-order": "node scripts/manual-order.mjs",
+    "verify": "node scripts/verify-registry.mjs",
+    "check:compliance": "node scripts/check-compliance.mjs",
+    "check": "npm run verify && npm run check:compliance",
+    "test": "node --test tests/*.test.mjs",
+    "test:concurrency": "node --test tests/alloc-concurrency.test.mjs",
+    "serve": "node scripts/serve.mjs"
+  }
+}
