@@ -161,22 +161,41 @@ Events 只勾 `order_created`，Signing secret 保存好（Zapier 侧可用于�
 - Headers：
   - `Authorization: Bearer <GitHub PAT>`
   - `Accept: application/vnd.github+json`
-- Data：
+- Data：**Zapier 的嵌套键用双下划线，不是方括号**。官方文档明确写着
+  「adding the parent object and a double underscore before the object」，
+  即 `client_payload__order_id` 会变成 `{"client_payload":{"order_id":...}}`。
+  写成 `client_payload[order_id]` 的话 GitHub 收到的是一个扁平对象，直接 422。
+
+  | 左（键，照抄） | 右（值） |
+  | --- | --- |
+  | `event_type` | 手填 `star_registration` |
+  | `client_payload__order_id` | 下拉选 `Data` → `Id` |
+  | `client_payload__display_name` | 下拉选 `Meta` → `Custom Data` → `Display Name`；没配下单前表单时退回 `Data` → `Attributes` → `User Name` |
+  | `client_payload__email` | 下拉选 `Data` → `Attributes` → `User Email` |
+  | `client_payload__dedication` | 下拉选 `Meta` → `Custom Data` → `Dedication` |
+  | `client_payload__anonymous` | 下拉选 `Meta` → `Custom Data` → `Anonymous` |
+  | `client_payload__status` | 下拉选 `Data` → `Attributes` → `Status` |
+  | `client_payload__source` | 手填 `lemon-squeezy` |
+
+  以上会序列化成 GitHub 期望的形状：
 
   ```json
   {
     "event_type": "star_registration",
     "client_payload": {
-      "order_id": "<data.id>",
-      "display_name": "<登记人姓名/称呼>",
-      "email": "<user_email>",
-      "dedication": "<献词，可为空>",
+      "order_id": "9000002",
+      "display_name": "Anna Lee",
+      "email": "anna@example.com",
+      "dedication": "愿你抬头就能看见",
       "anonymous": false,
-      "status": "<data.attributes.status>",
+      "status": "paid",
       "source": "lemon-squeezy"
     }
   }
   ```
+
+- 需要发送嵌套数组、PATCH/DELETE 或完全自定义的 JSON 时，才改用
+  `Custom Request` 动作（它不解析、原样发送）。
 
 - PAT：Fine-grained token，只授权本仓库的 **Contents: Read and write**；
   只存在 Zapier 的密钥管理里，不进前端、不进仓库。
