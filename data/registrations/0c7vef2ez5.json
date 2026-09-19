@@ -1,0 +1,30 @@
+{
+  "slug": "0c7vef2ez5",
+  "star_id": "HIP-105502",
+  "owner_display_name": "COCO",
+  "anonymous": false,
+  "locale": null,
+  "dedication_message": "Hello CoCo Star!",
+  "registered_at": "2026-09-19T22:35:09.059Z",
+  "star": {
+    "id": "HIP-105502",
+    "hip": 105502,
+    "hd": 203504,
+    "proper_name": null,
+    "bayer": null,
+    "flam": "1",
+    "constellation": "Peg",
+    "ra": 320.521648,
+    "dec": 19.804508,
+    "magnitude": 4.08,
+    "spectral_type": "K1III",
+    "distance_ly": 155.8
+  },
+  "artifacts": {
+    "certificate": "certificates/0c7vef2ez5.pdf",
+    "certificate_sha256": "ae44cf5fd86e38aa6e4c444de1a07d5d45b7f6e032c19438ff52b3635e9f1d1e",
+    "og_image": "og/0c7vef2ez5.png",
+    "og_sha256": "89b2fb5cc3c56928c1061af578119380b239d4b6d01e86c058a9efb9bc2c041e",
+    "certificate_public": true
+  }
+}

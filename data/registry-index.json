@@ -1,9 +1,20 @@
 {
-  "generated_at": "2026-09-19T14:36:09.279Z",
-  "count": 5,
-  "unique_stars": 5,
+  "generated_at": "2026-09-19T22:35:11.519Z",
+  "count": 6,
+  "unique_stars": 6,
   "duplicates": [],
   "entries": [
+    {
+      "slug": "0c7vef2ez5",
+      "star_id": "HIP-105502",
+      "star_name": null,
+      "constellation": "Peg",
+      "magnitude": 4.08,
+      "owner_display_name": "COCO",
+      "anonymous": false,
+      "registered_at": "2026-09-19T22:35:09.059Z",
+      "dedication_message": "Hello CoCo Star!"
+    },
     {
       "slug": "3xgdhyxf7z",
       "star_id": "HIP-80331",
