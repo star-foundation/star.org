@@ -1,0 +1,30 @@
+{
+  "slug": "w8yrrx3yn6",
+  "star_id": "HIP-39953",
+  "owner_display_name": "LiSI",
+  "anonymous": false,
+  "locale": null,
+  "dedication_message": "Hello LiSI Star!",
+  "registered_at": "2026-09-19T23:58:15.543Z",
+  "star": {
+    "id": "HIP-39953",
+    "hip": 39953,
+    "hd": 68273,
+    "proper_name": null,
+    "bayer": "Gam-2",
+    "flam": null,
+    "constellation": "Vel",
+    "ra": 122.383133,
+    "dec": -47.336588,
+    "magnitude": 1.75,
+    "spectral_type": "WC8 + O9I",
+    "distance_ly": 1117
+  },
+  "artifacts": {
+    "certificate": "certificates/w8yrrx3yn6.pdf",
+    "certificate_sha256": "622f9bc9be3cc87cdfe8ed67d48c14eec64b7cfda9f43f3253ccd8bff8408652",
+    "og_image": "og/w8yrrx3yn6.png",
+    "og_sha256": "82f08066cab3e07ead2f389c52c927864456a098129932e1d5e6ae96bb5c4a22",
+    "certificate_public": true
+  }
+}

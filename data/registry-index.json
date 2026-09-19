@@ -1,9 +1,20 @@
 {
-  "generated_at": "2026-09-19T23:44:37.444Z",
-  "count": 7,
-  "unique_stars": 7,
+  "generated_at": "2026-09-19T23:58:18.944Z",
+  "count": 8,
+  "unique_stars": 8,
   "duplicates": [],
   "entries": [
+    {
+      "slug": "w8yrrx3yn6",
+      "star_id": "HIP-39953",
+      "star_name": null,
+      "constellation": "Vel",
+      "magnitude": 1.75,
+      "owner_display_name": "LiSI",
+      "anonymous": false,
+      "registered_at": "2026-09-19T23:58:15.543Z",
+      "dedication_message": "Hello LiSI Star!"
+    },
     {
       "slug": "hst5hej7k9",
       "star_id": "HIP-8903",
