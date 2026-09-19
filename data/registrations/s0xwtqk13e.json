@@ -1,0 +1,29 @@
+{
+  "slug": "s0xwtqk13e",
+  "star_id": "HIP-69673",
+  "owner_display_name": "契约测试",
+  "anonymous": false,
+  "dedication_message": null,
+  "registered_at": "2026-09-19T01:22:19.187Z",
+  "star": {
+    "id": "HIP-69673",
+    "hip": 69673,
+    "hd": 124897,
+    "proper_name": "Arcturus",
+    "bayer": "Alp",
+    "flam": "16",
+    "constellation": "Boo",
+    "ra": 213.915456,
+    "dec": 19.18241,
+    "magnitude": -0.05,
+    "spectral_type": "K2III",
+    "distance_ly": 36.7
+  },
+  "artifacts": {
+    "certificate": "certificates/s0xwtqk13e.pdf",
+    "certificate_sha256": "934be05085e95fcdf2773f74a6f1a58e8b18016b2f9c1beab1691256ab387977",
+    "og_image": "og/s0xwtqk13e.png",
+    "og_sha256": "1203f3ab94fc92fb03a804eababb889b6e1e160d13586ab57eabbc90e787feba",
+    "certificate_public": true
+  }
+}
