@@ -1,9 +1,20 @@
 {
-  "generated_at": "2026-09-19T07:29:52.869Z",
-  "count": 2,
-  "unique_stars": 2,
+  "generated_at": "2026-09-19T07:35:16.100Z",
+  "count": 3,
+  "unique_stars": 3,
   "duplicates": [],
   "entries": [
+    {
+      "slug": "6ynjvtffzw",
+      "star_id": "HIP-69673",
+      "star_name": "Arcturus",
+      "constellation": "Boo",
+      "magnitude": -0.05,
+      "owner_display_name": "tongxiaojun",
+      "anonymous": false,
+      "registered_at": "2026-09-19T07:35:13.649Z",
+      "dedication_message": null
+    },
     {
       "slug": "6tmdcj9r86",
       "star_id": "HIP-30438",
