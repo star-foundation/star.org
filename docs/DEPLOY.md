@@ -137,10 +137,17 @@ Events 只勾 `order_created`，Signing secret 保存好（Zapier 侧可用于�
 | `client_payload` 字段 | 取自 | 说明 |
 | --- | --- | --- |
 | `order_id` | `data.id` | **幂等键**：同一订单号永远映射到同一登记编号，重复触发不会占第二颗星 |
-| `display_name` | 结算页「姓名/称呼」自定义字段；缺省用 `data.attributes.user_name` | 必填；超过 40 字截断 |
+| `display_name` | **`meta.custom_data.display_name`（下单前表单）**；缺省用 `data.attributes.user_name` | 必填；超过 40 字截断 |
 | `email` | `data.attributes.user_email` | 只用于发证书邮件，绝不写入公开仓库 |
-| `dedication` | 结算页「献词」自定义字段 | 选填；超过 100 字自动截断 |
-| `anonymous` | 结算页「匿名展示」自定义字段（勾选为 true） | 勾选后公开记录与页面不显示称呼 |
+| `dedication` | **`meta.custom_data.dedication`（下单前表单）** | 选填；超过 100 字截断 |
+| `anonymous` | **`meta.custom_data.anonymous`（下单前表单，勾选为 true）** | 勾选后公开记录与页面不显示称呼 |
+
+> **下单前表单（推荐）**：Lemon Squeezy 结算页不收集"登记人姓名/献词/匿名"这类自定义字段
+> （需求一直挂在 LS 的反馈板上未实现）。所以落地页内置了一个登记表单（`site/index.html` 的
+> `data-registration-form`），提交后把这三个值通过 `?checkout[custom][display_name]=...` 等参数
+> 拼进结算 URL —— 它们就会出现在 webhook 的 `meta.custom_data` 里。URL 构建逻辑在
+> `site/assets/js/checkout-url.mjs`（纯函数，已单测）。没用表单时 `display_name` 回退到
+> `data.attributes.user_name`（持卡人姓名）。
 | `status` | `data.attributes.status` | **务必映射**：只有 `paid` 才登记。`order_created` 在订单创建时就触发，pending / failed / refunded 都会来，流水线以退出码 5 拒绝（不提交、不告警）。状态判断放在代码里而不是 Zapier 的 Filter 步骤，是为了让免费版的两步 Zap 也够用 |
 
 > 结算页自定义字段落在载荷的哪个位置，取决于 Lemon Squeezy 后台的字段配置方式；

@@ -200,3 +200,62 @@ footer.site .disclaimer { max-width: 620px; line-height: 1.8; }
   .nav .btn { padding: 8px 14px; font-size: 13px; }
   .nav-links a[href="#faq"] { display: none; }
 }
+
+/* 下单前登记表单（名字 / 献词 / 匿名） */
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 8px auto 0;
+  max-width: 460px;
+  text-align: left;
+}
+.register-form .field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.register-form .field-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text, #16309a);
+}
+.register-form .field-label em {
+  font-style: normal;
+  font-size: 12px;
+  color: #b4552a;
+  font-weight: 500;
+  margin-left: 4px;
+}
+.register-form input[type="text"],
+.register-form textarea {
+  width: 100%;
+  padding: 11px 13px;
+  border: 1px solid #d8dbe9;
+  border-radius: 10px;
+  font: inherit;
+  color: #1b2a4a;
+  background: #fff;
+}
+.register-form textarea { resize: vertical; min-height: 64px; }
+.register-form input[type="text"]:focus,
+.register-form textarea:focus {
+  outline: 2px solid #16309a;
+  outline-offset: 1px;
+  border-color: transparent;
+}
+.register-form .field-hint {
+  align-self: flex-end;
+  font-size: 12px;
+  color: #8a91a8;
+}
+.register-form .field.checkbox {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #2a3a5f;
+}
+.register-form .field.checkbox input { width: 16px; height: 16px; accent-color: #16309a; }
+.register-form .btn { align-self: center; margin-top: 4px; }
+.register-form .field-note { font-size: 12.5px; text-align: center; margin-top: 2px; }

@@ -34,4 +34,28 @@
       setTimeout(() => { button.textContent = original; }, 1600);
     });
   });
+
+  // 下单前登记表单：把姓名/献词/匿名拼进 Lemon Squeezy 结算 URL 后跳转。
+  // URL 构建逻辑在 checkout-url.mjs（纯函数，先在页面里加载，暴露为 globalThis.buildCheckoutUrl）。
+  const form = document.querySelector('[data-registration-form]');
+  if (form && typeof globalThis.buildCheckoutUrl === 'function') {
+    const ded = form.querySelector('[name="dedication"]');
+    const counter = form.querySelector('[data-dedication-count]');
+    if (ded && counter) {
+      const upd = () => { counter.textContent = String([...ded.value].length); };
+      ded.addEventListener('input', upd);
+      upd();
+    }
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const displayName = (form.querySelector('[name="display_name"]')?.value || '').trim();
+      const dedication = (ded?.value || '').trim();
+      const anonymous = Boolean(form.querySelector('[name="anonymous"]')?.checked);
+      const base = form.getAttribute('data-checkout-url');
+      if (!displayName) return;            // 必填，浏览器 required 已拦，兜底
+      if (!base) return;
+      const url = globalThis.buildCheckoutUrl(base, { displayName, dedication, anonymous });
+      window.location.href = url;
+    });
+  }
 })();

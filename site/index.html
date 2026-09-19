@@ -146,7 +146,25 @@
         仅支持信用卡等常规法币结算方式。
       </p>
       {{#if checkoutReady}}
-      <a class="btn btn-primary" href="{{checkoutUrl}}">前往结算页</a>
+      <form class="register-form" data-registration-form data-checkout-url="{{checkoutUrl}}" autocomplete="off">
+        <label class="field">
+          <span class="field-label">登记人姓名 / 称呼 <em>必填</em></span>
+          <input name="display_name" type="text" maxlength="40" required
+                 placeholder="将印在证书上，如：李四 / Anna / 星野">
+        </label>
+        <label class="field">
+          <span class="field-label">献词（可选，最多 100 字）</span>
+          <textarea name="dedication" rows="3" maxlength="100"
+                    placeholder="愿你抬头就能看见的那颗星……"></textarea>
+          <span class="field-hint"><b data-dedication-count>0</b>/100</span>
+        </label>
+        <label class="field checkbox">
+          <input name="anonymous" type="checkbox">
+          <span>匿名展示 —— 公开页面与证书不显示我的名字</span>
+        </label>
+        <button class="btn btn-primary" type="submit">去支付 · {{priceDisplay}}</button>
+        <p class="muted field-note">提交后跳转到 Lemon Squeezy 安全结算页完成支付；姓名与献词会用于生成证书。</p>
+      </form>
       {{/if}}
       {{#unless checkoutReady}}
       <span class="btn btn-primary is-disabled">{{entryLabel}}</span>
@@ -235,6 +253,7 @@
     </div>
   </div>
 </footer>
+<script type="module" src="/assets/js/checkout-url.mjs"></script>
 <script src="/assets/js/site.js" defer></script>
 </body>
 </html>
