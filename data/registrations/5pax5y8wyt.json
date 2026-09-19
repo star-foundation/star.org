@@ -1,0 +1,29 @@
+{
+  "slug": "5pax5y8wyt",
+  "star_id": "HIP-71683",
+  "owner_display_name": "童小军",
+  "anonymous": false,
+  "dedication_message": null,
+  "registered_at": "2026-09-19T08:12:50.390Z",
+  "star": {
+    "id": "HIP-71683",
+    "hip": 71683,
+    "hd": 128620,
+    "proper_name": "Rigil Kentaurus",
+    "bayer": "Alp-1",
+    "flam": null,
+    "constellation": "Cen",
+    "ra": 219.91147,
+    "dec": -60.833976,
+    "magnitude": -0.01,
+    "spectral_type": "G2V",
+    "distance_ly": 4.3
+  },
+  "artifacts": {
+    "certificate": "certificates/5pax5y8wyt.pdf",
+    "certificate_sha256": "7bb15255efe3638dd57a721e6e5ca34f32f3e5b492da5cd9594805b95d3e6fd4",
+    "og_image": "og/5pax5y8wyt.png",
+    "og_sha256": "2ca3218a9a3282dd0a61d0b2272abaf30c124d519c2bca461a6dfa17444e172c",
+    "certificate_public": true
+  }
+}

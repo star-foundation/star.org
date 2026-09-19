@@ -1,9 +1,20 @@
 {
-  "generated_at": "2026-09-19T07:35:16.100Z",
-  "count": 3,
-  "unique_stars": 3,
+  "generated_at": "2026-09-19T08:12:54.492Z",
+  "count": 4,
+  "unique_stars": 4,
   "duplicates": [],
   "entries": [
+    {
+      "slug": "5pax5y8wyt",
+      "star_id": "HIP-71683",
+      "star_name": "Rigil Kentaurus",
+      "constellation": "Cen",
+      "magnitude": -0.01,
+      "owner_display_name": "童小军",
+      "anonymous": false,
+      "registered_at": "2026-09-19T08:12:50.390Z",
+      "dedication_message": null
+    },
     {
       "slug": "6ynjvtffzw",
       "star_id": "HIP-69673",
