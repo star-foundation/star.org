@@ -1,9 +1,20 @@
 {
-  "generated_at": "2026-09-19T12:52:28.744Z",
-  "count": 3,
-  "unique_stars": 3,
+  "generated_at": "2026-09-19T14:02:50.892Z",
+  "count": 4,
+  "unique_stars": 4,
   "duplicates": [],
   "entries": [
+    {
+      "slug": "6d1qmtgv35",
+      "star_id": "HIP-60718",
+      "star_name": "Acrux",
+      "constellation": "Cru",
+      "magnitude": 0.77,
+      "owner_display_name": "TONG",
+      "anonymous": false,
+      "registered_at": "2026-09-19T14:02:48.435Z",
+      "dedication_message": "Hello Tong Star!"
+    },
     {
       "slug": "1sqyxmtg14",
       "star_id": "HIP-69673",

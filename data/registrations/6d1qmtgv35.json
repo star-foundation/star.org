@@ -1,0 +1,29 @@
+{
+  "slug": "6d1qmtgv35",
+  "star_id": "HIP-60718",
+  "owner_display_name": "TONG",
+  "anonymous": false,
+  "dedication_message": "Hello Tong Star!",
+  "registered_at": "2026-09-19T14:02:48.435Z",
+  "star": {
+    "id": "HIP-60718",
+    "hip": 60718,
+    "hd": 108248,
+    "proper_name": "Acrux",
+    "bayer": "Alp-1",
+    "flam": null,
+    "constellation": "Cru",
+    "ra": 186.64967,
+    "dec": -63.099092,
+    "magnitude": 0.77,
+    "spectral_type": "B0.5I",
+    "distance_ly": 322
+  },
+  "artifacts": {
+    "certificate": "certificates/6d1qmtgv35.pdf",
+    "certificate_sha256": "e451cc735880f9bbad797506b32c2f0e4ea75df1679999d00620421e05d09520",
+    "og_image": "og/6d1qmtgv35.png",
+    "og_sha256": "1e870f81b11c24d4c6ed2b0c42fcd2d4b5abb6677d66a24a329ae037b0587249",
+    "certificate_public": true
+  }
+}
