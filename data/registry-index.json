@@ -1,30 +1,7 @@
 {
-  "generated_at": "2026-09-19T00:17:03.465Z",
-  "count": 2,
-  "unique_stars": 2,
+  "generated_at": "2026-09-18T10:52:30.907Z",
+  "count": 0,
+  "unique_stars": 0,
   "duplicates": [],
-  "entries": [
-    {
-      "slug": "5t29vvf4h1",
-      "star_id": "HIP-30438",
-      "star_name": "Canopus",
-      "constellation": "Car",
-      "magnitude": -0.62,
-      "owner_display_name": "幂等测试",
-      "anonymous": false,
-      "registered_at": "2026-09-19T00:16:07.958Z",
-      "dedication_message": "验证重复派发不会占第二颗星。"
-    },
-    {
-      "slug": "hn34tyjj3n",
-      "star_id": "HIP-32349",
-      "star_name": "Sirius",
-      "constellation": "CMa",
-      "magnitude": -1.44,
-      "owner_display_name": "链路验收测试",
-      "anonymous": false,
-      "registered_at": "2026-09-19T00:02:48.356Z",
-      "dedication_message": "这笔订单只用于验证支付成功后的登记链路，验证完成后会被清理。"
-    }
-  ]
+  "entries": []
 }
