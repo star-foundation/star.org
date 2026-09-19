@@ -70,3 +70,35 @@ test('TC-LP-12 登记页收录进 sitemap', () => {
     sandbox.cleanup();
   }
 });
+
+test('TC-LP-13 全站导航统一：每页都有「登记一颗星」→ 登记页，且不再内嵌结算链接', () => {
+  const sandbox = createSandbox({ availableStars: 3, poolSize: 3 });
+  try {
+    const result = runScript('register.mjs', [], {
+      sandbox,
+      input: JSON.stringify({ order_id: 'NAV-1', display_name: '导航测试', status: 'paid' }),
+    });
+    assert.equal(result.status, 0, result.stderr);
+    const { landing, register, sitemap } = build(sandbox, { LEMON_SQUEEZY_CHECKOUT_URL: CHECKOUT_URL });
+    assert.ok(sitemap.includes('/register/'), 'sitemap 应含登记页');
+
+    const slug = result.json.slug;
+    const pages = {
+      'index.html': landing,
+      'register/index.html': register,
+      'registry/index.html': readFileSync(path.join(sandbox.siteOut, 'registry', 'index.html'), 'utf8'),
+      404: readFileSync(path.join(sandbox.siteOut, '404.html'), 'utf8'),
+      ['s/' + slug + '/index.html']: readFileSync(path.join(sandbox.siteOut, 's', slug, 'index.html'), 'utf8'),
+    };
+    for (const [name, html] of Object.entries(pages)) {
+      assert.ok(html.includes('>登记一颗星<'), name + ' 导航应有统一的「登记一颗星」按钮');
+      assert.ok(/href="(?:\.\.\/)*\.?\/?register\/"/.test(html), name + ' 按钮应指向登记页');
+      if (name !== 'register/index.html') {
+        assert.ok(!html.includes('lemonsqueezy.com/checkout'), name + ' 不应内嵌结算链接（统一经登记页）');
+      }
+      assert.ok(!html.includes('{{'), name + ' 不得残留模板占位符');
+    }
+  } finally {
+    sandbox.cleanup();
+  }
+});
