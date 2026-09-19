@@ -1,0 +1,29 @@
+{
+  "slug": "dg805w7q3c",
+  "star_id": "HIP-30438",
+  "owner_display_name": "tongxiaojun",
+  "anonymous": false,
+  "dedication_message": null,
+  "registered_at": "2026-09-19T06:41:27.967Z",
+  "star": {
+    "id": "HIP-30438",
+    "hip": 30438,
+    "hd": 45348,
+    "proper_name": "Canopus",
+    "bayer": "Alp",
+    "flam": null,
+    "constellation": "Car",
+    "ra": 95.987926,
+    "dec": -52.69566,
+    "magnitude": -0.62,
+    "spectral_type": "F0I",
+    "distance_ly": 309.2
+  },
+  "artifacts": {
+    "certificate": "certificates/dg805w7q3c.pdf",
+    "certificate_sha256": "f62f555e3be051dd6d71a65e82d3bfc092678ead0afeb3bb50154e9709314c23",
+    "og_image": "og/dg805w7q3c.png",
+    "og_sha256": "a3cffc5fabe59f08f974e955a6453d65abdf4bc264bc764ac17829b2e18ae410",
+    "certificate_public": true
+  }
+}
