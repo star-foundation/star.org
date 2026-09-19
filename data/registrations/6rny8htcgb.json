@@ -1,0 +1,29 @@
+{
+  "slug": "6rny8htcgb",
+  "star_id": "HIP-32349",
+  "owner_display_name": "TongXiaoJun",
+  "anonymous": false,
+  "dedication_message": "Hello Star.org!",
+  "registered_at": "2026-09-19T10:07:00.841Z",
+  "star": {
+    "id": "HIP-32349",
+    "hip": 32349,
+    "hd": 48915,
+    "proper_name": "Sirius",
+    "bayer": "Alp",
+    "flam": "9",
+    "constellation": "CMa",
+    "ra": 101.287214,
+    "dec": -16.716116,
+    "magnitude": -1.44,
+    "spectral_type": "A0",
+    "distance_ly": 8.6
+  },
+  "artifacts": {
+    "certificate": "certificates/6rny8htcgb.pdf",
+    "certificate_sha256": "37d23f9fe41b0c6fa3240eb636b4453648135d25dc18df2dbbe7441ae7fbd5bd",
+    "og_image": "og/6rny8htcgb.png",
+    "og_sha256": "837353c8c635a2086d81960c8fb8e5adf933dc1e0ef9e78dc8f9324e94287b69",
+    "certificate_public": true
+  }
+}
