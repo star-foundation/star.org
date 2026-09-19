@@ -4,15 +4,15 @@
   "source_url": "https://github.com/astronexus/HYG-Database",
   "license": "CC BY-SA 4.0（公开天文数据）",
   "generated_at": "2026-09-18T10:10:17.012Z",
-  "updated_at": "2026-09-19T08:42:20.213Z",
+  "updated_at": "2026-09-18T10:10:17.015Z",
   "filter": {
     "max_magnitude": 6.5,
     "requires_hip": true,
     "requires_distance": true
   },
   "count": 800,
-  "available": 794,
-  "assigned": 6,
+  "available": 800,
+  "assigned": 0,
   "stars": [
     {
       "id": "HIP-32349",
@@ -27,9 +27,9 @@
       "magnitude": -1.44,
       "spectral_type": "A0",
       "distance_ly": 8.6,
-      "status": "assigned",
-      "assigned_slug": "g7093dc9kf",
-      "assigned_at": "2026-09-19T07:22:02.386Z"
+      "status": "available",
+      "assigned_slug": null,
+      "assigned_at": null
     },
     {
       "id": "HIP-30438",
@@ -44,9 +44,9 @@
       "magnitude": -0.62,
       "spectral_type": "F0I",
       "distance_ly": 309.2,
-      "status": "assigned",
-      "assigned_slug": "6tmdcj9r86",
-      "assigned_at": "2026-09-19T07:29:50.130Z"
+      "status": "available",
+      "assigned_slug": null,
+      "assigned_at": null
     },
     {
       "id": "HIP-69673",
@@ -61,9 +61,9 @@
       "magnitude": -0.05,
       "spectral_type": "K2III",
       "distance_ly": 36.7,
-      "status": "assigned",
-      "assigned_slug": "6ynjvtffzw",
-      "assigned_at": "2026-09-19T07:35:13.649Z"
+      "status": "available",
+      "assigned_slug": null,
+      "assigned_at": null
     },
     {
       "id": "HIP-71683",
@@ -78,9 +78,9 @@
       "magnitude": -0.01,
       "spectral_type": "G2V",
       "distance_ly": 4.3,
-      "status": "assigned",
-      "assigned_slug": "5pax5y8wyt",
-      "assigned_at": "2026-09-19T08:12:50.390Z"
+      "status": "available",
+      "assigned_slug": null,
+      "assigned_at": null
     },
     {
       "id": "HIP-91262",
@@ -95,9 +95,9 @@
       "magnitude": 0.03,
       "spectral_type": "A0V",
       "distance_ly": 25,
-      "status": "assigned",
-      "assigned_slug": "kg0javv8nn",
-      "assigned_at": "2026-09-19T08:38:18.884Z"
+      "status": "available",
+      "assigned_slug": null,
+      "assigned_at": null
     },
     {
       "id": "HIP-24608",
@@ -112,9 +112,9 @@
       "magnitude": 0.08,
       "spectral_type": null,
       "distance_ly": 42.8,
-      "status": "assigned",
-      "assigned_slug": "p39pwec7j2",
-      "assigned_at": "2026-09-19T08:42:20.213Z"
+      "status": "available",
+      "assigned_slug": null,
+      "assigned_at": null
     },
     {
       "id": "HIP-24436",
