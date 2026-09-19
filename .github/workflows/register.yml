@@ -81,10 +81,26 @@ jobs:
               --argjson anonymous "${INPUT_ANONYMOUS:-false}" \
               '{order_id:$order_id, display_name:$display_name, email:$email, dedication:$dedication, anonymous:$anonymous, source:"manual"}')
           fi
+          # pipefail：默认管道只看最后一个命令的退出码，node 失败会被 tee 的成功掩盖，
+          # 结果就是"分配失败但步骤显示成功"，运维只能在下个步骤看到莫名的 JSON 解析错误。
+          # 但售罄（退出码 3）是预期内的业务状态，不能让它把整条流水线标红。
+          set +e
+          set -o pipefail
           node scripts/register.mjs | tee register-result.json
+          code=$?
+          set -e
+          if [ "$code" = "3" ]; then
+            echo "::warning::候选库已售罄，本次未产生登记（已通知运维补货）"
+            exit 0
+          fi
+          exit "$code"
 
       - name: 提交登记记录（每次登记产生一次独立 commit）
         run: |
+          if [ ! -s register-result.json ]; then
+            echo "::error::未产生登记结果（载荷不合法或分配失败），本次不提交任何内容，请查看上一步日志"
+            exit 1
+          fi
           SLUG=$(node -e "const r=require('./register-result.json'); console.log(r.slug||'')")
           if [ -z "$SLUG" ]; then echo "未产生登记（可能候选库售罄），跳过提交"; exit 0; fi
           git config user.name "star-org-bot"

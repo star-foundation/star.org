@@ -106,34 +106,104 @@ npm run build:site          # 本地确认购买入口已变为「已开启」
 
 ## 4. Zapier / Make 配置（唯一的"胶水"环节）
 
-以 Zapier 为例：
+### 4.1 Lemon Squeezy 侧
 
-1. **Trigger**：`Webhooks by Zapier → Catch Hook`，复制生成的 URL 填到 Lemon Squeezy Webhook。
-2. 用 Lemon Squeezy Test Mode 下一笔测试单，抓取一次真实载荷，确认字段名
-   （常见为 `data.attributes.user_email`、`data.id`，自定义字段在 `data.attributes.first_order_item` 或
-   `meta.custom_data` 中，按实际载荷取）。
-3. **Filter**：仅当事件为 `order_created` 且状态为 paid 时继续。
-4. **Action**：`Webhooks by Zapier → POST`，配置：
-   - URL：`https://api.github.com/repos/<账号>/star.org/dispatches`
-   - Payload type：`json`
-   - Headers：
-     - `Authorization: Bearer <GitHub PAT>`（Fine-grained token，仅勾选该仓库的 Contents: Read and write）
-     - `Accept: application/vnd.github+json`
-   - Data：
-     ```json
-     {
-       "event_type": "star_registration",
-       "client_payload": {
-         "order_id": "<Lemon Squeezy 订单 ID>",
-         "display_name": "<登记人姓名/称呼>",
-         "email": "<用户邮箱>",
-         "dedication": "<献词，可为空>",
-         "anonymous": false,
-         "source": "lemon-squeezy"
-       }
-     }
-     ```
-5. GitHub PAT 只保存在 Zapier 的密钥管理中，不进入前端、不进入仓库。
+**Settings → Webhooks → Add webhook**：URL 填 Zapier/Make 生成的 Catch Hook 地址，
+Events 只勾 `order_created`，Signing secret 保存好（Zapier 侧可用于校验，可选但推荐）。
+
+`order_created` 的官方载荷结构（关键字段）：
+
+```json
+{
+  "meta": { "event_name": "order_created", "custom_data": { "...": "结算时传入的自定义数据" } },
+  "data": {
+    "type": "orders",
+    "id": "1",
+    "attributes": {
+      "order_number": 1,
+      "user_name": "John Doe",
+      "user_email": "johndoe@example.com",
+      "status": "paid",
+      "test_mode": false,
+      "first_order_item": { "product_name": "Star Registration" },
+      "urls": { "receipt": "https://app.lemonsqueezy.com/my-orders/...?signature=..." }
+    }
+  }
+}
+```
+
+### 4.2 字段映射
+
+| `client_payload` 字段 | 取自 | 说明 |
+| --- | --- | --- |
+| `order_id` | `data.id` | **幂等键**：同一订单号永远映射到同一登记编号，重复触发不会占第二颗星 |
+| `display_name` | 结算页「姓名/称呼」自定义字段；缺省用 `data.attributes.user_name` | 必填；超过 40 字截断 |
+| `email` | `data.attributes.user_email` | 只用于发证书邮件，绝不写入公开仓库 |
+| `dedication` | 结算页「献词」自定义字段 | 选填；超过 100 字自动截断 |
+| `anonymous` | 结算页「匿名展示」自定义字段（勾选为 true） | 勾选后公开记录与页面不显示称呼 |
+
+> 结算页自定义字段落在载荷的哪个位置，取决于 Lemon Squeezy 后台的字段配置方式；
+> 官方文档明确的是「通过结算链接传入的自定义数据」出现在 `meta.custom_data`。
+> **最可靠的做法**是先按 4.3 抓一次真实载荷，看清字段实际路径再填映射，不要照抄猜测的路径。
+
+### 4.3 先抓一次真实载荷（务必做）
+
+1. Trigger 选 `Webhooks by Zapier → Catch Hook`，复制 URL 填到 Lemon Squeezy Webhook。
+2. Lemon Squeezy 开 Test Mode，用测试卡下一单。
+3. 回 Zapier 点 **Find new records**，看真实载荷，按 4.2 的表把字段映射好。
+4. 用 **Test action** 发一次，去 GitHub Actions 页面确认 `登记（支付成功后自动执行）` 跑起来了。
+
+### 4.4 Action：调用 GitHub repository_dispatch
+
+- URL：`https://api.github.com/repos/star-foundation/star.org/dispatches`
+- Method `POST`，Payload type `json`
+- Headers：
+  - `Authorization: Bearer <GitHub PAT>`
+  - `Accept: application/vnd.github+json`
+- Data：
+
+  ```json
+  {
+    "event_type": "star_registration",
+    "client_payload": {
+      "order_id": "<data.id>",
+      "display_name": "<登记人姓名/称呼>",
+      "email": "<user_email>",
+      "dedication": "<献词，可为空>",
+      "anonymous": false,
+      "source": "lemon-squeezy"
+    }
+  }
+  ```
+
+- PAT：Fine-grained token，只授权本仓库的 **Contents: Read and write**；
+  只存在 Zapier 的密钥管理里，不进前端、不进仓库。
+
+### 4.5 不装 Zapier 也能自测接收端
+
+接收端（`register.yml`）与"谁派发"无关，可以直接用 GitHub CLI 模拟派发，
+用来验证链路是否通、以及异常载荷会不会污染数据：
+
+```bash
+gh api --method POST repos/star-foundation/star.org/dispatches \
+  -f event_type=star_registration \
+  -f client_payload[order_id]=TEST-0001 \
+  -f client_payload[display_name]=链路自测 \
+  -f client_payload[email]=you@example.com
+```
+
+派发后到 Actions 页面看 `登记（支付成功后自动执行）`：
+
+| 载荷 | 预期结果 |
+| --- | --- |
+| 正常 | 产生一次 `登记 <slug>` 提交（证书 PDF + OG 图 + 记录），候选库少一颗 |
+| 同一订单号再派发一次 | 仍然是同一个登记编号，**不会占第二颗星** |
+| 缺 `display_name` | 以退出码 4 失败，**不产生任何提交** |
+| 候选库售罄 | 退出码 3，标为 warning 并跳过提交（同时发运维告警） |
+
+> 自测产生的记录记得清理：删除 `data/registrations/<slug>.json`、`certificates/<slug>.pdf`、
+> `og/<slug>.png`，把 `data/stars_pool.json` 里那颗星改回 `available`，
+> 然后重新运行 `npm run build:site`。
 
 ## 5. 邮件服务（Resend 为例）
 
@@ -143,12 +213,16 @@ npm run build:site          # 本地确认购买入口已变为「已开启」
 
 ## 6. 域名绑定
 
-1. 仓库 **Settings → Pages → Custom domain** 填 `star.org`，保存。
-2. DNS 添加记录（GitHub 官方推荐值）：
-   - `A @ 185.199.108.153` / `.109.153` / `.110.153` / `.111.153`
-   - `CNAME www <账号>.github.io`
-3. 等待证书签发，勾选 **Enforce HTTPS**。
-4. 构建时会自动写入 `CNAME` 文件（`site.config.json` 的 `site.domain`）。
+1. 仓库 **Settings → Pages → Custom domain** 填 `www.star.org`，保存。
+   > ⚠️ **仓库里的 `CNAME` 文件在 Actions 发布模式下不生效**，域名必须绑在这个设置里。
+   > 只往仓库加 `CNAME` 文件，线上会一直 404（本项目踩过这个坑）。
+2. DNS 记录（GitHub 官方推荐值）：
+   - `CNAME www star-foundation.github.io`
+   - `A @ 185.199.108.153` / `.109.153` / `.110.153` / `.111.153`（apex 会 301 跳到 www）
+3. 等待证书签发（GitHub 自动签发 Let's Encrypt，证书 CN 即你的域名），勾选 **Enforce HTTPS**。
+4. 把仓库变量 `SITE_BASE_URL` 改成正式域名（如 `https://www.star.org`）并重新发布：
+   证书 PDF、邮件与 sitemap 里印出的永久链接都以它为准，改完记得跑一次
+   `npm run check:launch` 确认域名可达。
 
 ## 7. 上线前最后检查（全部 P0，一票否决）
 

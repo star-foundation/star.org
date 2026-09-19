@@ -125,15 +125,19 @@ export async function runRegistration(order, args = {}) {
 async function main() {
   assertConfig();
   const args = parseArgs(process.argv.slice(2));
-  const order = normalizeOrder(readOrderInput(process.argv.slice(2)));
+  // normalizeOrder 必须放在 try 里：载荷不合法（缺姓名、邮箱格式错）时它抛的是
+  // INVALID_ORDER，放在外面会以原始堆栈形式冒出去，运维只能看到一句
+  // "Unexpected end of JSON input" 之类的二次错误。
+  let order = null;
   try {
+    order = normalizeOrder(readOrderInput(process.argv.slice(2)));
     const result = await runRegistration(order, args);
     if (!args.quiet) process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
     if (result.status === 'sold_out') process.exit(3);
   } catch (error) {
     await sendOperatorAlert({
       subject: '[Star.org] 登记流程失败，需人工补单',
-      text: `错误：${error.message}\n来源：${order.source}\n时间：${new Date().toISOString()}\n堆栈：\n${error.stack}\n\n请用 Lemon Squeezy 后台订单号执行：node scripts/manual-order.mjs --order-id <订单号> --name "<称呼>" --email <邮箱>`,
+      text: `错误：${error.message}\n来源：${order?.source ?? 'unknown'}\n时间：${new Date().toISOString()}\n堆栈：\n${error.stack}\n\n请用 Lemon Squeezy 后台订单号执行：node scripts/manual-order.mjs --order-id <订单号> --name "<称呼>" --email <邮箱>`,
     }).catch(() => {});
     process.stderr.write(`登记失败：${error.message}\n`);
     process.exit(error.code === 'INVALID_ORDER' ? 4 : 1);
