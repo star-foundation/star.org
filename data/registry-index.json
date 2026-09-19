@@ -1,9 +1,20 @@
 {
-  "generated_at": "2026-09-19T08:12:54.492Z",
-  "count": 4,
-  "unique_stars": 4,
+  "generated_at": "2026-09-19T08:38:21.334Z",
+  "count": 5,
+  "unique_stars": 5,
   "duplicates": [],
   "entries": [
+    {
+      "slug": "kg0javv8nn",
+      "star_id": "HIP-91262",
+      "star_name": "Vega",
+      "constellation": "Lyr",
+      "magnitude": 0.03,
+      "owner_display_name": "Card Holder Name",
+      "anonymous": false,
+      "registered_at": "2026-09-19T08:38:18.884Z",
+      "dedication_message": null
+    },
     {
       "slug": "5pax5y8wyt",
       "star_id": "HIP-71683",

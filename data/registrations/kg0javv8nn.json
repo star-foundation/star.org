@@ -1,0 +1,29 @@
+{
+  "slug": "kg0javv8nn",
+  "star_id": "HIP-91262",
+  "owner_display_name": "Card Holder Name",
+  "anonymous": false,
+  "dedication_message": null,
+  "registered_at": "2026-09-19T08:38:18.884Z",
+  "star": {
+    "id": "HIP-91262",
+    "hip": 91262,
+    "hd": 172167,
+    "proper_name": "Vega",
+    "bayer": "Alp",
+    "flam": "3",
+    "constellation": "Lyr",
+    "ra": 279.234597,
+    "dec": 38.783692,
+    "magnitude": 0.03,
+    "spectral_type": "A0V",
+    "distance_ly": 25
+  },
+  "artifacts": {
+    "certificate": "certificates/kg0javv8nn.pdf",
+    "certificate_sha256": "9e0a61de42030f9729052643312997390f5251f54c78b73c0383fcd592f07565",
+    "og_image": "og/kg0javv8nn.png",
+    "og_sha256": "7e18aec6204c3b8c44b95a485af277cbfca7be5ac94ac78fe86a9f910b6f4d08",
+    "certificate_public": true
+  }
+}
