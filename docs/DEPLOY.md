@@ -106,26 +106,34 @@ npm run build:site          # 本地确认购买入口已变为「已开启」
 
 ### 付款完成后怎么让客户回到 Star.org
 
-付款成功后客户会停在 Lemon Squeezy 的确认弹窗与收据页，若不配置，他们就**没有任何
-路径回到站点**看证书与永久链接。Lemon Squeezy 的「确认弹窗」可以自定义标题、文案、
-**按钮文字**与**按钮链接**，按钮链接还支持订单变量。
+付款成功后客户会依次接触 Lemon Squeezy 的几个界面。**这三处都必须配**，否则客户
+在等待证书的几分钟里没有任何路径回到站点，也无法自查进度（这是本项目的功能需求 4.9）。
 
-配置位置：**Lemon Squeezy → Products → 你的商品 → Settings → Confirmation modal**
+统一的目标地址（`/thanks/` 等待页，本仓库 `site/thanks.html`）：
 
-| 字段 | 建议值 |
-| --- | --- |
-| Title | `付款已收到` |
-| Message | `证书通常在 1-3 分钟内生成并发送到你的邮箱，也可以随时回到 Star.org 查看。` |
-| Button text | `回到 Star.org 查看进度` |
-| Button link | `https://www.star.org/thanks/?order=[order_identifier]` |
+```
+https://www.star.org/thanks/?order=[order_identifier]
+```
 
-`[order_identifier]` 是官方支持的变量（订单 UUID），会被替换成真实订单号；
-`/thanks/` 页面（本仓库 `site/thanks.html`）会把它显示出来，方便客户找客服时提供。
-其余可用变量：`[order_id]`、`[email]`、`[name]`、`[total]`、`[license_key]`。
+| # | 客户在哪看到 | 配置位置（Lemon Squeezy 后台） | 要填什么 |
+| --- | --- | --- | --- |
+| 1 | 付款完成、还在结算页时的**确认弹窗** | **Products → 你的商品 → Settings → Confirmation modal** | Button text `回到 Star.org 查看进度`；Button link 填上面的地址 |
+| 2 | **收据邮件**里的按钮 | **Products → 你的商品 → Settings → Receipt** | Button content `回到 Star.org 查看进度`；Destination link 填上面的地址 |
+| 3 | 客户登录后看到的**订单页**（app.lemonsqueezy.com/my-orders） | **Products → 你的商品 → Links** | 新增一个链接，名称 `查看证书与永久链接`，URL 填上面的地址 |
 
-> 想直接跳转而不让客户看到收据页，可在商品的 Links 里使用带变量的跳转 URL；
-> 但**不建议**——客户往往需要收据，保留确认弹窗加一个回站按钮体验更好。
+**第 3 项最容易被漏掉**：My Orders 是 Lemon Squeezy 的全局客户账户页，界面本身不可
+自定义；但官方文档说明「如果商品配置了 links，它们会出现在订单页上」——所以要在商品的
+**Links** 里加一条，客户从收据邮件点进订单页后才看得到回站入口。每个商品最多 3 条链接。
+
+三处都支持**订单变量**：`[order_identifier]`（订单 UUID，推荐）、`[order_id]`、`[email]`、
+`[name]`、`[total]`、`[license_key]`。`/thanks/` 会把订单号显示出来，方便客户找客服时提供
+（只在页面上展示，不存储、不外发）。
+
+> 不建议用「购买后自动跳转」替代确认弹窗——客户往往需要留一份收据。
 > `/thanks/` 已设 `noindex` 且不进 sitemap（购买后过渡页不应出现在搜索结果里）。
+>
+> 兜底：即使这三处都没配，客户仍会在 1-3 分钟内收到**我们发的证书邮件**，里面有永久链接；
+> 证书生成失败时运维也会收到告警（见第 7 节）。但**不要依赖兜底**，三处都要配。
 
 ## 4. Zapier / Make 配置（唯一的"胶水"环节）
 
