@@ -338,7 +338,7 @@ const DATA = [
       { t: "接收端验证：repository_dispatch → 登记流水线全链路", tag: "p0", done: true,
         note: "用真实派发跑了 4 次：正常载荷在 CI 里完成分配→渲染证书 PDF→生成 OG 图→提交记录（commit「登记 hn34tyjj3n」），证明接收端与证书渲染都可用；同一订单号重复派发复用同一登记编号、不占第二颗星；缺 display_name 的异常载荷以退出码 4 失败且零提交；候选库售罄退出码 3、标 warning 并跳过提交" },
       { t: "Lemon Squeezy Webhook → Zapier/Make → repository_dispatch 联调", tag: "p0", done: true,
-        note: "Zap 侧已全链路打通（无需注册 LS 也能验证）：Catch Hook 收到真实载荷 → Custom Request POST 到 GitHub repository_dispatch → 触发登记并生成「李明远」的证书/OG → workflow_run 自动部署上线；字段映射为真实值（非写死）、幂等无误、隐私零泄漏。剩余仅 LS 后台：把 Webhook URL 指向 Catch Hook 地址（hooks.zapier.com/hooks/catch/28900098/4dgu97p/，Events 勾 order_created）+ 测试卡下一单 —— 都是配置，无代码改动" },
+        note: "已用【真实 LS 测试订单】端到端验证：LS 结算 → LS webhook(order_created) → Zapier Catch Hook → Custom Request POST → GitHub repository_dispatch → 分配恒星 → 证书/OG → workflow_run 自动部署 → 线上永久链接页（含「李明月」）可访问。字段映射为真实值：display_name 取自 data.attributes.user_name（LS 无自定义字段，最初映射到 meta.custom_data.display_name 会得到空值导致拒单）、status 取自 data.attributes.status(paid)、order_id 取自 data.id；幂等无误、隐私零泄漏。生产前注意：展示名=持卡人姓名（LS 不收集登记名/献词），PRD 要求的下单前表单（姓名/献词/匿名）是后续根治项" },
     ],
   },
   {
