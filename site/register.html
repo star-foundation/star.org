@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>登记一颗星 · {{siteName}}</title>
-<meta name="description" content="填写登记人姓名或称呼、可选的献词，然后前往结算（{{priceDisplay}}）。姓名与献词会印在证书上；选择匿名后不会出现在公开页面。">
+<title>认领一颗星 · {{siteName}}</title>
+<meta name="description" content="填写认领人姓名或称呼、可选的献词，然后前往结算（{{priceDisplay}}）。姓名与献词会印在证书上；选择匿名后不会出现在公开页面。">
 <link rel="canonical" href="{{baseUrl}}/register/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="{{siteName}}">
-<meta property="og:title" content="登记一颗星 · {{siteName}}">
-<meta property="og:description" content="填写登记人姓名或称呼、可选的献词，然后前往结算。{{priceDisplay}}，含 PDF 证书与永久链接。">
+<meta property="og:title" content="认领一颗星 · {{siteName}}">
+<meta property="og:description" content="填写认领人姓名或称呼、可选的献词，然后前往结算。{{priceDisplay}}，含 PDF 证书与永久链接。">
 <meta property="og:url" content="{{baseUrl}}/register/">
 <meta property="og:image" content="{{defaultOgImage}}">
 <meta name="twitter:card" content="summary_large_image">
@@ -21,9 +21,9 @@
   <div class="wrap nav">
     <div class="brand"><a href="/">{{siteName}}</a></div>
     <nav class="nav-links">
-      <a href="/registry/">公开登记表</a>
+      <a href="/registry/">公开认领表</a>
       <a href="/#faq">常见问题</a>
-      {{#if checkoutReady}}<a class="btn btn-primary btn-sm" href="/register/">登记一颗星</a>{{/if}}
+      {{#if checkoutReady}}<a class="btn btn-primary btn-sm" href="/register/">认领一颗星</a>{{/if}}
     </nav>
   </div>
 </header>
@@ -31,10 +31,10 @@
 <main>
   <section class="hero plain">
     <div class="wrap narrow">
-      <div class="eyebrow">可公开验证的恒星登记</div>
-      <h1>登记一颗星</h1>
+      <div class="eyebrow">可公开验证的恒星认领</div>
+      <h1>认领一颗星</h1>
       <p class="lede">
-        填写登记人姓名或称呼、可选的献词，然后前往结算。系统会为你分配一颗真实的恒星，
+        填写认领人姓名或称呼、可选的献词，然后前往结算。系统会为你分配一颗真实的恒星，
         并生成载有真实天文数据的证书与永久链接。
       </p>
       <div class="price-note">{{priceDisplay}} · {{priceNote}}</div>
@@ -46,7 +46,7 @@
       {{#if checkoutReady}}
       <form class="register-form" data-registration-form data-checkout-url="{{checkoutUrl}}" autocomplete="off">
         <label class="field">
-          <span class="field-label">登记人姓名 / 称呼 <em>必填</em></span>
+          <span class="field-label">认领人姓名 / 称呼 <em>必填</em></span>
           <input name="display_name" type="text" maxlength="40" required
                  placeholder="将印在证书上，如：李四 / Anna / 星野">
         </label>
@@ -70,7 +70,7 @@
       <div class="center">
         <span class="btn btn-primary is-disabled">{{entryLabel}}</span>
         <p class="muted" style="margin-top:14px;font-size:14px;">{{entryMessage}}</p>
-        <p style="margin-top:18px;"><a href="/registry/">先看看公开登记表</a></p>
+        <p style="margin-top:18px;"><a href="/registry/">先看看公开认领表</a></p>
       </div>
       {{/unless}}
     </div>
@@ -85,8 +85,8 @@
         <li><b>收到证书邮件</b> —— 证书发送到你在结算页填写的邮箱；永久链接可以随时分享。</li>
       </ol>
       <p class="muted" style="font-size:14px;">
-        公开登记表里只有恒星编号、展示用的称呼、献词（如有）与登记日期。
-        邮箱与订单信息不会写入任何公开文件；勾选匿名后，连称呼也不会出现在公开页面与登记表中。
+        公开认领表里只有恒星编号、展示用的称呼、献词（如有）与认领日期。
+        邮箱与订单信息不会写入任何公开文件；勾选匿名后，连称呼也不会出现在公开页面与认领表中。
       </p>
     </div>
   </section>
@@ -95,12 +95,12 @@
 <footer class="site">
   <div class="wrap foot-grid">
     <div class="disclaimer">
-      {{siteName}} 提供纪念性质的公开可验证恒星登记服务，不构成国际天文学联合会（IAU）官方命名，
+      {{siteName}} 提供纪念性质的公开可验证恒星认领服务，不构成国际天文学联合会（IAU）官方命名，
       亦不代表任何天体命名权。证书所载天文数据来自公开星表。
       <br>联系：<a href="mailto:{{supportEmail}}">{{supportEmail}}</a>
     </div>
     <div>
-      <a href="/registry/">公开登记表</a> ·
+      <a href="/registry/">公开认领表</a> ·
       <a href="/#faq">常见问题</a>
       {{#if registryRepoUrl}}· <a href="{{registryRepoUrl}}" rel="noopener">公开仓库</a>{{/if}}
       <div class="muted" style="margin-top:8px;">© {{year}} {{siteName}}</div>

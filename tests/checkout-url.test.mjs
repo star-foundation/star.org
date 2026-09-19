@@ -4,7 +4,7 @@ import { buildCheckoutUrl } from '../site/assets/js/checkout-url.mjs';
 
 const BASE = 'https://star-org.lemonsqueezy.com/checkout/buy/7deb7838-aa5a-43ca-852f-00aa4a2d8613';
 
-test('TC-FORM-01 登记信息拼进 checkout[custom][...]', () => {
+test('TC-FORM-01 认领信息拼进 checkout[custom][...]', () => {
   const url = new URL(buildCheckoutUrl(BASE, { displayName: '李四', dedication: '愿你抬头见星光', anonymous: false }));
   assert.equal(url.searchParams.get('checkout[custom][display_name]'), '李四');
   assert.equal(url.searchParams.get('checkout[custom][dedication]'), '愿你抬头见星光');

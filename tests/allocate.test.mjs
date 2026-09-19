@@ -35,7 +35,7 @@ test('TC-ALLOC-02 连续两笔独立订单分配到不同恒星', () => {
     assert.notEqual(first.json.star_id, second.json.star_id);
     assert.notEqual(first.json.slug, second.json.slug);
     const pool = readJson(sandbox.poolFile);
-    assert.equal(pool.stars.filter((s) => s.status === 'assigned').length, 2 + 2); // 2 笔新登记 + 2 条预置
+    assert.equal(pool.stars.filter((s) => s.status === 'assigned').length, 2 + 2); // 2 笔新认领 + 2 条预置
   } finally {
     sandbox.cleanup();
   }
@@ -48,7 +48,7 @@ test('TC-ALLOC-04 候选库售罄时进入异常处理，不生成分配记录',
     const result = runScript('allocate.mjs', [], { sandbox, input: JSON.stringify({ display_name: 'Anna' }) });
     assert.equal(result.status, 3, '售罄应返回退出码 3');
     assert.equal(result.json.status, 'sold_out');
-    assert.equal(readdirSync(sandbox.registrations).length, before, '不得新增登记记录');
+    assert.equal(readdirSync(sandbox.registrations).length, before, '不得新增认领记录');
   } finally {
     sandbox.cleanup();
   }
@@ -94,7 +94,7 @@ test('订单信息非法时拒绝执行', () => {
   try {
     const result = runScript('allocate.mjs', [], { sandbox, input: JSON.stringify({ email: 'a@example.com' }) });
     assert.equal(result.status, 4);
-    assert.match(result.stderr, /缺少登记人姓名/);
+    assert.match(result.stderr, /缺少认领人姓名/);
   } finally {
     sandbox.cleanup();
   }

@@ -201,7 +201,7 @@ footer.site .disclaimer { max-width: 620px; line-height: 1.8; }
   .nav-links a[href="#faq"] { display: none; }
 }
 
-/* 下单前登记表单（名字 / 献词 / 匿名） */
+/* 下单前认领表单（名字 / 献词 / 匿名） */
 .register-form {
   display: flex;
   flex-direction: column;
@@ -259,7 +259,7 @@ footer.site .disclaimer { max-width: 620px; line-height: 1.8; }
 .register-form .field.checkbox input { width: 16px; height: 16px; accent-color: #16309a; }
 .register-form .btn { align-self: center; margin-top: 4px; }
 .register-form .field-note { font-size: 12.5px; text-align: center; margin-top: 2px; }
-/* 登记页的「接下来会发生什么」 */
+/* 认领页的「接下来会发生什么」 */
 .steps {
   counter-reset: step;
   list-style: none;
@@ -297,7 +297,7 @@ footer.site .disclaimer { max-width: 620px; line-height: 1.8; }
 }
 .steps li b { color: #16309a; }
 
-/* 公开登记表的候选库进度条 */
+/* 公开认领表的候选库进度条 */
 .progress-card {
   border: 1px solid #e6e8f2;
   border-radius: 12px;
@@ -340,7 +340,7 @@ footer.site .disclaimer { max-width: 620px; line-height: 1.8; }
 .progress-foot strong { color: #16309a; }
 
 /* 早期阶段（如 1/800）真实宽度不足 1 像素，给一条最小可见宽度，
-   否则进度条看起来像没渲染。只在已有登记时生效，0 条仍是空轨道。 */
+   否则进度条看起来像没渲染。只在已有认领时生效，0 条仍是空轨道。 */
 .progress-fill.is-started { min-width: 4px; }
 
 /* 等待页：不确定进度（证书生成中）用流动条纹表示"正在进行"，

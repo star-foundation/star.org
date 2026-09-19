@@ -4,11 +4,11 @@
  *
  * 产物：
  *   /                    落地页
- *   /registry/           公开可验证登记表（无需登录）
- *   /s/{slug}/           每条登记的永久链接页面
+ *   /registry/           公开可验证认领表（无需登录）
+ *   /s/{slug}/           每条认领的永久链接页面
  *   /certificates/*.pdf  证书下载
  *   /og/*.png            OG 分享图
- *   /data/*.json         公开登记数据（供任何访客自行核对）
+ *   /data/*.json         公开认领数据（供任何访客自行核对）
  *   404.html / sitemap.xml / robots.txt / CNAME
  */
 import { cpSync, existsSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
@@ -55,8 +55,8 @@ export function relativize(html, depth) {
 /**
  * 落地页「你会拿到什么」展示的内容。
  *
- * 优先展示**最近一条真实登记**（含登记人与献词）——既是社会证明，也让访客在购买前
- * 看到真实交付物，而不是一个虚构样例。没有登记记录时回退到内置示例并明确标注「示例数据」。
+ * 优先展示**最近一条真实认领**（含认领人与献词）——既是社会证明，也让访客在购买前
+ * 看到真实交付物，而不是一个虚构样例。没有认领记录时回退到内置示例并明确标注「示例数据」。
  */
 function sampleView(cfg, records = []) {
   const latest = records[0] ?? null;
@@ -81,8 +81,8 @@ function sampleView(cfg, records = []) {
       magnitudeText: view.magnitudeText,
       distanceText: view.distanceText,
       spectralText: view.spectralText,
-      // 匿名登记不展示姓名（与登记表、永久页一致）
-      displayName: view.anonymous ? '匿名登记人' : view.displayName,
+      // 匿名认领不展示姓名（与认领表、永久页一致）
+      displayName: view.anonymous ? '匿名认领人' : view.displayName,
       anonymous: view.anonymous,
       dedication: view.dedication,
       registeredDateZh: view.registeredDateZh,
@@ -119,8 +119,8 @@ async function buildDefaultOg(cfg, outDir) {
   try {
     renderPng(
       renderOgHtml({
-        // 默认 OG 图保持固定的示例内容：社交平台会缓存 OG 图，跟着最新登记变动
-        // 会让卡片反复失效。真实的最新登记展示在落地页正文里。
+        // 默认 OG 图保持固定的示例内容：社交平台会缓存 OG 图，跟着最新认领变动
+        // 会让卡片反复失效。真实的最新认领展示在落地页正文里。
         ...sampleView(cfg, []),
         slug: 'star-org',
         starFieldSvg: '',
@@ -155,7 +155,7 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
   const entryLabel = soldOut ? '候选库已售罄' : '购买通道接入中';
   const entryMessage = soldOut ? cfg.policy.soldOutMessage : cfg.policy.checkoutPendingMessage;
   const latest = records[0] ?? null;
-  // 登记进度（公开登记表与付款等待页共用）：已登记 / 候选库总数
+  // 认领进度（公开认领表与付款等待页共用）：已认领 / 候选库总数
   const poolTotal = pool.stars.length || 1;
   const poolPercent = Math.round((index.count / poolTotal) * 1000) / 10;
   const poolStarted = index.count > 0;
@@ -201,7 +201,7 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
   });
   writeFileAtomic(path.join(outDir, 'index.html'), relativize(landing, 0));
 
-  // 登记页（三个申请入口统一指向这里；表单在这里填写姓名/献词/匿名）
+  // 认领页（三个申请入口统一指向这里；表单在这里填写姓名/献词/匿名）
   const registerHtml = render(tpl('register.html'), common);
   ensureDir(path.join(outDir, 'register'));
   writeFileAtomic(path.join(outDir, 'register', 'index.html'), relativize(registerHtml, 1));
@@ -212,7 +212,7 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
   ensureDir(path.join(outDir, 'thanks'));
   writeFileAtomic(path.join(outDir, 'thanks', 'index.html'), relativize(thanksHtml, 1));
 
-  // 公开登记表
+  // 公开认领表
   // 最近 7 天新增（工作流里算，不进前端脚本）
   const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
   const recentCount7d = index.entries.filter((entry) => {
@@ -234,7 +234,7 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
   ensureDir(path.join(outDir, 'registry'));
   writeFileAtomic(path.join(outDir, 'registry', 'index.html'), relativize(registryHtml, 1));
 
-  // 每条登记的永久链接页面
+  // 每条认领的永久链接页面
   let pages = 0;
   for (const record of records) {
     const slug = record.slug;
@@ -251,7 +251,7 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
     const page = render(tpl('permanent.html'), {
       ...common,
       ...view,
-      shareText: encodeURIComponent(`我为 ${view.starTitle} 完成了一次可公开验证的恒星登记`),
+      shareText: encodeURIComponent(`我为 ${view.starTitle} 完成了一次可公开验证的恒星认领`),
       shareUrl: encodeURIComponent(view.permalink),
     });
     ensureDir(path.join(outDir, 's', slug));
@@ -347,7 +347,7 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
 async function main() {
   const result = await buildSite();
   console.log(`站点已生成：${result.outDir}`);
-  console.log(`  页面数：${result.pages}（含登记永久页 ${result.registryCount} 个）`);
+  console.log(`  页面数：${result.pages}（含认领永久页 ${result.registryCount} 个）`);
   console.log(`  候选库剩余：${result.available} 颗`);
   const entryState = result.checkoutReady
     ? '已开启'

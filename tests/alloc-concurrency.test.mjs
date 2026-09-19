@@ -55,11 +55,11 @@ for (const round of [1, 2, 3]) {
       assert.equal(claimed.length, 1, '同一 slug 只能占用一颗恒星');
 
       const records = readdirSync(sandbox.registrations).filter((name) => name.startsWith(newSlug));
-      assert.equal(records.length, 1, '只允许生成一条登记记录');
+      assert.equal(records.length, 1, '只允许生成一条认领记录');
 
-      // 无可用恒星时不得产生任何孤立登记
+      // 无可用恒星时不得产生任何孤立认领
       const allRecords = readdirSync(sandbox.registrations);
-      assert.equal(allRecords.length, 4, `登记记录总数应为 4（3 条预置 + 1 条新登记），实际 ${allRecords.length}`);
+      assert.equal(allRecords.length, 4, `认领记录总数应为 4（3 条预置 + 1 条新认领），实际 ${allRecords.length}`);
     } finally {
       sandbox.cleanup();
     }

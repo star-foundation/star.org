@@ -4,7 +4,7 @@
  *
  * 用法：
  *   node scripts/manual-order.mjs --order-id 123456 --name "For Anna" --email a@b.com [--dedication "..."] [--anonymous] [--force]
- *   node scripts/manual-order.mjs --slug a1b2c3d4e5 --name "For Anna" --email a@b.com   # 重发既有登记的证书邮件
+ *   node scripts/manual-order.mjs --slug a1b2c3d4e5 --name "For Anna" --email a@b.com   # 重发既有认领的证书邮件
  *
  * 说明：订单号只用于派生 slug（HMAC）与幂等判断，不会写入公开仓库。
  */
@@ -29,7 +29,7 @@ function parseArgs(argv) {
 async function main() {
   assertConfig();
   const args = parseArgs(process.argv.slice(2));
-  if (!args.name) throw new Error('必须提供 --name "<登记人称呼>"');
+  if (!args.name) throw new Error('必须提供 --name "<认领人称呼>"');
   if (args.slug && !isValidSlug(args.slug)) throw new Error(`slug 格式不正确：${args.slug}`);
 
   const order = normalizeOrder({
@@ -44,9 +44,9 @@ async function main() {
 
   if (args.slug) {
     const existing = findRegistration(args.slug);
-    if (!existing) throw new Error(`找不到登记记录：${args.slug}`);
+    if (!existing) throw new Error(`找不到认领记录：${args.slug}`);
   } else if (!args.orderId) {
-    throw new Error('必须提供 --order-id（按订单补单）或 --slug（重发既有登记）');
+    throw new Error('必须提供 --order-id（按订单补单）或 --slug（重发既有认领）');
   }
 
   const result = await runRegistration(order, {

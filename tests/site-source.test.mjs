@@ -26,7 +26,7 @@ test('TC-LP-05 移动端：所有页面声明 viewport 且样式含响应式规�
 test('站点基础文件齐全（favicon / 交互脚本 / 站点配置）', () => {
   assert.ok(readFileSync(path.join(ROOT, 'site', 'assets', 'img', 'favicon.svg'), 'utf8').startsWith('<svg'));
   const js = readFileSync(path.join(ROOT, 'site', 'assets', 'js', 'site.js'), 'utf8');
-  assert.ok(js.includes('data-registry-search'), '登记表需支持检索');
+  assert.ok(js.includes('data-registry-search'), '认领表需支持检索');
   assert.ok(js.includes('data-copy'), '永久页需支持复制链接');
   const config = JSON.parse(readFileSync(path.join(ROOT, 'site.config.json'), 'utf8'));
   assert.equal(config.product.maxDedicationChars, 100);
@@ -44,12 +44,12 @@ test('TC-LP-06 构建产物使用相对路径：项目子路径 /star.org/ 下�
 
     const landing = readFileSync(path.join(out, 'index.html'), 'utf8');
     assert.ok(landing.includes('href="./assets/css/site.css"'), '落地页样式需为相对路径');
-    assert.ok(landing.includes('href="./registry/"'), '落地页的登记表链接需为相对路径');
+    assert.ok(landing.includes('href="./registry/"'), '落地页的认领表链接需为相对路径');
     assert.ok(!/(href|src)="\/(?!\/)/.test(landing), '落地页不应残留根绝对路径');
 
     const registry = readFileSync(path.join(out, 'registry', 'index.html'), 'utf8');
-    assert.ok(registry.includes('href="../assets/css/site.css"'), '登记表样式需上跳一级');
-    assert.ok(!/(href|src)="\/(?!\/)/.test(registry), '登记表不应残留根绝对路径');
+    assert.ok(registry.includes('href="../assets/css/site.css"'), '认领表样式需上跳一级');
+    assert.ok(!/(href|src)="\/(?!\/)/.test(registry), '认领表不应残留根绝对路径');
 
     const notFound = readFileSync(path.join(out, '404.html'), 'utf8');
     assert.ok(notFound.includes('href="./assets/css/site.css"'), '404 页样式需为相对路径');

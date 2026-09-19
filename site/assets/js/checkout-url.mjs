@@ -1,4 +1,4 @@
-// 纯函数：把登记信息拼进 Lemon Squeezy 结算 URL 的 checkout[custom][...] 参数，
+// 纯函数：把认领信息拼进 Lemon Squeezy 结算 URL 的 checkout[custom][...] 参数，
 // 这样 LS webhook 的 meta.custom_data 里就有 display_name / dedication / anonymous，
 // 证书上就能显示客户自己填的名字与献词。零依赖，可在 Node 里直接测试。
 export function buildCheckoutUrl(base, { displayName, dedication, anonymous } = {}) {

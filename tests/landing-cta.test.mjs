@@ -36,12 +36,12 @@ test('TC-LP-08 未配置结算链接：显示「购买通道接入中」，不�
   }
 });
 
-test('TC-LP-02 配置结算链接后：购买按钮指向登记页（不再直接跳结算），且不再出现接入中文案', () => {
+test('TC-LP-02 配置结算链接后：购买按钮指向认领页（不再直接跳结算），且不再出现接入中文案', () => {
   const sandbox = createSandbox({ availableStars: 3, poolSize: 3 });
   try {
     const html = buildLanding(sandbox, { LEMON_SQUEEZY_CHECKOUT_URL: CHECKOUT_URL });
-    assert.ok(html.includes('register/'), '购买入口应指向登记页 /register/');
-    assert.ok(html.includes('登记一颗星'), '按钮文案应统一为「登记一颗星」');
+    assert.ok(html.includes('register/'), '购买入口应指向认领页 /register/');
+    assert.ok(html.includes('认领一颗星'), '按钮文案应统一为「认领一颗星」');
     assert.ok(html.includes('US$29'), '页面应展示价格');
     assert.ok(!html.includes('购买通道接入中'), '已开启时不应出现接入中文案');
     assert.ok(!html.includes('候选库已售罄'), '有库存时不应出现售罄文案');

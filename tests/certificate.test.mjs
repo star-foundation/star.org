@@ -40,7 +40,7 @@ test('TC-PDF-01 证书字段完整性（姓名/献词/恒星数据/日期/永久
     '0.03 等',          // 视星等
     'A0V',              // 光谱型
     '25.0 光年',        // 距离
-    '2026年9月20日',     // 登记日期
+    '2026年9月20日',     // 认领日期
     'https://star.org/s/abcd123456/', // 永久链接
     '如何自行核实',       // 验证说明
     'IAU',              // 合规声明
@@ -64,12 +64,12 @@ test('TC-PDF-04 中文 / emoji / 特殊字符姓名正确渲染', () => {
   assert.ok(!html.includes('<家人>'), '不得把用户输入当成 HTML');
 });
 
-test('TC-PAY-04 / TC-PAGE-05 匿名登记：页面视图不暴露姓名，证书按策略处理', () => {
+test('TC-PAY-04 / TC-PAGE-05 匿名认领：页面视图不暴露姓名，证书按策略处理', () => {
   const view = viewFor({ anonymous: true, owner_display_name: null });
   assert.equal(view.displayName, null);
   assert.equal(view.anonymous, true);
   const html = renderCertificateHtml(view);
-  assert.ok(html.includes('匿名登记人'));
+  assert.ok(html.includes('匿名认领人'));
   assert.ok(!html.includes('For Anna'));
 });
 

@@ -14,7 +14,7 @@ const skipRender = hasChrome ? false : '未检测到 Chrome/Chromium，跳过需
  *   TC-ERR-03 用户要求修改姓名/献词 → 改记录后重发证书
  *   TC-ERR-04 重复提交同一订单 → 不得分配第二颗星
  */
-test('TC-ERR-02 人工补单：按订单号补出登记，且 slug 可由订单号复现', () => {
+test('TC-ERR-02 人工补单：按订单号补出认领，且 slug 可由订单号复现', () => {
   const sandbox = createSandbox({ availableStars: 2, poolSize: 3 });
   try {
     const result = runScript('manual-order.mjs', [
@@ -64,7 +64,7 @@ test('TC-ERR-03 改献词后重发：记录被更新、证书与 OG 图重新渲
     ], { sandbox });
     assert.equal(edited.status, 0, edited.stderr);
     assert.equal(edited.json.status, 'replay');
-    assert.equal(edited.json.slug, slug, '必须复用同一条登记，而不是新建一条');
+    assert.equal(edited.json.slug, slug, '必须复用同一条认领，而不是新建一条');
     const steps = Object.fromEntries(edited.json.steps.map((step) => [step.step, step.status]));
     assert.equal(steps.record_update, 'updated');
     assert.equal(steps.certificate, 'rendered');
@@ -72,9 +72,9 @@ test('TC-ERR-03 改献词后重发：记录被更新、证书与 OG 图重新渲
 
     const after = readJson(path.join(sandbox.registrations, `${slug}.json`));
     assert.equal(after.dedication_message, '改过之后的献词');
-    assert.equal(after.registered_at, before.registered_at, '重发不得改变登记时间');
+    assert.equal(after.registered_at, before.registered_at, '重发不得改变认领时间');
     assert.notEqual(after.artifacts.certificate_sha256, certBefore, '证书应重新生成');
-    assert.equal(readdirSync(sandbox.registrations).filter((f) => f.endsWith('.json')).length, 2, '沙盒内仍只有 1 条预置 + 1 条登记');
+    assert.equal(readdirSync(sandbox.registrations).filter((f) => f.endsWith('.json')).length, 2, '沙盒内仍只有 1 条预置 + 1 条认领');
   } finally {
     sandbox.cleanup();
   }
@@ -92,7 +92,7 @@ test('TC-ERR-02 对账脚本在未配置 API Key 时给出人工对账清单', (
   }
 });
 
-test('TC-ALLOC-04 售罄时补单失败但留下可追溯记录，不产生孤立登记', () => {
+test('TC-ALLOC-04 售罄时补单失败但留下可追溯记录，不产生孤立认领', () => {
   const sandbox = createSandbox({ availableStars: 0, poolSize: 2 });
   try {
     const result = runScript('manual-order.mjs', [
@@ -100,7 +100,7 @@ test('TC-ALLOC-04 售罄时补单失败但留下可追溯记录，不产生孤�
     ], { sandbox });
     assert.equal(result.status, 3, '售罄应返回退出码 3');
     assert.equal(result.json.status, 'sold_out');
-    assert.equal(readdirSync(sandbox.registrations).filter((f) => f.endsWith('.json')).length, 2, '不得新增登记记录');
+    assert.equal(readdirSync(sandbox.registrations).filter((f) => f.endsWith('.json')).length, 2, '不得新增认领记录');
   } finally {
     sandbox.cleanup();
   }

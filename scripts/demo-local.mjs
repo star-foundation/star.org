@@ -3,7 +3,7 @@
  * 本地一键启动（开发自用，不参与线上架构）。
  *
  * 做三件事：
- *   1. 在临时沙盒目录里跑一笔真实的完整登记（分配 → 证书 PDF → OG 图 → 登记记录 → 邮件写入 outbox）
+ *   1. 在临时沙盒目录里跑一笔真实的完整认领（分配 → 证书 PDF → OG 图 → 认领记录 → 邮件写入 outbox）
  *   2. 用这份沙盒数据构建静态站点
  *   3. 启动本地预览服务器（默认 http://127.0.0.1:4321/）
  *
@@ -90,7 +90,7 @@ const orderId = args.orderId || `DEMO-${Date.now()}`;
 
 console.log('Star.org 本地演示');
 console.log(`  沙盒目录：${sandbox}`);
-console.log(`  订单号：  ${orderId}（仅用于派生登记编号，不会写入公开数据）`);
+console.log(`  订单号：  ${orderId}（仅用于派生认领编号，不会写入公开数据）`);
 console.log('  正在分配恒星并渲染证书与分享图…');
 
 const order = normalizeOrder({
@@ -112,18 +112,18 @@ const site = await buildSite();
 const recordFiles = readdirSync(path.join(sandbox, 'data', 'registrations')).filter((f) => f.endsWith('.json'));
 
 console.log('');
-console.log(`✅ 登记完成：${result.slug}`);
+console.log(`✅ 认领完成：${result.slug}`);
 console.log(`   恒星：      ${result.star_id}`);
 console.log(`   证书：      certificates/${result.slug}.pdf`);
 console.log(`   分享图：    og/${result.slug}.png`);
 console.log(`   邮件：      outbox/（EMAIL_PROVIDER=outbox，本地只落盘不真发）`);
-console.log(`   累计登记：  ${recordFiles.length} 条`);
+console.log(`   累计认领：  ${recordFiles.length} 条`);
 console.log('');
 console.log(`✅ 站点已构建：${site.outDir}（页面 ${site.pages} 个，候选库剩余 ${site.available} 颗）`);
 console.log('');
 console.log('预览地址：');
 console.log(`  落地页        ${baseUrl}/`);
-console.log(`  公开登记表    ${baseUrl}/registry/`);
+console.log(`  公开认领表    ${baseUrl}/registry/`);
 console.log(`  永久链接页    ${baseUrl}/s/${result.slug}/`);
 console.log(`  证书 PDF      ${baseUrl}/certificates/${result.slug}.pdf`);
 console.log(`  分享图        ${baseUrl}/og/${result.slug}.png`);

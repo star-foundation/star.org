@@ -25,7 +25,7 @@ export function sortedRegistrations(dir = PATHS.registrations) {
     .sort((a, b) => String(b.registered_at).localeCompare(String(a.registered_at)));
 }
 
-/** 生成公开登记表索引（供 /registry/ 页面与外部程序读取） */
+/** 生成公开认领表索引（供 /registry/ 页面与外部程序读取） */
 export function buildRegistryIndex({ dir = PATHS.registrations, outFile = PATHS.registryIndex } = {}) {
   const records = sortedRegistrations(dir);
   const byStar = {};

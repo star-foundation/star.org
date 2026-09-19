@@ -17,12 +17,12 @@ export function renderCertificateHtml(view) {
   const cfg = loadConfig();
   const certificateView = {
     ...view,
-    // 匿名登记且策略允许时，证书仍保留姓名（证书由本人持有），但公开页不会引用它
-    ownerName: view.anonymous && !cfg.policy.anonymousNameInCertificate ? '匿名登记人' : view.displayName || '匿名登记人',
+    // 匿名认领且策略允许时，证书仍保留姓名（证书由本人持有），但公开页不会引用它
+    ownerName: view.anonymous && !cfg.policy.anonymousNameInCertificate ? '匿名认领人' : view.displayName || '匿名认领人',
     brandName: cfg.site.name,
     issuedLine: `本证书由 ${cfg.site.name} 于 ${view.registeredDateZh} 签发`,
     disclaimer:
-      '本登记为纪念性质的公开可验证登记服务，不构成国际天文学联合会（IAU）官方命名，' +
+      '本认领为纪念性质的公开可验证认领服务，不构成国际天文学联合会（IAU）官方命名，' +
       '亦不代表任何天体命名权。证书所载天文数据来自公开星表，供纪念与收藏之用。',
   };
   return render(template('certificate.html'), certificateView);

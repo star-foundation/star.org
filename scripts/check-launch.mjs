@@ -54,7 +54,7 @@ console.log('');
 console.log('购买入口');
 if (soldOut) {
   blockers.push('候选库已售罄，购买入口自动下线');
-  line('⛔', '已下线：候选库没有可登记的恒星', '补货：npm run build:pool 重新生成 data/stars_pool.json');
+  line('⛔', '已下线：候选库没有可认领的恒星', '补货：npm run build:pool 重新生成 data/stars_pool.json');
 } else if (!checkoutConfigured) {
   blockers.push('未配置 Lemon Squeezy 结算链接');
   line('⛔', `接入中：候选库有 ${available} 颗可用，但结算链接未配置`,
@@ -73,7 +73,7 @@ console.log('');
 console.log('数据与幂等');
 if (process.env.STARORG_SLUG_SECRET) {
   ok.push('STARORG_SLUG_SECRET 已配置');
-  line('✓', 'STARORG_SLUG_SECRET 已配置', '同一订单号可复现同一登记编号，补单幂等成立');
+  line('✓', 'STARORG_SLUG_SECRET 已配置', '同一订单号可复现同一认领编号，补单幂等成立');
 } else if (!inActions) {
   line('·', 'STARORG_SLUG_SECRET 未在本地环境中设置', secretHint);
 } else {

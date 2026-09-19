@@ -38,7 +38,7 @@ npm run verify && npm run build:site
 
 ## 3. 候选库售罄（TC-ALLOC-04 / TC-ERR-01）
 
-- 系统行为：分配时判定 `sold_out`，**不生成登记记录**，给 `OPERATOR_EMAIL` 发告警，流程以退出码 3 结束。
+- 系统行为：分配时判定 `sold_out`，**不生成认领记录**，给 `OPERATOR_EMAIL` 发告警，流程以退出码 3 结束。
 - 站点行为：落地页购买入口自动下线，显示"恒星候选库正在补充中"。
 - 人工动作：
   1. 按第 2 节扩充候选库并推送；
@@ -68,16 +68,16 @@ LEMON_SQUEEZY_API_KEY=xxx STARORG_SLUG_SECRET=xxx node scripts/reconcile.mjs
 MVP 不做自助修改，人工处理：
 
 ```bash
-# 1. 找到登记编号（用订单号派生，或从用户提供的永久链接里取 slug）
+# 1. 找到认领编号（用订单号派生，或从用户提供的永久链接里取 slug）
 # 2. 直接改公开记录
 $EDITOR data/registrations/<slug>.json      # 修改 owner_display_name / dedication_message
 # 3. 重新生成证书与 OG 图并重发邮件
 node scripts/manual-order.mjs --slug <slug> --name "<新称呼>" --email <用户邮箱> --force
 # 4. 提交
-git add -A && git commit -m "修改登记 <slug>" && git push
+git add -A && git commit -m "修改认领 <slug>" && git push
 ```
 
-注意：匿名登记不要擅自把姓名写回公开记录。
+注意：匿名认领不要擅自把姓名写回公开记录。
 
 ## 6. 流程失败排查（PRD 6 异常场景）
 
@@ -98,7 +98,7 @@ git add -A && git commit -m "修改登记 <slug>" && git push
 
 - 公开文件（`data/`、`certificates/`、`og/`）中**不得**出现邮箱、订单号、支付信息；
   `npm run verify` 会做正则扫描，CI 每次推送都跑。
-- 匿名登记：公开记录里 `owner_display_name` 为 `null`，页面显示"匿名登记人"。
+- 匿名认领：公开记录里 `owner_display_name` 为 `null`，页面显示"匿名认领人"。
   证书本身仍会印上用户填写的称呼（那是用户自己留存的凭证），但公开页面不会引用它。
 - 用户要求删除：删除 `data/registrations/<slug>.json` 与对应证书/OG 图，
   并把候选库该恒星复位为 `available`，然后 `npm run verify && npm run build:site` 并提交。

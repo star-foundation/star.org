@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 export const ROOT = path.resolve(fileURLToPath(new URL('../', import.meta.url)));
 
-/** 建立测试沙盒：独立的候选库、登记目录、证书目录、站点输出，互不干扰 */
+/** 建立测试沙盒：独立的候选库、认领目录、证书目录、站点输出，互不干扰 */
 export function createSandbox({ availableStars = 5, poolSize = 8 } = {}) {
   const dir = mkdtempSync(path.join(os.tmpdir(), 'starorg-test-'));
   const dataDir = path.join(dir, 'data');
@@ -23,7 +23,7 @@ export function createSandbox({ availableStars = 5, poolSize = 8 } = {}) {
   const sandboxPool = { ...pool, stars, count: stars.length, available: availableStars };
   writeFileSync(path.join(dataDir, 'stars_pool.json'), JSON.stringify(sandboxPool, null, 2));
 
-  // 预置的 assigned 恒星需要有对应登记记录，否则自检会报孤立分配
+  // 预置的 assigned 恒星需要有对应认领记录，否则自检会报孤立分配
   for (let index = availableStars; index < poolSize; index += 1) {
     const star = stars[index];
     writeFileSync(

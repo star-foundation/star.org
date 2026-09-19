@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * 分配引擎：为一次已支付订单分配一颗未被登记的恒星。
+ * 分配引擎：为一次已支付订单分配一颗未被认领的恒星。
  *
  * 用法：
  *   echo '{"display_name":"For Anna","email":"a@b.com","dedication":"..."}' | node scripts/allocate.mjs
@@ -12,7 +12,7 @@
  * 退出码：0 成功 / 3 候选库售罄 / 4 订单信息非法 / 5 锁超时 / 1 其他错误
  *
  * 并发安全（对应 TC-ALLOC-03 防超卖）：
- *   1) GitHub Actions 的 concurrency 分组保证同一时刻只有一个登记流程在跑；
+ *   1) GitHub Actions 的 concurrency 分组保证同一时刻只有一个认领流程在跑；
  *   2) 本脚本再用 mkdir 原子锁做第二道闸门，本地/自测同样不会超卖；
  *   3) 拿到锁之后重新读取候选库，永远基于最新状态挑选，避免读到陈旧快照。
  */
@@ -61,7 +61,7 @@ export function allocateWithinLock(order, { poolFile = PATHS.pool, registrations
       : randomSlug();
   if (!isValidSlug(slug)) slug = randomSlug();
 
-  // 幂等：同一笔订单重复触发时，返回既有登记而不是再分配一颗星（TC-ERR-04）
+  // 幂等：同一笔订单重复触发时，返回既有认领而不是再分配一颗星（TC-ERR-04）
   const existing = findRegistration(slug, registrationsDir);
   if (existing) {
     return { status: 'replay', slug, star: existing.star, record: existing, replay: true };
@@ -76,7 +76,7 @@ export function allocateWithinLock(order, { poolFile = PATHS.pool, registrations
   const registeredAt = new Date().toISOString();
   const record = buildRegistrationRecord({ slug, star, order, registeredAt });
 
-  // 先写登记记录，再写回候选库：任一步失败都不会出现"星星被占用但没有记录"
+  // 先写认领记录，再写回候选库：任一步失败都不会出现"星星被占用但没有记录"
   ensureDir(registrationsDir);
   writeJsonAtomic(registrationPath(slug, registrationsDir), record);
 

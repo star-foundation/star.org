@@ -122,12 +122,12 @@ export function checkRequiredDisclosures() {
     id: 'VERIFY_ENTRY',
     // 必须是真实可点的链接（href），而不是正文里提一句
     ok: every(landingRaw, (html) => /href=["'][^"']*\/registry\/["']/.test(html)),
-    message: '落地页需提供公开登记表入口（信任背书区块）',
+    message: '落地页需提供公开认领表入口（信任背书区块）',
   });
   checks.push({
     id: 'REGISTRY_NO_LOGIN',
     ok: every(registryTexts, (text) => !/登录后|请先登录|sign in to view/i.test(text)),
-    message: '公开登记表不得设置访问门槛（TC-REG-01）',
+    message: '公开认领表不得设置访问门槛（TC-REG-01）',
   });
   return checks;
 }
@@ -143,7 +143,7 @@ function main() {
   const label = (file) => path.relative(PATHS.root, file);
 
   console.log(`合规扫描：检查 ${fileCount} 个文件`);
-  console.log(`  声明校验对象：${[...targets.landing, ...targets.registry].map(label).join('、') || '（未找到落地页/登记表文件）'}`);
+  console.log(`  声明校验对象：${[...targets.landing, ...targets.registry].map(label).join('、') || '（未找到落地页/认领表文件）'}`);
   if (violations.length === 0) console.log('  ✓ 未发现禁用措辞或违规收款渠道');
   for (const violation of violations) {
     console.log(`  ✗ [${violation.type}] ${path.relative(PATHS.root, violation.file)}:${violation.line} 命中「${violation.term}」→ ${violation.text}`);

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * 登记编排：分配 → PDF 证书 → OG 分享图 → 登记记录落盘 → 登记表索引 → 邮件通知。
+ * 认领编排：分配 → PDF 证书 → OG 分享图 → 认领记录落盘 → 认领表索引 → 邮件通知。
  * 这是 GitHub Actions 中真正执行的"一条龙"脚本，也可本地运行做全链路联调。
  *
  * 用法：
@@ -138,11 +138,11 @@ async function main() {
     // 未付款订单是正常噪音（用户下单后放弃支付），不值得半夜叫醒运维。
     if (error.code !== 'UNPAID_ORDER') {
       await sendOperatorAlert({
-        subject: '[Star.org] 登记流程失败，需人工补单',
+        subject: '[Star.org] 认领流程失败，需人工补单',
         text: `错误：${error.message}\n来源：${order?.source ?? 'unknown'}\n时间：${new Date().toISOString()}\n堆栈：\n${error.stack}\n\n请用 Lemon Squeezy 后台订单号执行：node scripts/manual-order.mjs --order-id <订单号> --name "<称呼>" --email <邮箱>`,
       }).catch(() => {});
     }
-    process.stderr.write(`登记失败：${error.message}\n`);
+    process.stderr.write(`认领失败：${error.message}\n`);
     if (error.code === 'INVALID_ORDER') process.exit(4);
     if (error.code === 'UNPAID_ORDER') process.exit(5);
     process.exit(1);

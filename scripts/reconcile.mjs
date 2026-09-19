@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * 对账：找出"已支付但仓库里没有登记记录"的孤立订单（对应 TC-ERR-02）。
+ * 对账：找出"已支付但仓库里没有认领记录"的孤立订单（对应 TC-ERR-02）。
  *
  * 用法：
  *   LEMON_SQUEEZY_API_KEY=xxx STARORG_SLUG_SECRET=xxx node scripts/reconcile.mjs
@@ -35,11 +35,11 @@ async function main() {
   if (!apiKey) {
     console.log('未配置 LEMON_SQUEEZY_API_KEY，改为输出人工对账清单：');
     console.log('  1. 打开 Lemon Squeezy 后台 → Orders，按时间列出已支付订单；');
-    console.log('  2. 打开仓库 data/registrations/ 目录，按 commit 时间列出登记记录；');
+    console.log('  2. 打开仓库 data/registrations/ 目录，按 commit 时间列出认领记录；');
     console.log('  3. 两边数量/时间对不上时，用 scripts/manual-order.mjs 为缺失订单补单。');
     return;
   }
-  if (!secret) throw new Error('对账需要 STARORG_SLUG_SECRET（与登记流程使用同一个密钥）');
+  if (!secret) throw new Error('对账需要 STARORG_SLUG_SECRET（与认领流程使用同一个密钥）');
 
   const orders = await fetchOrders(apiKey);
   const paid = orders.filter((order) => (order.attributes?.status || '').match(/paid|completed/i));
@@ -55,7 +55,7 @@ async function main() {
       });
     }
   }
-  console.log(`已支付订单：${paid.length}，登记记录：${paid.length - orphans.length}，孤立订单：${orphans.length}`);
+  console.log(`已支付订单：${paid.length}，认领记录：${paid.length - orphans.length}，孤立订单：${orphans.length}`);
   for (const orphan of orphans) {
     console.log(`  孤立订单 ${orphan.order_id}（${orphan.created_at}）→ 补单命令：`);
     console.log(`    node scripts/manual-order.mjs --order-id ${orphan.order_id} --name "<称呼>" --email ${orphan.email || '<邮箱>'}`);

@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>公开登记表 · {{siteName}}</title>
-<meta name="description" content="所有已登记的恒星记录，任何人无需登录即可查阅，用来确认一颗恒星是否已经被登记过。">
+<title>公开认领表 · {{siteName}}</title>
+<meta name="description" content="所有已认领的恒星记录，任何人无需登录即可查阅，用来确认一颗恒星是否已经被认领过。">
 <link rel="canonical" href="{{registryUrl}}">
 <meta property="og:type" content="website">
-<meta property="og:title" content="公开登记表 · {{siteName}}">
-<meta property="og:description" content="已登记 {{registryCount}} 条记录，无需登录即可查阅与核实。">
+<meta property="og:title" content="公开认领表 · {{siteName}}">
+<meta property="og:description" content="已认领 {{registryCount}} 条记录，无需登录即可查阅与核实。">
 <meta property="og:url" content="{{registryUrl}}">
 <meta property="og:image" content="{{defaultOgImage}}">
 <meta name="twitter:card" content="summary_large_image">
@@ -22,7 +22,7 @@
     <nav class="nav-links">
       <a href="/">返回首页</a>
       <a href="/#faq">常见问题</a>
-      {{#if checkoutReady}}<a class="btn btn-primary btn-sm" href="/register/">登记一颗星</a>{{/if}}
+      {{#if checkoutReady}}<a class="btn btn-primary btn-sm" href="/register/">认领一颗星</a>{{/if}}
     </nav>
   </div>
 </header>
@@ -30,10 +30,10 @@
 <main>
   <section class="plain" style="padding-top:52px;">
     <div class="wrap">
-      <h1 style="font-size:clamp(28px,4vw,40px);">公开登记表</h1>
+      <h1 style="font-size:clamp(28px,4vw,40px);">公开认领表</h1>
       <p class="lede">
-        这里是全部已登记的恒星记录，共 <strong>{{registryCount}}</strong> 条。
-        不需要注册、不需要付费，任何人都可以查阅——这份登记表存在的意义就是让"是否被重复登记"这件事可以被你自己核实。
+        这里是全部已认领的恒星记录，共 <strong>{{registryCount}}</strong> 条。
+        不需要注册、不需要付费，任何人都可以查阅——这份认领表存在的意义就是让"是否被重复认领"这件事可以被你自己核实。
       </p>
 
       {{#if hasDuplicates}}
@@ -43,29 +43,29 @@
       {{/if}}
       {{#unless hasDuplicates}}
       <div class="banner ok">
-        自动检查结果：当前没有任何一颗恒星被登记两次（登记表生成于 {{generatedAt}}）。
+        自动检查结果：当前没有任何一颗恒星被认领两次（认领表生成于 {{generatedAt}}）。
       </div>
       {{/unless}}
 
       <div class="grid grid-3" style="margin-bottom:22px;">
-        <div class="card soft"><div class="num">{{registryCount}}</div><div class="stat">已登记记录</div></div>
-        <div class="card soft"><div class="num">{{availableCount}}</div><div class="stat">候选库剩余可登记</div></div>
+        <div class="card soft"><div class="num">{{registryCount}}</div><div class="stat">已认领记录</div></div>
+        <div class="card soft"><div class="num">{{availableCount}}</div><div class="stat">候选库剩余可认领</div></div>
         <div class="card soft"><div class="num">{{poolTotal}}</div><div class="stat">候选库总恒星数</div></div>
       </div>
 
       <div class="progress-card">
         <div class="progress-head">
-          <span>候选库登记进度</span>
+          <span>候选库认领进度</span>
           <span class="mono">{{progressLabel}}　<strong>{{progressPercent}}%</strong></span>
         </div>
-        <div class="progress-track" role="progressbar" aria-label="候选库登记进度"
+        <div class="progress-track" role="progressbar" aria-label="候选库认领进度"
              aria-valuenow="{{progressPercent}}" aria-valuemin="0" aria-valuemax="100">
           <div class="progress-fill{{#if progressStarted}} is-started{{/if}}" style="width: {{progressPercent}}%"></div>
         </div>
         <div class="progress-foot">
-          已登记 <strong>{{registryCount}}</strong> 颗，还剩 <strong>{{availableCount}}</strong> 颗可登记；
+          已认领 <strong>{{registryCount}}</strong> 颗，还剩 <strong>{{availableCount}}</strong> 颗可认领；
           最近 7 天新增 <strong>{{recentCount7d}}</strong> 颗。
-          登记进度按"已登记 / 候选库总数"计算，补货后总数会随之增长。
+          认领进度按"已认领 / 候选库总数"计算，补货后总数会随之增长。
         </div>
       </div>
 
@@ -80,7 +80,7 @@
         </div>
         <div class="step">
           <h3>在下表里搜这个编号</h3>
-          <p class="muted" style="font-size:14.5px;">用下面的搜索框输入编号。如果只搜到一条记录，说明这颗恒星只被登记过一次。</p>
+          <p class="muted" style="font-size:14.5px;">用下面的搜索框输入编号。如果只搜到一条记录，说明这颗恒星只被认领过一次。</p>
         </div>
         <div class="step">
           <h3>想看原始文件也可以</h3>
@@ -88,9 +88,9 @@
         </div>
       </div>
 
-      <h2 style="margin-top:44px;">登记记录</h2>
+      <h2 style="margin-top:44px;">认领记录</h2>
       <div class="search-row">
-        <input type="search" placeholder="搜索恒星编号、星座、登记编号或日期，例如 HIP-91262" data-registry-search aria-label="搜索登记记录">
+        <input type="search" placeholder="搜索恒星编号、星座、认领编号或日期，例如 HIP-91262" data-registry-search aria-label="搜索认领记录">
         <span class="muted" style="align-self:center;font-size:14px;">匹配 <span data-registry-count>{{registryCount}}</span> 条</span>
       </div>
 
@@ -102,9 +102,9 @@
               <th>恒星编号</th>
               <th>恒星</th>
               <th>视星等</th>
-              <th>登记人</th>
-              <th>登记日期</th>
-              <th>登记编号</th>
+              <th>认领人</th>
+              <th>认领日期</th>
+              <th>认领编号</th>
               <th></th>
             </tr>
           </thead>
@@ -126,15 +126,15 @@
       <p class="empty" data-registry-empty hidden>没有匹配的记录，请检查编号是否正确。</p>
       {{/if}}
       {{#unless entries.length}}
-      <p class="empty">还没有任何登记记录。第一条记录会出现在这里。</p>
+      <p class="empty">还没有任何认领记录。第一条记录会出现在这里。</p>
       {{/unless}}
 
       <div class="verify-box">
         <strong>给技术用户的说明</strong>
         <p class="muted" style="font-size:14.5px;margin:8px 0 0;">
-          每条登记的原始记录是 <span class="mono">data/registrations/{slug}.json</span>，
+          每条认领的原始记录是 <span class="mono">data/registrations/{slug}.json</span>，
           索引文件是 <a href="{{indexJsonUrl}}">{{indexJsonUrl}}</a>。
-          记录中不包含邮箱、订单号等任何可识别信息；恒星编号与登记记录一一对应，可用于程序化查重。
+          记录中不包含邮箱、订单号等任何可识别信息；恒星编号与认领记录一一对应，可用于程序化查重。
           {{#if registryDirUrl}}完整目录见 <a href="{{registryDirUrl}}" rel="noopener">公开仓库</a>。{{/if}}
         </p>
       </div>
@@ -145,7 +145,7 @@
 <footer class="site">
   <div class="wrap foot-grid">
     <div class="disclaimer">
-      {{siteName}} 提供纪念性质的公开可验证恒星登记服务，不构成国际天文学联合会（IAU）官方命名。
+      {{siteName}} 提供纪念性质的公开可验证恒星认领服务，不构成国际天文学联合会（IAU）官方命名。
       <br>联系：<a href="mailto:{{supportEmail}}">{{supportEmail}}</a>
     </div>
     <div class="muted">© {{year}} {{siteName}}</div>

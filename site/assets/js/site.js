@@ -1,4 +1,4 @@
-// 站点交互：登记表检索、复制链接、X 分享。无第三方依赖。
+// 站点交互：认领表检索、复制链接、X 分享。无第三方依赖。
 (function () {
   const search = document.querySelector('[data-registry-search]');
   if (search) {
@@ -49,8 +49,8 @@
     }
   }
 
-  // 付款等待页的登记进度：轮询公开的 /data/registry-index.json（同源、无隐私字段），
-  // 让客户看到"候选库已登记数"是否 +1 —— 数字变了基本就说明自己那一颗已经写入。
+  // 付款等待页的认领进度：轮询公开的 /data/registry-index.json（同源、无隐私字段），
+  // 让客户看到"候选库已认领数"是否 +1 —— 数字变了基本就说明自己那一颗已经写入。
   // 不做任何猜测式假进度：拿不到数据就维持构建时的静态值。
   const poolCount = document.querySelector('[data-pool-count]');
   const poolFill = document.querySelector('[data-pool-fill]');
@@ -104,7 +104,7 @@
     window.setInterval(tick, 5000);
   }
 
-  // 下单前登记表单：把姓名/献词/匿名拼进 Lemon Squeezy 结算 URL 后跳转。
+  // 下单前认领表单：把姓名/献词/匿名拼进 Lemon Squeezy 结算 URL 后跳转。
   // URL 构建逻辑在 checkout-url.mjs（纯函数，先在页面里加载，暴露为 globalThis.buildCheckoutUrl）。
   const form = document.querySelector('[data-registration-form]');
   if (form && typeof globalThis.buildCheckoutUrl === 'function') {

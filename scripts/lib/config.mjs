@@ -39,7 +39,7 @@ export function loadConfig() {
       baseUrl,
       checkoutUrl,
       registryRepoUrl,
-      // GitHub 仓库里的公开登记表目录（供任何访客自行核对）
+      // GitHub 仓库里的公开认领表目录（供任何访客自行核对）
       registryDirUrl: registryRepoUrl
         ? `${registryRepoUrl.replace(/\/+$/, '')}/tree/main/data/registrations`
         : '',

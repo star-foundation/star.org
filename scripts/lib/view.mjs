@@ -16,8 +16,8 @@ export function formatDateIso(iso) {
 }
 
 /**
- * 把恒星数据 + 登记记录整理成页面/证书/邮件/OG 图共用的展示模型。
- * 匿名登记：公开视图里不出现任何姓名。
+ * 把恒星数据 + 认领记录整理成页面/证书/邮件/OG 图共用的展示模型。
+ * 匿名认领：公开视图里不出现任何姓名。
  */
 export function buildStarView({ star, record, slug, baseUrl, registryUrl, certificateUrl, ogImageUrl, certificatePublic = true }) {
   const anonymous = Boolean(record?.anonymous);
@@ -50,7 +50,7 @@ export function buildStarView({ star, record, slug, baseUrl, registryUrl, certif
     ogImageUrl,
     registryUrl,
     certificatePublic: Boolean(certificatePublic),
-    // SIMBAD 外链：斯特拉斯堡天文数据中心的天体数据库，用来让登记人自己核实
+    // SIMBAD 外链：斯特拉斯堡天文数据中心的天体数据库，用来让认领人自己核实
     // "这颗星真实存在、而且这些天文数据不是我们编的"。HIP 编号在场内 800 颗星上全都有，
     // 所以统一用 Ident=HIP+<hip> 查询；万一将来出现没有 HIP 的星，退化为按坐标查询。
     simbadIdent: hipIdent(star),

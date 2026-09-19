@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 /**
- * 登记表自检（同时是"可公开验证"的机器可读实现，对应 TC-REG-03 / TC-REG-04 / TC-ALLOC-05）。
+ * 认领表自检（同时是"可公开验证"的机器可读实现，对应 TC-REG-03 / TC-REG-04 / TC-ALLOC-05）。
  *
  * 检查项：
  *   1. 文件名与 slug 字段一致、slug 格式合法
- *   2. 不存在同一颗恒星被登记两次（防超卖红线）
+ *   2. 不存在同一颗恒星被认领两次（防超卖红线）
  *   3. 公开记录中不含邮箱、订单号等隐私字段（隐私红线）
- *   4. 候选库与登记记录双向一致（assigned 状态 ↔ 登记记录）
+ *   4. 候选库与认领记录双向一致（assigned 状态 ↔ 认领记录）
  *   5. 证书 / OG 图产物存在且哈希与记录一致
- *   6. 登记表索引与磁盘记录一致
+ *   6. 认领表索引与磁盘记录一致
  *
  * 用法：node scripts/verify-registry.mjs [--json]
  * 退出码：0 通过 / 1 存在错误
@@ -63,7 +63,7 @@ export function verifyRegistry({ poolFile = PATHS.pool, registrationsDir = PATHS
       errors.push({
         code: 'DUPLICATE_STAR',
         file,
-        message: `恒星 ${record.star_id} 被重复登记：${seenStars.get(record.star_id)} 与 ${record.slug}`,
+        message: `恒星 ${record.star_id} 被重复认领：${seenStars.get(record.star_id)} 与 ${record.slug}`,
       });
     } else {
       seenStars.set(record.star_id, record.slug);
@@ -83,7 +83,7 @@ export function verifyRegistry({ poolFile = PATHS.pool, registrationsDir = PATHS
 
     const star = poolById.get(record.star_id);
     if (!star) {
-      warnings.push({ code: 'STAR_NOT_IN_POOL', file, message: `登记记录引用的恒星 ${record.star_id} 不在当前候选库中` });
+      warnings.push({ code: 'STAR_NOT_IN_POOL', file, message: `认领记录引用的恒星 ${record.star_id} 不在当前候选库中` });
     } else {
       if (star.status !== 'assigned') {
         errors.push({ code: 'POOL_STATUS', file, message: `恒星 ${record.star_id} 在候选库中状态为 ${star.status}，应为 assigned` });
@@ -111,13 +111,13 @@ export function verifyRegistry({ poolFile = PATHS.pool, registrationsDir = PATHS
     }
   }
 
-  // 反向检查：候选库中标记为 assigned 的恒星必须有对应登记记录
+  // 反向检查：候选库中标记为 assigned 的恒星必须有对应认领记录
   for (const star of pool.stars) {
     if (star.status === 'assigned' && star.assigned_slug && !seenSlugs.has(star.assigned_slug)) {
       errors.push({
         code: 'ORPHAN_ASSIGNMENT',
         file: 'data/stars_pool.json',
-        message: `恒星 ${star.id} 标记为已分配（${star.assigned_slug}），但没有对应的登记记录`,
+        message: `恒星 ${star.id} 标记为已分配（${star.assigned_slug}），但没有对应的认领记录`,
       });
     }
   }
@@ -125,7 +125,7 @@ export function verifyRegistry({ poolFile = PATHS.pool, registrationsDir = PATHS
   // 索引一致性
   const index = buildRegistryIndex({ dir: registrationsDir, outFile: null });
   if (index.count !== entries.length) {
-    errors.push({ code: 'INDEX_COUNT', file: 'data/registry-index.json', message: '登记表索引数量与磁盘记录不一致' });
+    errors.push({ code: 'INDEX_COUNT', file: 'data/registry-index.json', message: '认领表索引数量与磁盘记录不一致' });
   }
   if (index.duplicates.length > 0) {
     errors.push({ code: 'INDEX_DUPLICATES', file: 'data/registry-index.json', message: `索引中发现 ${index.duplicates.length} 组重复恒星` });
@@ -153,9 +153,9 @@ function main() {
   if (process.argv.includes('--json')) {
     process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
   } else {
-    console.log(`登记表自检：${result.status === 'pass' ? '通过' : '未通过'}`);
-    console.log(`  登记记录 ${result.registrations} 条 / 唯一恒星 ${result.uniqueStars} 颗`);
-    console.log(`  候选库 ${result.poolTotal} 颗（可登记 ${result.poolAvailable}）`);
+    console.log(`认领表自检：${result.status === 'pass' ? '通过' : '未通过'}`);
+    console.log(`  认领记录 ${result.registrations} 条 / 唯一恒星 ${result.uniqueStars} 颗`);
+    console.log(`  候选库 ${result.poolTotal} 颗（可认领 ${result.poolAvailable}）`);
     for (const warning of result.warnings) console.log(`  ⚠ [${warning.code}] ${warning.message}`);
     for (const error of result.errors) console.log(`  ✗ [${error.code}] ${error.message}`);
   }

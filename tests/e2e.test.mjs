@@ -43,15 +43,15 @@ test('TC-ALLOC-01 / TC-PDF-01 / TC-PDF-02 / TC-MAIL-01 全链路：下单 → �
     assert.equal(size.signature, '89504e470d0a1a0a', '必须是合法 PNG');
     assert.ok(statSync(og).size > 15_000, 'OG 图体积过小，可能渲染成空白图');
 
-    // 登记记录：公开字段齐全、无隐私字段（TC-REG-03）
+    // 认领记录：公开字段齐全、无隐私字段（TC-REG-03）
     const record = readJson(path.join(sandbox.registrations, `${payload.slug}.json`));
     assert.equal(record.star_id, payload.star_id);
     assert.equal(record.owner_display_name, '致 小满');
     assert.equal(record.dedication_message, order.dedication);
     assert.equal(record.star.spectral_type !== undefined, true);
     const serialized = JSON.stringify(record);
-    assert.ok(!serialized.includes('xiaoman@example.com'), '登记记录不得包含邮箱');
-    assert.ok(!serialized.includes('LS-E2E-1'), '登记记录不得包含订单号');
+    assert.ok(!serialized.includes('xiaoman@example.com'), '认领记录不得包含邮箱');
+    assert.ok(!serialized.includes('LS-E2E-1'), '认领记录不得包含订单号');
     assert.ok(record.artifacts.certificate_sha256, '应记录证书哈希，便于外部校验');
 
     // 邮件（TC-MAIL-02：链接正确、无占位符残留）
@@ -73,7 +73,7 @@ test('TC-ALLOC-01 / TC-PDF-01 / TC-PDF-02 / TC-MAIL-01 全链路：下单 → �
   }
 });
 
-test('TC-LP-01~04 / TC-PAGE-01~05 / TC-REG-01~05 站点构建与公开登记表', { skip }, () => {
+test('TC-LP-01~04 / TC-PAGE-01~05 / TC-REG-01~05 站点构建与公开认领表', { skip }, () => {
   const sandbox = createSandbox({ availableStars: 3, poolSize: 4 });
   try {
     const publicOrder = {
@@ -102,28 +102,28 @@ test('TC-LP-01~04 / TC-PAGE-01~05 / TC-REG-01~05 站点构建与公开登记表'
     const out = sandbox.siteOut;
     // 落地页（TC-LP-01 / TC-LP-02）
     const landing = readFileSync(path.join(out, 'index.html'), 'utf8');
-    assert.ok(landing.includes('每一次登记，都可以被公开验证'), '落地页需含一句话价值主张');
-    // 三个申请入口统一指向登记页，姓名/献词在登记页填完，登记页再带 checkout[custom] 跳结算
-    assert.ok(landing.includes('register/'), '购买入口需指向登记页 /register/');
+    assert.ok(landing.includes('每一次认领，都可以被公开验证'), '落地页需含一句话价值主张');
+    // 三个申请入口统一指向认领页，姓名/献词在认领页填完，认领页再带 checkout[custom] 跳结算
+    assert.ok(landing.includes('register/'), '购买入口需指向认领页 /register/');
     const register = readFileSync(path.join(out, 'register', 'index.html'), 'utf8');
-    assert.ok(register.includes('https://star-org.lemonsqueezy.com/checkout/buy/test'), '登记页表单需携带结算链接');
-    assert.ok(register.includes('name="display_name"') && register.includes('name="dedication"'), '登记页需含姓名与献词表单');
-    assert.ok(landing.includes('/registry/'), '需提供公开登记表入口');
+    assert.ok(register.includes('https://star-org.lemonsqueezy.com/checkout/buy/test'), '认领页表单需携带结算链接');
+    assert.ok(register.includes('name="display_name"') && register.includes('name="dedication"'), '认领页需含姓名与献词表单');
+    assert.ok(landing.includes('/registry/'), '需提供公开认领表入口');
     assert.ok(landing.includes('IAU'), 'FAQ 需澄清 IAU 关系');
     assert.ok(landing.includes('退款'), 'FAQ 需含退款政策');
     assert.ok(!landing.includes('{{'), '落地页不得残留占位符');
 
-    // 公开登记表（TC-REG-01 / TC-REG-04）
+    // 公开认领表（TC-REG-01 / TC-REG-04）
     const registry = readFileSync(path.join(out, 'registry', 'index.html'), 'utf8');
-    assert.ok(registry.includes('公开登记表'));
-    assert.ok(!/登录后可见|请先登录/.test(registry), '登记表不得设置访问门槛');
-    assert.ok(registry.includes(first.json.star_id), '登记表应列出已登记恒星');
+    assert.ok(registry.includes('公开认领表'));
+    assert.ok(!/登录后可见|请先登录/.test(registry), '认领表不得设置访问门槛');
+    assert.ok(registry.includes(first.json.star_id), '认领表应列出已认领恒星');
     assert.ok(registry.includes(second.json.star_id));
-    assert.ok(registry.includes('没有任何一颗恒星被登记两次'), '需给出查重结论');
+    assert.ok(registry.includes('没有任何一颗恒星被认领两次'), '需给出查重结论');
 
     const index = readJson(path.join(out, 'data', 'registry-index.json'));
     assert.equal(index.duplicates.length, 0, '不得出现重复分配');
-    assert.equal(index.count, 3, '索引应包含沙盒中全部登记记录（1 条预置 + 2 条新登记）');
+    assert.equal(index.count, 3, '索引应包含沙盒中全部认领记录（1 条预置 + 2 条新认领）');
 
     // 永久链接页面（TC-PAGE-01 / TC-PAGE-02 / TC-PAGE-03）
     const page = readFileSync(path.join(out, 's', first.json.slug, 'index.html'), 'utf8');
@@ -139,10 +139,10 @@ test('TC-LP-01~04 / TC-PAGE-01~05 / TC-REG-01~05 站点构建与公开登记表'
 
     // 匿名展示（TC-PAY-04 / TC-PAGE-05）
     const anonPage = readFileSync(path.join(out, 's', second.json.slug, 'index.html'), 'utf8');
-    assert.ok(!anonPage.includes('不应出现在公开页面的名字'), '匿名登记不得公开姓名');
-    assert.ok(anonPage.includes('匿名登记人'));
+    assert.ok(!anonPage.includes('不应出现在公开页面的名字'), '匿名认领不得公开姓名');
+    assert.ok(anonPage.includes('匿名认领人'));
     const anonRecord = readJson(path.join(out, 'data', 'registrations', `${second.json.slug}.json`));
-    assert.equal(anonRecord.owner_display_name, null, '匿名登记的公开记录不得写入姓名');
+    assert.equal(anonRecord.owner_display_name, null, '匿名认领的公开记录不得写入姓名');
 
     // 404（TC-PAGE-04）与站点级文件
     assert.ok(existsSync(path.join(out, '404.html')));

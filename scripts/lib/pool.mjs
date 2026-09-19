@@ -63,7 +63,7 @@ export async function withAllocationLock(fn, options = {}) {
         continue;
       }
       if (Date.now() - startedAt > timeoutMs) {
-        const err = new Error('等待分配锁超时：另一个登记流程仍在执行中');
+        const err = new Error('等待分配锁超时：另一个认领流程仍在执行中');
         err.code = 'LOCK_TIMEOUT';
         throw err;
       }

@@ -21,7 +21,7 @@ export function normalizeOrder(input = {}) {
   const cfg = loadConfig();
   const maxDedication = cfg.product.maxDedicationChars || 100;
 
-  // 登记名优先用客户在下单前表单自填的（LS 会放进 meta.custom_data → client_payload.display_name）；
+  // 认领名优先用客户在下单前表单自填的（LS 会放进 meta.custom_data → client_payload.display_name）；
   // 若为空（例如访客绕过落地页、直接打开结算链接下单），回退到 LS 订单里的持卡人姓名
   // （data.attributes.user_name → client_payload.fallback_display_name），避免正常付款却拒单。
   const ownName = clean(input.display_name ?? input.displayName ?? '', MAX_DISPLAY_NAME);
@@ -31,7 +31,7 @@ export function normalizeOrder(input = {}) {
   );
   const displayName = ownName || fallbackName;
   if (!displayName) {
-    const err = new Error('缺少登记人姓名/称呼（display_name）');
+    const err = new Error('缺少认领人姓名/称呼（display_name）');
     err.code = 'INVALID_ORDER';
     throw err;
   }
@@ -42,7 +42,7 @@ export function normalizeOrder(input = {}) {
   // 字段缺省（人工派发补单、本地测试）时视为可信来源，不拦。
   const status = String(input.status ?? input.order_status ?? '').trim().toLowerCase();
   if (status && !PAID_STATUSES.has(status)) {
-    const err = new Error(`订单未支付成功（status=${status}），拒绝登记`);
+    const err = new Error(`订单未支付成功（status=${status}），拒绝认领`);
     err.code = 'UNPAID_ORDER';
     throw err;
   }
@@ -62,7 +62,7 @@ export function normalizeOrder(input = {}) {
 
   return {
     orderId: input.order_id ?? input.orderId ?? null,
-    // 人工指定登记编号（改文案重发场景）；为空时由订单号派生
+    // 人工指定认领编号（改文案重发场景）；为空时由订单号派生
     slug: slug || null,
     displayName,
     email: email || null,
@@ -85,9 +85,9 @@ function clean(value, maxLength, keepNewlines = false) {
 }
 
 /**
- * 构造公开登记记录。
+ * 构造公开认领记录。
  * 隐私红线：不含邮箱、订单号、IP 等任何可识别信息（TC-REG-03）。
- * 匿名登记（anonymous=true）时连展示名也不写入公开仓库（PRD 5.4）。
+ * 匿名认领（anonymous=true）时连展示名也不写入公开仓库（PRD 5.4）。
  */
 export function buildRegistrationRecord({ slug, star, order, registeredAt, certificateSha256, ogSha256 }) {
   const anonymous = Boolean(order.anonymous);

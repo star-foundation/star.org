@@ -3,19 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{{starTitle}} · 恒星登记证书 · {{siteName}}</title>
-<meta name="description" content="{{starTitle}}（{{starId}}）的恒星登记记录：{{starSubtitle}}，视星等 {{magnitudeText}}，距地球 {{distanceText}}。登记编号 {{slug}}，可在公开登记表中核实。">
+<title>{{starTitle}} · 恒星认领证书 · {{siteName}}</title>
+<meta name="description" content="{{starTitle}}（{{starId}}）的恒星认领记录：{{starSubtitle}}，视星等 {{magnitudeText}}，距地球 {{distanceText}}。认领编号 {{slug}}，可在公开认领表中核实。">
 <link rel="canonical" href="{{permalink}}">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="{{siteName}}">
-<meta property="og:title" content="{{starTitle}} · 恒星登记证书">
+<meta property="og:title" content="{{starTitle}} · 恒星认领证书">
 <meta property="og:description" content="{{#if dedication}}{{dedication}}{{/if}}{{#unless dedication}}{{starSubtitle}} · 视星等 {{magnitudeText}} · 距地球 {{distanceText}}{{/unless}}">
 <meta property="og:url" content="{{permalink}}">
 <meta property="og:image" content="{{ogImageUrl}}">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="{{starTitle}} · 恒星登记证书">
+<meta name="twitter:title" content="{{starTitle}} · 恒星认领证书">
 <meta name="twitter:description" content="{{#if dedication}}{{dedication}}{{/if}}{{#unless dedication}}{{starSubtitle}}{{/unless}}">
 <meta name="twitter:image" content="{{ogImageUrl}}">
 <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
@@ -26,9 +26,9 @@
   <div class="wrap nav">
     <div class="brand"><a href="/">{{siteName}}</a></div>
     <nav class="nav-links">
-      <a href="/registry/">公开登记表</a>
+      <a href="/registry/">公开认领表</a>
       <a href="/#faq">常见问题</a>
-      {{#if checkoutReady}}<a class="btn btn-primary btn-sm" href="/register/">登记一颗星</a>{{/if}}
+      {{#if checkoutReady}}<a class="btn btn-primary btn-sm" href="/register/">认领一颗星</a>{{/if}}
     </nav>
   </div>
 </header>
@@ -36,7 +36,7 @@
 <main>
   <section class="plain" style="padding-top:48px;">
     <div class="wrap narrow">
-      <div class="muted" style="font-size:13px;letter-spacing:.16em;text-transform:uppercase;">恒星登记 · 编号 {{slug}}</div>
+      <div class="muted" style="font-size:13px;letter-spacing:.16em;text-transform:uppercase;">恒星认领 · 编号 {{slug}}</div>
       <div class="star-card" style="margin-top:16px;">
         <div class="star-head">
           <h1 class="star-name">{{starTitle}}</h1>
@@ -51,8 +51,8 @@
           <div><dt>视星等</dt><dd>{{magnitudeText}}</dd></div>
           <div><dt>光谱型</dt><dd><span class="dot" style="background:{{spectralColor}}"></span>{{spectralText}}（{{spectralLabel}}）</dd></div>
           <div><dt>距地球</dt><dd>{{distanceText}}</dd></div>
-          <div><dt>登记人</dt><dd>{{#if anonymous}}匿名登记人{{/if}}{{#unless anonymous}}{{displayName}}{{/unless}}</dd></div>
-          <div><dt>登记日期</dt><dd>{{registeredDateZh}}</dd></div>
+          <div><dt>认领人</dt><dd>{{#if anonymous}}匿名认领人{{/if}}{{#unless anonymous}}{{displayName}}{{/unless}}</dd></div>
+          <div><dt>认领日期</dt><dd>{{registeredDateZh}}</dd></div>
         </dl>
 
         {{#if dedication}}
@@ -76,15 +76,15 @@
           <ol>
             <li>先在 <a href="{{simbadUrl}}" target="_blank" rel="noopener noreferrer">SIMBAD 天文数据库</a>
               查询 <span class="mono">{{simbadIdent}}</span>，确认这颗恒星真实存在、且证书上的赤经/赤纬/视星等与之相符。</li>
-            <li>打开<a href="/registry/">公开登记表</a>，搜索恒星标识 <span class="mono">{{starId}}</span>。</li>
-            <li>应当只出现一条记录，登记编号为 <span class="mono">{{slug}}</span>；若出现两条，说明登记表异常，请来信告知。</li>
+            <li>打开<a href="/registry/">公开认领表</a>，搜索恒星标识 <span class="mono">{{starId}}</span>。</li>
+            <li>应当只出现一条记录，认领编号为 <span class="mono">{{slug}}</span>；若出现两条，说明认领表异常，请来信告知。</li>
             <li>{{#if registryDirUrl}}也可以直接打开公开仓库的 <span class="mono">data/registrations/{{slug}}.json</span> 查看原始记录。{{/if}}</li>
           </ol>
         </div>
       </div>
 
       <p class="muted" style="font-size:13.5px;margin-top:22px;">
-        本登记为纪念性质的公开可验证登记服务，不构成国际天文学联合会（IAU）官方命名，
+        本认领为纪念性质的公开可验证认领服务，不构成国际天文学联合会（IAU）官方命名，
         亦不代表任何天体命名权。
       </p>
     </div>

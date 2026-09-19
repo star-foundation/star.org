@@ -84,14 +84,14 @@ for (const file of files) {
   }
 }
 
-// 公开登记记录里不得出现邮箱 / 订单号
+// 公开认领记录里不得出现邮箱 / 订单号
 for (const file of files.filter((f) => f.startsWith('data/registrations/') && f.endsWith('.json'))) {
   const content = readFileSync(path.join(ROOT, file), 'utf8');
   if (/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/.test(content)) {
-    problems.push({ type: 'privacy', file, message: '公开登记记录中出现邮箱' });
+    problems.push({ type: 'privacy', file, message: '公开认领记录中出现邮箱' });
   }
   if (/"(order_id|email|customer_email|ls_order_id)"/.test(content)) {
-    problems.push({ type: 'privacy', file, message: '公开登记记录中出现订单/邮箱字段' });
+    problems.push({ type: 'privacy', file, message: '公开认领记录中出现订单/邮箱字段' });
   }
 }
 

@@ -23,7 +23,7 @@ test('TC-PAY-03 献词超过 100 字按规则截断，不破坏排版', () => {
   assert.equal(order.dedicationTruncated, true);
 });
 
-test('TC-PAY-04 匿名登记：公开记录中不写入展示名', () => {
+test('TC-PAY-04 匿名认领：公开记录中不写入展示名', () => {
   const order = normalizeOrder({ display_name: 'For Anna', anonymous: true, dedication: '致你' });
   const record = buildRegistrationRecord({
     slug: 'abcdefghij',
@@ -37,7 +37,7 @@ test('TC-PAY-04 匿名登记：公开记录中不写入展示名', () => {
 });
 
 test('姓名必填且被清洗（去标签、限长）', () => {
-  assert.throws(() => normalizeOrder({ display_name: '   ' }), /缺少登记人姓名/);
+  assert.throws(() => normalizeOrder({ display_name: '   ' }), /缺少认领人姓名/);
   const order = normalizeOrder({ display_name: '<b>Anna</b>\n\n' + 'x'.repeat(80) });
   assert.ok(!order.displayName.includes('<'));
   assert.ok(order.displayName.length <= MAX_DISPLAY_NAME);
