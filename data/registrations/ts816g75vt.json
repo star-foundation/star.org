@@ -1,0 +1,29 @@
+{
+  "slug": "ts816g75vt",
+  "star_id": "HIP-32349",
+  "owner_display_name": "tongxiaojun",
+  "anonymous": false,
+  "dedication_message": "Hello Star.org!",
+  "registered_at": "2026-09-19T09:52:21.505Z",
+  "star": {
+    "id": "HIP-32349",
+    "hip": 32349,
+    "hd": 48915,
+    "proper_name": "Sirius",
+    "bayer": "Alp",
+    "flam": "9",
+    "constellation": "CMa",
+    "ra": 101.287214,
+    "dec": -16.716116,
+    "magnitude": -1.44,
+    "spectral_type": "A0",
+    "distance_ly": 8.6
+  },
+  "artifacts": {
+    "certificate": "certificates/ts816g75vt.pdf",
+    "certificate_sha256": "1402d6976f98b097e3f92b3989cab20a727d17227c3d033d930c869141b3e936",
+    "og_image": "og/ts816g75vt.png",
+    "og_sha256": "fbac925766b397a681037c914fd48b443140901430508b093e28fc7061d17f1e",
+    "certificate_public": true
+  }
+}
