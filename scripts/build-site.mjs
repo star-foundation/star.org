@@ -109,6 +109,10 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
   const entryLabel = soldOut ? '候选库已售罄' : '购买通道接入中';
   const entryMessage = soldOut ? cfg.policy.soldOutMessage : cfg.policy.checkoutPendingMessage;
   const latest = records[0] ?? null;
+  // 登记进度（公开登记表与付款等待页共用）：已登记 / 候选库总数
+  const poolTotal = pool.stars.length || 1;
+  const poolPercent = Math.round((index.count / poolTotal) * 1000) / 10;
+  const poolStarted = index.count > 0;
 
   const common = {
     siteName: cfg.site.name,
@@ -132,7 +136,9 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
     soldOutMessage: cfg.policy.soldOutMessage,
     registryCount: index.count,
     availableCount: available,
-    poolTotal: pool.stars.length,
+    poolTotal,
+    poolPercent,
+    poolStarted,
     latestSlug: latest?.slug ?? null,
     latestUrl: latest ? registrationUrl(latest.slug) : null,
     defaultOgImage: `${cfg.site.baseUrl}/og/default.png`,
@@ -161,9 +167,7 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
   writeFileAtomic(path.join(outDir, 'thanks', 'index.html'), relativize(thanksHtml, 1));
 
   // 公开登记表
-  // 登记进度：候选库被登记掉的比例 + 最近 7 天新增（给公开登记表一个直观的进度感）
-  const progressTotal = pool.stars.length || 1;
-  const progressPercent = Math.round((index.count / progressTotal) * 1000) / 10;
+  // 最近 7 天新增（工作流里算，不进前端脚本）
   const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
   const recentCount7d = index.entries.filter((entry) => {
     const t = Date.parse(entry.registered_at || '');
@@ -176,9 +180,9 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
     hasDuplicates: index.duplicates.length > 0,
     indexJsonUrl: `${cfg.site.baseUrl}/data/registry-index.json`,
     generatedAt: index.generated_at,
-    progressPercent,
-    progressLabel: `${index.count} / ${progressTotal}`,
-    progressStarted: index.count > 0,
+    progressPercent: poolPercent,
+    progressLabel: `${index.count} / ${poolTotal}`,
+    progressStarted: poolStarted,
     recentCount7d,
   });
   ensureDir(path.join(outDir, 'registry'));

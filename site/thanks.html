@@ -32,7 +32,39 @@
         并发送到你在结算页填写的邮箱。这个页面可以安全关闭。
       </p>
 
-      <ol class="steps" style="text-align:left;max-width:520px;margin:26px auto 0;">
+      <div class="progress-card" style="max-width:560px;margin:24px auto 0;text-align:left;">
+        <div class="progress-head">
+          <span>你的证书</span>
+          <span class="mono" data-thanks-stage>正在分配恒星…</span>
+        </div>
+        <div class="progress-track is-indeterminate" role="progressbar" aria-label="证书生成中"
+             aria-valuetext="正在生成">
+          <div class="progress-fill"></div>
+        </div>
+        <div class="progress-foot">
+          通常 <strong>1-3 分钟</strong>完成，最长不超过 5 分钟；完成后会自动发送到你的邮箱，
+          本页可以安全关闭。
+        </div>
+      </div>
+
+      <div class="progress-card" style="max-width:560px;margin:14px auto 0;text-align:left;">
+        <div class="progress-head">
+          <span>候选库登记进度</span>
+          <span class="mono"><span data-pool-label>{{registryCount}} / {{poolTotal}}</span>　<strong data-pool-percent>{{poolPercent}}%</strong></span>
+        </div>
+        <div class="progress-track" role="progressbar" aria-label="候选库登记进度"
+             aria-valuenow="{{poolPercent}}" aria-valuemin="0" aria-valuemax="100" data-pool-track>
+          <div class="progress-fill{{#if poolStarted}} is-started{{/if}}" style="width: {{poolPercent}}%" data-pool-fill></div>
+        </div>
+        <div class="progress-foot" data-pool-note>
+          已登记 <strong data-pool-count>{{registryCount}}</strong> 颗，候选库共 <strong>{{poolTotal}}</strong> 颗。
+          你这一颗写入登记表后，这里的数字会 <strong>+1</strong>——数字变了就说明已经生成好了。
+          <span data-pool-done hidden>🎉 <strong>数字已增加，你的登记很可能已经写入</strong>，可到
+            <a href="/registry/">公开登记表</a>查看最新记录（页面会自动刷新）。</span>
+        </div>
+      </div>
+
+      <ol class="steps" style="text-align:left;max-width:560px;margin:26px auto 0;">
         <li><b>系统分配恒星</b> —— 按亮度顺序分配一颗真实恒星，并生成载有真实天文数据的 PDF 证书。</li>
         <li><b>证书发到你的邮箱</b> —— 邮件里有证书下载链接和永久链接。</li>
         <li><b>永久链接可随时分享</b> —— 页面与登记表都可被公开核实，且不依赖你保留邮件。</li>

@@ -161,3 +161,33 @@ test('TC-REG-07 候选库无登记时进度条为空轨道（不显示"已开始
     sandbox.cleanup();
   }
 });
+
+test('TC-LP-15 等待页 /thanks/ 显示两块进度：证书生成中（不确定）+ 候选库真实计数', () => {
+  const sandbox = createSandbox({ availableStars: 3, poolSize: 4 });
+  try {
+    const reg = runScript('register.mjs', [], {
+      sandbox,
+      input: JSON.stringify({ order_id: 'THANKS-1', display_name: '等待页', status: 'paid' }),
+    });
+    assert.equal(reg.status, 0, reg.stderr);
+    const built = runScript('build-site.mjs', [], {
+      sandbox,
+      env: { ...NO_CHROME, LEMON_SQUEEZY_CHECKOUT_URL: CHECKOUT_URL },
+    });
+    assert.equal(built.status, 0, built.stderr);
+    const html = readFileSync(path.join(sandbox.siteOut, 'thanks', 'index.html'), 'utf8');
+    // 证书生成中：不确定进度条 + 阶段文案 + 端点提示
+    assert.ok(html.includes('is-indeterminate'), '应有不确定进度条表示证书生成中');
+    assert.ok(html.includes('data-thanks-stage'), '应有阶段文案（正在分配恒星…）');
+    assert.ok(html.includes('正在分配恒星'), '初始阶段文案应为"正在分配恒星"');
+    // 候选库真实计数：poolSize=4 且预置 1 条 + 新登记 1 条 = 2
+    assert.ok(html.includes('data-pool-count'), '应有候选库计数元素');
+    assert.ok(html.includes('data-pool-label>2 / 4'), '候选库计数应为 2 / 4，实际：' + (html.match(/data-pool-label>[^<]*/) || [])[0]);
+    assert.ok(html.includes('data-pool-percent>50%'), '百分比应为 50%');
+    assert.ok(html.includes('aria-valuenow="50"'), '进度条 aria 值应为 50');
+    assert.ok(html.includes('data-pool-done'), '应有"数字 +1 即完成"的提示元素');
+    assert.ok(!html.includes('{{'), '不得残留占位符');
+  } finally {
+    sandbox.cleanup();
+  }
+});

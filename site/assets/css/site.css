@@ -342,3 +342,21 @@ footer.site .disclaimer { max-width: 620px; line-height: 1.8; }
 /* 早期阶段（如 1/800）真实宽度不足 1 像素，给一条最小可见宽度，
    否则进度条看起来像没渲染。只在已有登记时生效，0 条仍是空轨道。 */
 .progress-fill.is-started { min-width: 4px; }
+
+/* 等待页：不确定进度（证书生成中）用流动条纹表示"正在进行"，
+   不假装能给出百分比——真实进度靠下面的候选库计数体现。 */
+.progress-track.is-indeterminate { position: relative; }
+.progress-track.is-indeterminate .progress-fill {
+  width: 40%;
+  min-width: 40%;
+  background: linear-gradient(90deg, #16309a, #4a6bdc, #16309a);
+  background-size: 200% 100%;
+  animation: progress-sweep 1.6s linear infinite;
+}
+@keyframes progress-sweep {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(250%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .progress-track.is-indeterminate .progress-fill { animation: none; width: 100%; }
+}

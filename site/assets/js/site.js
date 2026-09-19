@@ -49,6 +49,61 @@
     }
   }
 
+  // 付款等待页的登记进度：轮询公开的 /data/registry-index.json（同源、无隐私字段），
+  // 让客户看到"候选库已登记数"是否 +1 —— 数字变了基本就说明自己那一颗已经写入。
+  // 不做任何猜测式假进度：拿不到数据就维持构建时的静态值。
+  const poolCount = document.querySelector('[data-pool-count]');
+  const poolFill = document.querySelector('[data-pool-fill]');
+  const poolTrack = document.querySelector('[data-pool-track]');
+  const poolLabel = document.querySelector('[data-pool-label]');
+  const poolPercentEl = document.querySelector('[data-pool-percent]');
+  const poolDone = document.querySelector('[data-pool-done]');
+  if (poolCount && poolTrack) {
+    const initial = Number(poolCount.textContent.trim()) || 0;
+    const total = Number((poolLabel?.textContent || '').split('/')[1]) || 0;
+    const render = (count) => {
+      poolCount.textContent = String(count);
+      if (poolLabel && total) poolLabel.textContent = count + ' / ' + total;
+      if (total) {
+        const pct = Math.round((count / total) * 1000) / 10;
+        if (poolPercentEl) poolPercentEl.textContent = pct + '%';
+        poolTrack.setAttribute('aria-valuenow', String(pct));
+        if (poolFill) {
+          poolFill.style.width = pct + '%';
+          poolFill.classList.toggle('is-started', count > 0);
+        }
+      }
+      if (poolDone) poolDone.hidden = count <= initial;
+    };
+    const poll = async () => {
+      try {
+        const res = await fetch('/data/registry-index.json', { cache: 'no-store' });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (typeof data.count === 'number') render(data.count);
+      } catch {
+        /* 网络失败就用静态值，不打扰客户 */
+      }
+    };
+    render(initial);
+    poll();
+    window.setInterval(poll, 10000);
+  }
+
+  // 等待页的阶段文案：按经过时间推进（付款后 0-20s / 20-70s / 70s+），
+  // 只做"看起来在动"的提示，不声称真实服务端状态。
+  const stage = document.querySelector('[data-thanks-stage]');
+  if (stage) {
+    const stages = ['正在分配恒星…', '正在生成证书与永久链接…', '正在发送邮件…'];
+    const startedAt = Date.now();
+    const tick = () => {
+      const elapsed = (Date.now() - startedAt) / 1000;
+      stage.textContent = stages[elapsed < 20 ? 0 : elapsed < 70 ? 1 : 2];
+    };
+    tick();
+    window.setInterval(tick, 5000);
+  }
+
   // 下单前登记表单：把姓名/献词/匿名拼进 Lemon Squeezy 结算 URL 后跳转。
   // URL 构建逻辑在 checkout-url.mjs（纯函数，先在页面里加载，暴露为 globalThis.buildCheckoutUrl）。
   const form = document.querySelector('[data-registration-form]');
