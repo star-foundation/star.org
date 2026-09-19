@@ -2,7 +2,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import { createSandbox, runScript } from './helpers.mjs';
+import { createSandbox, runScript, readJson, copy, claimLabel } from './helpers.mjs';
+import { buildStarView } from '../scripts/lib/view.mjs';
+import { renderCertificateHtml } from '../scripts/lib/render.mjs';
 
 const CHECKOUT_URL = 'https://store.lemonsqueezy.com/checkout/buy/test-variant';
 const NO_CHROME = { CHROME_PATH: path.join('/nonexistent', 'chrome') };
@@ -42,8 +44,9 @@ test('TC-LP-10 落地页不再内嵌表单，三个申请入口统一指向 /reg
     const ctaCount = (landing.match(/href="\.?\/?register\/"/g) || []).length;
     assert.equal(ctaCount, 3, '导航 / 主视觉 / 购买区三个入口都应指向 /register/，实际 ' + ctaCount);
     assert.ok(!landing.includes('href="' + CHECKOUT_URL + '"'), '落地页不应再直接跳到结算页');
-    const labels = landing.match(/>认领一颗星</g) || [];
-    assert.equal(labels.length, 3, '三个入口文案应统一为「认领一颗星」，实际 ' + labels.length);
+    const claim = claimLabel();
+    const labels = landing.split('>' + claim + '<').length - 1;
+    assert.equal(labels, 3, '三个入口文案应统一为「' + claim + '」，实际 ' + labels);
   } finally {
     sandbox.cleanup();
   }
@@ -91,7 +94,7 @@ test('TC-LP-13 全站导航统一：每页都有「认领一颗星」→ 认领�
       ['s/' + slug + '/index.html']: readFileSync(path.join(sandbox.siteOut, 's', slug, 'index.html'), 'utf8'),
     };
     for (const [name, html] of Object.entries(pages)) {
-      assert.ok(html.includes('>认领一颗星<'), name + ' 导航应有统一的「认领一颗星」按钮');
+      assert.ok(html.includes('>' + claimLabel() + '<'), name + ' 导航应有统一的「' + claimLabel() + '」按钮');
       assert.ok(/href="(?:\.\.\/)*\.?\/?register\/"/.test(html), name + ' 按钮应指向认领页');
       if (name !== 'register/index.html') {
         assert.ok(!html.includes('lemonsqueezy.com/checkout'), name + ' 不应内嵌结算链接（统一经认领页）');
@@ -115,7 +118,7 @@ test('TC-LP-14 付款完成等待页 /thanks/：可回站、带订单号提示�
     assert.ok(thanks.includes('付款已收到'), '应确认付款已收到');
     assert.ok(thanks.includes('data-order-hint'), '应能展示 Lemon Squeezy 传来的订单号');
     assert.ok(thanks.includes('noindex'), '购买后过渡页应 noindex');
-    assert.ok(thanks.includes('>认领一颗星<'), '导航应与其他页统一');
+    assert.ok(thanks.includes('>' + claimLabel() + '<'), '导航应与其他页统一');
     assert.ok(thanks.includes('公开认领表'), '应提供回站入口');
     assert.ok(!thanks.includes('{{'), '不得残留占位符');
     const sitemap = readFileSync(path.join(sandbox.siteOut, 'sitemap.xml'), 'utf8');
@@ -142,7 +145,10 @@ test('TC-REG-06 公开认领表显示候选库进度：百分比与进度条随�
     assert.ok(html.includes('aria-valuenow="50"'), '2/4 应算出 50%，实际：' + (html.match(/aria-valuenow="[^"]*"/) || [])[0]);
     assert.ok(html.includes('>50%<'), '应显示 50% 文字');
     assert.ok(html.includes('2 / 4'), '应显示 已认领/总数');
-    assert.ok(/最近 7 天新增\s*<strong>2<\/strong>/.test(html), '应统计最近 7 天新增');
+    // 进度说明里的"最近 7 天新增"数量：用目录键取文案片段，不写死中文
+    const recentLabel = copy('registry.progressFoot');
+    assert.ok(html.includes('<strong>2</strong>'), '应统计最近 7 天新增');
+    assert.ok(recentLabel.includes('7'), '进度文案应说明统计窗口为 7 天');
   } finally {
     sandbox.cleanup();
   }
@@ -156,7 +162,7 @@ test('TC-REG-07 候选库无认领时进度条为空轨道（不显示"已开始
     const html = readFileSync(path.join(sandbox.siteOut, 'registry', 'index.html'), 'utf8');
     assert.ok(html.includes('aria-valuenow="0"'), '0 条时应为 0%');
     assert.ok(!html.includes('is-started'), '0 条时不应出现最小可见宽度类');
-    assert.ok(/最近 7 天新增\s*<strong>0<\/strong>/.test(html), '近期新增应为 0');
+    assert.ok(html.includes('<strong>0</strong>'), '近期新增应为 0');
   } finally {
     sandbox.cleanup();
   }
@@ -215,11 +221,25 @@ test('TC-STAR-01 永久链接页与证书都给出 SIMBAD 外链（可核实恒�
     assert.ok(page.includes('target="_blank"'), '外链应新开标签');
     assert.ok(page.includes('HIP ' + hip), '应显示 SIMBAD 用的标识 HIP ' + hip);
 
-    // 证书模板：证书是打印件，也要带上 SIMBAD 核实路径（模板占位符 + 视图数据两头都验）
-    const certTpl = readFileSync(path.join(process.cwd(), 'templates', 'certificate.html'), 'utf8');
-    assert.ok(certTpl.includes('{{simbadUrl}}'), '证书模板应引用 simbadUrl');
-    assert.ok(certTpl.includes('{{simbadIdent}}'), '证书模板应引用 simbadIdent');
-    assert.ok(certTpl.includes('SIMBAD'), '证书应写明 SIMBAD 核实步骤');
+    // 证书：证书是打印件，也要带上 SIMBAD 核实路径。
+    // 断言渲染后的证书而非模板源码——文案自阶段 1 起集中在 site/i18n/*.json（DECISIONS D9），
+    // 模板里只剩 {{t.*}} 键，只有渲染产物才能证明"证书上真的有这条核实路径"。
+    const record = readJson(path.join(sandbox.registrations, slug + '.json'));
+    const certView = buildStarView({
+      star: record.star,
+      record,
+      slug,
+      baseUrl: 'https://star.test',
+      registryUrl: 'https://star.test/registry/',
+      certificateUrl: 'https://star.test/certificates/' + slug + '.pdf',
+      ogImageUrl: 'https://star.test/og/' + slug + '.png',
+      locale: 'zh',
+    });
+    const certHtml = renderCertificateHtml(certView);
+    assert.ok(certHtml.includes('https://simbad.cds.unistra.fr/simbad/sim-id?Ident=HIP+' + hip),
+      '证书应给出 SIMBAD 查询链接');
+    assert.ok(certHtml.includes('HIP ' + hip), '证书应显示 SIMBAD 用的标识 HIP ' + hip);
+    assert.ok(certHtml.includes('SIMBAD'), '证书应写明 SIMBAD 核实步骤');
 
     // 证书 PDF 应已生成（渲染链路没被新字段破坏）
     const certPdf = path.join(sandbox.dataDir, '..', 'certificates', slug + '.pdf');
@@ -282,7 +302,7 @@ test('TC-LP-17 最新认领为匿名时，落地页只显示「匿名认领人�
     const built = runScript('build-site.mjs', [], { sandbox, env: NO_CHROME });
     assert.equal(built.status, 0, built.stderr);
     const html = readFileSync(path.join(sandbox.siteOut, 'index.html'), 'utf8');
-    assert.ok(html.includes('匿名认领人'), '匿名认领应显示「匿名认领人」');
+    assert.ok(html.includes(copy('star.anonymousOwner')), '匿名认领应显示「' + copy('star.anonymousOwner') + '」');
     assert.ok(!html.includes('李四'), '匿名认领不得泄漏姓名到落地页');
     assert.ok(html.includes('致自己'), '献词是公开内容，匿名时仍应展示');
   } finally {

@@ -18,10 +18,18 @@ import { ensureDir, writeFileAtomic, writeJsonAtomic, removeIfExists } from './l
 import { readPool } from './lib/pool.mjs';
 import { buildRegistryIndex, sortedRegistrations } from './lib/registry.mjs';
 import { buildStarView } from './lib/view.mjs';
+import { starTitle, starSubtitle, formatRa, formatDec, formatMagnitude, formatDistance } from './lib/astro.mjs';
+import { formatDate } from './lib/i18n.mjs';
+
+/** 匿名认领在公开页面上显示的占位名（与目录里的 star.anonymousOwner 同义） */
+function anonymousLabel(locale) {
+  return locale === 'en' ? 'Anonymous claimer' : '匿名认领人';
+}
 import { render } from './lib/template.mjs';
 import {
   resolveDefaultLocale, otherLocale, htmlLang, loadCatalogs, interpolateCatalog,
   flattenCatalog, switchableKeys, missingKeysFor, buildAltCatalogScript,
+  buildJsCatalogScript,
 } from './lib/i18n.mjs';
 import { renderOgHtml } from './lib/render.mjs';
 import { renderPng } from './lib/chrome.mjs';
@@ -92,7 +100,7 @@ export function relativize(html, depth) {
  * 优先展示**最近一条真实认领**（含认领人与献词）——既是社会证明，也让访客在购买前
  * 看到真实交付物，而不是一个虚构样例。没有认领记录时回退到内置示例并明确标注「示例数据」。
  */
-function sampleView(cfg, records = []) {
+function sampleView(cfg, records = [], locale = 'zh') {
   const latest = records[0] ?? null;
   if (latest) {
     const view = buildStarView({
@@ -104,6 +112,7 @@ function sampleView(cfg, records = []) {
       certificateUrl: certificateUrl(latest.slug),
       ogImageUrl: ogImageUrl(latest.slug),
       certificatePublic: latest.artifacts?.certificate_public !== false,
+      locale,
     });
     return {
       isReal: true,
@@ -116,30 +125,37 @@ function sampleView(cfg, records = []) {
       distanceText: view.distanceText,
       spectralText: view.spectralText,
       // 匿名认领不展示姓名（与认领表、永久页一致）
-      displayName: view.anonymous ? '匿名认领人' : view.displayName,
+      displayName: view.anonymous ? anonymousLabel(locale) : view.displayName,
       anonymous: view.anonymous,
       dedication: view.dedication,
-      registeredDateZh: view.registeredDateZh,
+      registeredDate: view.registeredDate,
       slug: view.slug,
       permalink: view.permalink,
       simbadUrl: view.simbadUrl,
       simbadIdent: view.simbadIdent,
     };
   }
+  // 没有真实认领时的内置示例：同样按当前语言渲染，否则英文站会露出中文示例
+  const demoStar = {
+    id: 'HIP-91262', proper_name: 'Vega', constellation: 'Lyr', bayer: 'Alp', hd: 172167,
+    magnitude: 0.03, distance_ly: 25.0, spectral_type: 'A0V', ra: 279.2347, dec: 38.7837,
+  };
   return {
     isReal: false,
     starId: 'HIP-91262',
-    starTitle: '织女星',
-    starSubtitle: '天琴座 α · Vega · HD 172167 · HIP-91262',
-    raText: '18h 36m 56s',
-    decText: '+38° 47′ 01″',
-    magnitudeText: '0.03 等',
-    distanceText: '25.0 光年',
+    starTitle: starTitle(demoStar, locale),
+    starSubtitle: starSubtitle(demoStar, locale),
+    raText: formatRa(demoStar.ra),
+    decText: formatDec(demoStar.dec),
+    magnitudeText: formatMagnitude(demoStar.magnitude, locale),
+    distanceText: formatDistance(demoStar.distance_ly, locale),
     spectralText: 'A0V',
     displayName: 'For Anna',
     anonymous: false,
-    dedication: '愿你在每一个抬头看天的夜晚，都能找到属于自己的那一颗。',
-    registeredDateZh: '2026年9月20日',
+    dedication: locale === 'en'
+      ? 'For the star you look up at every night.'
+      : '愿你在每一个抬头看天的夜晚，都能找到属于自己的那一颗。',
+    registeredDate: formatDate('2026-09-20T00:00:00Z', locale),
     slug: 'sample',
     permalink: `${cfg.site.baseUrl}/s/sample`,
     simbadUrl: `https://simbad.cds.unistra.fr/simbad/sim-id?Ident=HIP+91262`,
@@ -147,7 +163,7 @@ function sampleView(cfg, records = []) {
   };
 }
 
-async function buildDefaultOg(cfg, outDir) {
+async function buildDefaultOg(cfg, outDir, locale = 'zh') {
   const file = path.join(outDir, 'og', 'default.png');
   if (existsSync(file)) return { status: 'exists', file };
   try {
@@ -155,7 +171,7 @@ async function buildDefaultOg(cfg, outDir) {
       renderOgHtml({
         // 默认 OG 图保持固定的示例内容：社交平台会缓存 OG 图，跟着最新认领变动
         // 会让卡片反复失效。真实的最新认领展示在落地页正文里。
-        ...sampleView(cfg, []),
+        ...sampleView(cfg, [], locale),
         slug: 'star-org',
         starFieldSvg: '',
         brandName: cfg.site.name,
@@ -197,9 +213,15 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
   // 目录里可能带 {{siteName}} / {{supportEmail}} / {{price}} 之类的占位符，先解析再喂模板
   const nested = loadCatalogs()[locale];
   const pricing = { price: nested.product.price, priceNote: nested.product.priceNote };
-  const vars = { ...baseVars, ...pricing };
+  // maxChars 供 "最多 N 字" 这类文案复用，避免同一个上限写死在多处
+  const vars = { ...baseVars, ...pricing, maxChars: cfg.product.maxDedicationChars };
   const t = interpolateCatalog(loadCatalogs()[locale], vars);
   const tAlt = interpolateCatalog(loadCatalogs()[altLocale], vars);
+  // 逐页目录：某些文案带页面级占位符（如 {{registryCount}}、{{poolTotal}}），
+  // 基础变量解析不了，用这个补上再喂模板。
+  const pageCatalog = (extra = {}) => interpolateCatalog(loadCatalogs()[locale], { ...vars, ...extra });
+  const pageCatalogFor = (loc, extra = {}) => interpolateCatalog(loadCatalogs()[loc], { ...vars, ...extra });
+  const pageCatalogAlt = (extra = {}) => interpolateCatalog(loadCatalogs()[altLocale], { ...vars, ...extra });
   // 购买入口的状态文案也来自目录，配置里不再保留第二份
   const entryLabelKey = soldOut ? 'state.soldOut' : 'state.checkoutPending';
   const entryMessageKey = soldOut ? 'state.soldOutMessage' : 'state.checkoutPendingMessage';
@@ -223,6 +245,7 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
     registryUrl: `${cfg.site.baseUrl}/registry/`,
     priceDisplay: t.product.price,
     priceNote: t.product.priceNote,
+    maxDedicationChars: cfg.product.maxDedicationChars,
     checkoutUrl: cfg.site.checkoutUrl,
     checkoutReady,
     checkoutConfigured,
@@ -240,6 +263,8 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
     altLangName: tAlt.common.lang.name,
     selfLangName: t.common.lang.name,
     altTitle: `${cfg.site.name} · ${tAlt.brand.tagline}`,
+    // 给前端脚本用的双语目录（付款等待页的动态文案靠它）
+    i18nJsScript: buildJsCatalogScript(locale, altLocale),
     registryCount: index.count,
     availableCount: available,
     poolTotal,
@@ -256,7 +281,7 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
   // 落地页
   // 示例区的文案里带 {{count}} / {{slug}} / {{ident}}，这些值只有拿到 sample 之后才知道，
   // 所以落地页用自己那一份目录（在基础变量上补这三个值），不从 common.t 复用。
-  const sample = sampleView(cfg, records);
+  const sample = sampleView(cfg, records, locale);
   const sampleVars = {
     ...vars,
     count: index.count,
@@ -266,11 +291,13 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
   const sampleKey = sample.isReal ? 'Real' : 'Sample';
   const landingT = interpolateCatalog(loadCatalogs()[locale], sampleVars);
   const landingTAlt = interpolateCatalog(loadCatalogs()[altLocale], sampleVars);
+  const sampleAlt = sampleView(cfg, records, altLocale);
   const landing = renderPage('index.html', {
     ...common,
     t: landingT,
     tAltFlat: flattenCatalog(landingTAlt),
     sample,
+    sampleAlt,
     registryPreview: index.entries.slice(0, 5),
     sampleLedeKey: `landing.sample.lede${sampleKey}`,
     sampleLede: landingT.landing.sample[`lede${sampleKey}`],
@@ -282,13 +309,22 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
   writeFileAtomic(path.join(outDir, 'index.html'), relativize(landing, 0));
 
   // 认领页（三个申请入口统一指向这里；表单在这里填写姓名/献词/匿名）
-  const registerHtml = render(tpl('register.html'), common);
+  const registerHtml = renderPage('register.html', {
+    ...common,
+    t: pageCatalog(),
+    tAltFlat: flattenCatalog(pageCatalogAlt()),
+  });
   ensureDir(path.join(outDir, 'register'));
   writeFileAtomic(path.join(outDir, 'register', 'index.html'), relativize(registerHtml, 1));
 
   // 付款完成后的等待页（Lemon Squeezy 确认弹窗的按钮链接指向这里）。
   // 不放进 sitemap：它是购买后的过渡页，页面本身已标 noindex。
-  const thanksHtml = render(tpl('thanks.html'), common);
+  const thanksVars = { registryCount: index.count, poolTotal };
+  const thanksHtml = renderPage('thanks.html', {
+    ...common,
+    t: pageCatalog(thanksVars),
+    tAltFlat: flattenCatalog(pageCatalogAlt(thanksVars)),
+  });
   ensureDir(path.join(outDir, 'thanks'));
   writeFileAtomic(path.join(outDir, 'thanks', 'index.html'), relativize(thanksHtml, 1));
 
@@ -299,17 +335,29 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
     const t = Date.parse(entry.registered_at || '');
     return Number.isFinite(t) && t >= sevenDaysAgo;
   }).length;
-  const registryHtml = render(tpl('registry.html'), {
+  const registryVars = {
+    registryCount: index.count,
+    availableCount: available,
+    poolTotal,
+    dupCount: index.duplicates.length,
+    indexJsonUrl: `${cfg.site.baseUrl}/data/registry-index.json`,
+    generatedAt: index.generated_at,
+    recentCount7d,
+    registryDirUrl: cfg.site.registryDirUrl,
+  };
+  const registryHtml = renderPage('registry.html', {
     ...common,
     entries: index.entries,
     duplicates: index.duplicates,
     hasDuplicates: index.duplicates.length > 0,
-    indexJsonUrl: `${cfg.site.baseUrl}/data/registry-index.json`,
+    indexJsonUrl: registryVars.indexJsonUrl,
     generatedAt: index.generated_at,
     progressPercent: poolPercent,
     progressLabel: `${index.count} / ${poolTotal}`,
     progressStarted: poolStarted,
     recentCount7d,
+    t: pageCatalog(registryVars),
+    tAltFlat: flattenCatalog(pageCatalogAlt(registryVars)),
   });
   ensureDir(path.join(outDir, 'registry'));
   writeFileAtomic(path.join(outDir, 'registry', 'index.html'), relativize(registryHtml, 1));
@@ -327,20 +375,86 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
       certificateUrl: certificateUrl(slug),
       ogImageUrl: ogImageUrl(slug),
       certificatePublic: record.artifacts?.certificate_public !== false,
+      locale,
     });
-    const page = render(tpl('permanent.html'), {
-      ...common,
-      ...view,
-      shareText: encodeURIComponent(`我为 ${view.starTitle} 完成了一次可公开验证的恒星认领`),
-      shareUrl: encodeURIComponent(view.permalink),
+    // 永久页的文案里嵌了这颗星的具体数据（星级、编号、SIMBAD 标识），
+    // 所以目录要按这颗星再解析一遍占位符
+    const starVars = {
+      slug,
+      starId: view.starId,
+      starTitle: view.starTitle,
+      starSubtitle: view.starSubtitle,
+      magnitudeText: view.magnitudeText,
+      distanceText: view.distanceText,
+      simbadUrl: view.simbadUrl,
+      ident: view.simbadIdent,
+    };
+    const starT = pageCatalog(starVars);
+    const starTAlt = pageCatalogAlt(starVars);
+    // 同一颗星的另一种语言写法（星名、星座、星等、距离、日期），供客户端切换数据值
+    const buildViewFor = (loc) => buildStarView({
+      star: record.star,
+      record,
+      slug,
+      baseUrl: cfg.site.baseUrl,
+      registryUrl: `${cfg.site.baseUrl}/registry/`,
+      certificateUrl: certificateUrl(slug),
+      ogImageUrl: ogImageUrl(slug),
+      certificatePublic: record.artifacts?.certificate_public !== false,
+      locale: loc,
     });
+    const enView = buildViewFor('en');
+    const zhView = buildViewFor('zh');
+    // 永久链接 URL 策略（DECISIONS D9）：/s/<slug>/ 为英文 canonical，
+    // 另产出 /zh/s/<slug>/ 作为中文默认入口，两者用 hreflang 互链、canonical 都指向前者。
+    const canonicalUrl = registrationUrl(slug);
+    const zhUrl = `${cfg.site.baseUrl}/zh/s/${slug}/`;
+    const hreflangLinks = [
+      `<link rel="alternate" hreflang="en" href="${canonicalUrl}">`,
+      `<link rel="alternate" hreflang="zh-CN" href="${zhUrl}">`,
+      `<link rel="alternate" hreflang="x-default" href="${canonicalUrl}">`,
+    ].join('\n');
+
+    // pageView = 这一页默认语言的数据值（星名/星等/日期都要对应语言）；
+    // altData = 另一种语言的数据值，放在 data-i18n-alt 里供客户端切换。
+    const renderStarPage = (pageLocale, pageAltLocale, pageView, altData) => {
+      const tFor = (loc) => pageCatalogFor(loc, starVars);
+      return renderPage('permanent.html', {
+        ...common,
+        ...pageView,
+        alt: altData,
+        locale: pageLocale,
+        altLocale: pageAltLocale,
+        htmlLang: htmlLang(pageLocale),
+        ogLocale: ogLocale(pageLocale),
+        selfLangName: loadCatalogs()[pageLocale].common.lang.name,
+        altLangName: loadCatalogs()[pageAltLocale].common.lang.name,
+        altTitle: `${cfg.site.name} · ${loadCatalogs()[pageAltLocale].brand.tagline}`,
+        t: tFor(pageLocale),
+        tAltFlat: flattenCatalog(tFor(pageAltLocale)),
+        canonicalUrl,
+        hreflangLinks,
+        shareText: encodeURIComponent(tFor(pageLocale).star.shareText),
+        shareUrl: encodeURIComponent(canonicalUrl),
+      });
+    };
+
     ensureDir(path.join(outDir, 's', slug));
-    writeFileAtomic(path.join(outDir, 's', slug, 'index.html'), relativize(page, 2));
-    pages += 1;
+    writeFileAtomic(path.join(outDir, 's', slug, 'index.html'),
+      relativize(renderStarPage('en', 'zh', enView, zhView), 2));
+    // 中文默认入口：数据值与文案都取中文
+    ensureDir(path.join(outDir, 'zh', 's', slug));
+    writeFileAtomic(path.join(outDir, 'zh', 's', slug, 'index.html'),
+      relativize(renderStarPage('zh', 'en', zhView, enView), 3));
+    pages += 2;
   }
 
   // 404
-  writeFileAtomic(path.join(outDir, '404.html'), relativize(render(tpl('404.html'), common), 0));
+  writeFileAtomic(path.join(outDir, '404.html'), relativize(renderPage('404.html', {
+    ...common,
+    t: pageCatalog(),
+    tAltFlat: flattenCatalog(pageCatalogAlt()),
+  }), 0));
 
   // 静态资源
   copyAssets(outDir);
@@ -383,6 +497,8 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
     `${cfg.site.baseUrl}/register/`,
     `${cfg.site.baseUrl}/registry/`,
     ...records.map((record) => registrationUrl(record.slug)),
+    // 中文默认入口也要能被搜索引擎收录（与英文页用 hreflang 互链）
+    ...records.map((record) => `${cfg.site.baseUrl}/zh/s/${record.slug}/`),
   ];
   writeFileAtomic(
     path.join(outDir, 'sitemap.xml'),
@@ -408,7 +524,7 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
   }
   if (soldOut) warnings.push('候选库已售罄，落地页购买入口自动下线（补货后自动恢复）');
 
-  const ogDefault = await buildDefaultOg(cfg, outDir);
+  const ogDefault = await buildDefaultOg(cfg, outDir, locale);
 
   return {
     outDir,

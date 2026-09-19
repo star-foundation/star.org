@@ -1,7 +1,7 @@
 {
   "site": {
     "name": "Star.org",
-    "defaultLocale": "zh",
+    "defaultLocale": "en",
     "domain": "star.org",
     "baseUrl": "https://star.org",
     "registryRepoUrl": "https://github.com/star-foundation/star.org",

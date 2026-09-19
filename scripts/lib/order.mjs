@@ -69,9 +69,22 @@ export function normalizeOrder(input = {}) {
     dedication: dedication || null,
     dedicationTruncated: truncated,
     anonymous: parseBool(input.anonymous),
+    // 买家下单时的语言（结算页/Zapier 透传）。决定证书与邮件用哪种语言生成；
+    // 缺失或非法时回退站点默认语言。
+    locale: normalizeLocale(input.locale ?? input.lang ?? input.language),
     source: input.source || 'lemon-squeezy',
     receivedAt: new Date().toISOString(),
   };
+}
+
+/** 只接受站点支持的两种语言；其他值一律视为未提供 */
+export const SUPPORTED_LOCALES = ['en', 'zh'];
+
+function normalizeLocale(value) {
+  const raw = String(value ?? '').trim().toLowerCase();
+  if (!raw) return null;
+  const short = raw.split(/[-_]/)[0];
+  return SUPPORTED_LOCALES.includes(short) ? short : null;
 }
 
 function clean(value, maxLength, keepNewlines = false) {
@@ -96,6 +109,9 @@ export function buildRegistrationRecord({ slug, star, order, registeredAt, certi
     star_id: star.id,
     owner_display_name: anonymous ? null : order.displayName,
     anonymous,
+    // 生成证书/邮件时使用的语言。不是隐私字段（check-secrets 不拦），
+    // 是有意公开的，便于外部核对"这份证书为什么是英文"。
+    locale: order.locale || null,
     dedication_message: order.dedication || null,
     registered_at: registeredAt,
     star: {

@@ -1,7 +1,8 @@
 import {
   starTitle, starSubtitle, formatRa, formatDec, formatMagnitude, formatDistance,
-  spectralLabel, spectralColor, skyChartSvg, constellationZh, bayerLabel, starFieldSvg,
+  spectralLabel, spectralColor, skyChartSvg, constellationName, bayerLabel, starFieldSvg,
 } from './astro.mjs';
+import { formatDate } from './i18n.mjs';
 
 export function formatDateZh(iso) {
   const date = new Date(iso);
@@ -19,29 +20,37 @@ export function formatDateIso(iso) {
  * 把恒星数据 + 认领记录整理成页面/证书/邮件/OG 图共用的展示模型。
  * 匿名认领：公开视图里不出现任何姓名。
  */
-export function buildStarView({ star, record, slug, baseUrl, registryUrl, certificateUrl, ogImageUrl, certificatePublic = true }) {
+export function buildStarView({
+  star, record, slug, baseUrl, registryUrl, certificateUrl, ogImageUrl,
+  certificatePublic = true, locale = 'zh',
+}) {
   const anonymous = Boolean(record?.anonymous);
   const displayName = anonymous ? null : record?.owner_display_name ?? null;
+  const registeredAt = record?.registered_at ?? new Date().toISOString();
   return {
     slug,
+    locale,
     starId: star.id,
-    starTitle: starTitle(star),
-    starSubtitle: starSubtitle(star),
+    starTitle: starTitle(star, locale),
+    starSubtitle: starSubtitle(star, locale),
     properName: star.proper_name ?? null,
-    constellationZh: constellationZh(star.constellation),
+    constellationName: constellationName(star.constellation, locale),
     bayer: bayerLabel(star.bayer),
     raText: formatRa(star.ra),
     decText: formatDec(star.dec),
-    magnitudeText: formatMagnitude(star.magnitude),
-    distanceText: formatDistance(star.distance_ly),
+    magnitudeText: formatMagnitude(star.magnitude, locale),
+    distanceText: formatDistance(star.distance_ly, locale),
     spectralText: star.spectral_type || '—',
-    spectralLabel: spectralLabel(star.spectral_type),
+    spectralLabel: spectralLabel(star.spectral_type, locale),
     spectralColor: spectralColor(star.spectral_type),
-    skyChartSvg: skyChartSvg(star),
+    skyChartSvg: skyChartSvg(star, { locale }),
     starFieldSvg: starFieldSvg(slug),
-    registeredAt: record?.registered_at ?? null,
-    registeredDateZh: formatDateZh(record?.registered_at ?? new Date().toISOString()),
-    registeredDateIso: formatDateIso(record?.registered_at ?? new Date().toISOString()),
+    registeredAt,
+    // 按语言格式化的日期（en → September 19, 2026；zh → 2026年9月19日）
+    registeredDate: formatDate(registeredAt, locale),
+    // 旧字段名保留为别名，证书/邮件模板在阶段 3 迁移完成后即删除
+    registeredDateZh: formatDate(registeredAt, 'zh'),
+    registeredDateIso: formatDateIso(registeredAt),
     displayName,
     anonymous,
     dedication: record?.dedication_message ?? null,

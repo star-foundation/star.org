@@ -3,8 +3,30 @@ import { spawnSync } from 'node:child_process';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { flatCatalogs, resolveDefaultLocale } from '../scripts/lib/i18n.mjs';
 
 export const ROOT = path.resolve(fileURLToPath(new URL('../', import.meta.url)));
+
+/**
+ * 取默认语言的文案（DECISIONS D9）。
+ *
+ * 断言界面文案时不要写死中文字面量：站点默认语言会变、以后还可能加第三种语言。
+ * 用目录键取值，既能在改默认语言后继续通过，也能顺带保证"这个键确实存在翻译"。
+ */
+export function copy(key, locale) {
+  const target = locale || resolveDefaultLocale();
+  const value = flatCatalogs({ reload: true })[target][key];
+  if (typeof value !== 'string') {
+    throw new Error(`文案键不存在或不是字符串：${target} → ${key}`);
+  }
+  return value;
+}
+
+/** 默认语言下的"认领一颗星"按钮文案，供多处导航断言复用 */
+export function claimLabel(locale) {
+  return copy('common.nav.claim', locale);
+}
+
 
 /** 建立测试沙盒：独立的候选库、认领目录、证书目录、站点输出，互不干扰 */
 export function createSandbox({ availableStars = 5, poolSize = 8 } = {}) {

@@ -42,15 +42,52 @@ export const STAR_NAME_ZH = {
   Menkar: '天囷一', Mira: '蒭藁增二', Megrez: '天权', Izar: '梗河一', Mothallah: '天大将军增一',
 };
 
+/** 星座英文名（IAU 标准，键与 CONSTELLATION_ZH 完全一致） */
+export const CONSTELLATION_EN = {
+  And: 'Andromeda', Ant: 'Antlia', Aps: 'Apus', Aqr: 'Aquarius', Aql: 'Aquila', Ara: 'Ara',
+  Ari: 'Aries', Aur: 'Auriga', Boo: 'Boötes', Cae: 'Caelum', Cam: 'Camelopardalis', Cnc: 'Cancer',
+  CVn: 'Canes Venatici', CMa: 'Canis Major', CMi: 'Canis Minor', Cap: 'Capricornus', Car: 'Carina',
+  Cas: 'Cassiopeia', Cen: 'Centaurus', Cep: 'Cepheus', Cet: 'Cetus', Cha: 'Chamaeleon',
+  Cir: 'Circinus', Col: 'Columba', Com: 'Coma Berenices', CrA: 'Corona Australis',
+  CrB: 'Corona Borealis', Crv: 'Corvus', Crt: 'Crater', Cru: 'Crux', Cyg: 'Cygnus', Del: 'Delphinus',
+  Dor: 'Dorado', Dra: 'Draco', Equ: 'Equuleus', Eri: 'Eridanus', For: 'Fornax', Gem: 'Gemini',
+  Gru: 'Grus', Her: 'Hercules', Hor: 'Horologium', Hya: 'Hydra', Hyi: 'Hydrus', Ind: 'Indus',
+  Lac: 'Lacerta', Leo: 'Leo', LMi: 'Leo Minor', Lep: 'Lepus', Lib: 'Libra', Lup: 'Lupus',
+  Lyn: 'Lynx', Lyr: 'Lyra', Men: 'Mensa', Mic: 'Microscopium', Mon: 'Monoceros', Mus: 'Musca',
+  Nor: 'Norma', Oct: 'Octans', Oph: 'Ophiuchus', Ori: 'Orion', Pav: 'Pavo', Peg: 'Pegasus',
+  Per: 'Perseus', Phe: 'Phoenix', Pic: 'Pictor', Psc: 'Pisces', PsA: 'Piscis Austrinus',
+  Pup: 'Puppis', Pyx: 'Pyxis', Ret: 'Reticulum', Sge: 'Sagitta', Sgr: 'Sagittarius',
+  Sco: 'Scorpius', Scl: 'Sculptor', Sct: 'Scutum', Ser: 'Serpens', Sex: 'Sextans', Tau: 'Taurus',
+  Tel: 'Telescopium', Tri: 'Triangulum', TrA: 'Triangulum Australe', Tuc: 'Tucana',
+  UMa: 'Ursa Major', UMi: 'Ursa Minor', Vel: 'Vela', Vir: 'Virgo', Vol: 'Volans', Vul: 'Vulpecula',
+};
+
 const GREEK = {
   Alp: 'α', Bet: 'β', Gam: 'γ', Del: 'δ', Eps: 'ε', Zet: 'ζ', Eta: 'η', The: 'θ', Iot: 'ι',
   Kap: 'κ', Lam: 'λ', Mu: 'μ', Nu: 'ν', Xi: 'ξ', Omi: 'ο', Pi: 'π', Rho: 'ρ', Sig: 'σ',
   Tau: 'τ', Ups: 'υ', Phi: 'φ', Chi: 'χ', Psi: 'ψ', Ome: 'ω',
 };
 
-export function constellationZh(abbr) {
+/**
+ * 星座名。locale 默认 'zh' 以保持既有行为与测试；
+ * 站点渲染一律显式传入当前语言（见 DECISIONS D9）。
+ */
+export function constellationName(abbr, locale = 'zh') {
   if (!abbr) return '';
-  return CONSTELLATION_ZH[abbr] || abbr;
+  const map = locale === 'en' ? CONSTELLATION_EN : CONSTELLATION_ZH;
+  return map[abbr] || abbr;
+}
+
+/** 保留旧名，等价于 constellationName(abbr, 'zh') */
+export function constellationZh(abbr) {
+  return constellationName(abbr, 'zh');
+}
+
+/** 星名：英文直接用 IAU 专名；中文查传统译名，查不到时回退专名本身 */
+export function starName(properName, locale = 'zh') {
+  if (!properName) return '';
+  if (locale === 'en') return properName;
+  return STAR_NAME_ZH[properName] || properName;
 }
 
 /** HYG 的 bayer 字段形如 "Alp" / "Alp1"，转成 "α" / "α¹" */
@@ -86,16 +123,17 @@ export function formatDec(decDeg) {
   return `${sign}${String(fix[0]).padStart(2, '0')}° ${String(fix[1]).padStart(2, '0')}′ ${String(fix[2]).padStart(2, '0')}″`;
 }
 
-export function formatMagnitude(mag) {
+export function formatMagnitude(mag, locale = 'zh') {
   if (!Number.isFinite(mag)) return '—';
-  return `${mag.toFixed(2)} 等`;
+  return locale === 'en' ? `mag ${mag.toFixed(2)}` : `${mag.toFixed(2)} 等`;
 }
 
-export function formatDistance(ly) {
+export function formatDistance(ly, locale = 'zh') {
   if (!Number.isFinite(ly) || ly <= 0) return '—';
-  if (ly < 100) return `${ly.toFixed(1)} 光年`;
-  if (ly < 1000) return `${Math.round(ly)} 光年`;
-  return `${Math.round(ly).toLocaleString('en-US')} 光年`;
+  const unit = locale === 'en' ? 'ly' : '光年';
+  if (ly < 100) return `${ly.toFixed(1)} ${unit}`;
+  if (ly < 1000) return `${Math.round(ly)} ${unit}`;
+  return `${Math.round(ly).toLocaleString('en-US')} ${unit}`;
 }
 
 /** 光谱型 → 恒星颜色（用于证书与页面上的小色点） */
@@ -113,28 +151,33 @@ export function spectralColor(spectralType) {
   }
 }
 
-export function spectralLabel(spectralType) {
+export function spectralLabel(spectralType, locale = 'zh') {
   const cls = (spectralType || '').trim().charAt(0).toUpperCase();
-  const map = { O: '蓝巨星', B: '蓝白星', A: '白色星', F: '黄白星', G: '黄色星（类太阳）', K: '橙色星', M: '红色星' };
-  return map[cls] || '未知光谱型';
+  const zh = { O: '蓝巨星', B: '蓝白星', A: '白色星', F: '黄白星', G: '黄色星（类太阳）', K: '橙色星', M: '红色星' };
+  const en = { O: 'blue giant', B: 'blue-white star', A: 'white star', F: 'yellow-white star', G: 'yellow star (Sun-like)', K: 'orange star', M: 'red star' };
+  const map = locale === 'en' ? en : zh;
+  return map[cls] || (locale === 'en' ? 'unknown spectral type' : '未知光谱型');
 }
 
-export function starTitle(star) {
-  if (star.proper_name && STAR_NAME_ZH[star.proper_name]) return STAR_NAME_ZH[star.proper_name];
-  if (star.proper_name) return star.proper_name;
+export function starTitle(star, locale = 'zh') {
+  if (star.proper_name) return starName(star.proper_name, locale);
   return star.id;
 }
 
-export function starSubtitle(star) {
+export function starSubtitle(star, locale = 'zh') {
   const parts = [];
   if (star.constellation) {
-    const zh = constellationZh(star.constellation);
+    const name = constellationName(star.constellation, locale);
     const bayer = bayerLabel(star.bayer);
-    parts.push(bayer ? `${zh} ${bayer}` : zh);
+    parts.push(bayer ? `${name} ${bayer}` : name);
   }
   if (star.proper_name) {
-    const zh = STAR_NAME_ZH[star.proper_name];
-    parts.push(zh ? `${zh}（${star.proper_name}）` : star.proper_name);
+    if (locale === 'en') {
+      parts.push(star.proper_name);
+    } else {
+      const zh = STAR_NAME_ZH[star.proper_name];
+      parts.push(zh ? `${zh}（${star.proper_name}）` : star.proper_name);
+    }
   }
   if (star.hd) parts.push(`HD ${star.hd}`);
   parts.push(star.id);
@@ -188,9 +231,10 @@ export function skyChartSvg(star, opts = {}) {
 
   const sx = x(star.ra).toFixed(1);
   const sy = y(star.dec).toFixed(1);
-  const label = starTitle(star);
+  const locale = opts.locale || 'zh';
+  const label = starTitle(star, locale);
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" role="img" aria-label="${label} 在天球上的位置">
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" role="img" aria-label="${label}${locale === "en" ? " on the celestial sphere" : " 在天球上的位置"}">
   <rect x="0" y="0" width="${w}" height="${h}" fill="#fbf9f5"/>
   <rect x="${pad.l}" y="${pad.t}" width="${innerW}" height="${innerH}" fill="none" stroke="#e6e1d8"/>
   ${grid.join('\n  ')}
@@ -199,8 +243,8 @@ export function skyChartSvg(star, opts = {}) {
   <circle cx="${sx}" cy="${sy}" r="10" fill="#2b3a55" opacity="0.12"/>
   <circle cx="${sx}" cy="${sy}" r="4.6" fill="#2b3a55"/>
   <text x="${sx}" y="${Number(sy) - 16}" fill="#2b3a55" font-size="13" font-weight="600" text-anchor="middle">${label}</text>
-  <text x="${pad.l}" y="${pad.t - 5}" fill="#9a938a" font-size="11">赤经 →</text>
-  <text x="${pad.l + 4}" y="${pad.t + 14}" fill="#9a938a" font-size="11">北天极</text>
-  <text x="${pad.l + 4}" y="${pad.t + innerH - 6}" fill="#9a938a" font-size="11">南天极</text>
+  <text x="${pad.l}" y="${pad.t - 5}" fill="#9a938a" font-size="11">${locale === "en" ? "RA →" : "赤经 →"}</text>
+  <text x="${pad.l + 4}" y="${pad.t + 14}" fill="#9a938a" font-size="11">${locale === "en" ? "N celestial pole" : "北天极"}</text>
+  <text x="${pad.l + 4}" y="${pad.t + innerH - 6}" fill="#9a938a" font-size="11">${locale === "en" ? "S celestial pole" : "南天极"}</text>
 </svg>`;
 }

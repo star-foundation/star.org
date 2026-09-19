@@ -200,7 +200,9 @@ export function formatDate(iso, locale = DEFAULT_LOCALE) {
  */
 export function switchableKeys(html) {
   const keys = new Set();
-  const re = /data-i18n="([\w.]+)"/g;
+  // 三种可切换的载体：节点文本、placeholder 属性、aria-label 属性。
+  // 少收集一种，"这个字段切换后仍是中文"这类残缺就查不出来。
+  const re = /data-i18n(?:-placeholder|-aria)?="([\w.]+)"/g;
   let match;
   while ((match = re.exec(html))) keys.add(match[1]);
   return keys;
@@ -234,6 +236,37 @@ export function buildAltCatalogScript(locale, flatValues, keys) {
 /** 把嵌套目录压平成键值对（构建器内嵌时用） */
 export function flattenCatalog(nested) {
   return flatten(nested);
+}
+
+/**
+ * 生成给**前端脚本**用的双语目录块（id="i18n-js"）。
+ *
+ * 为什么需要它：有些文案不是静态节点，而是由 site.js 运行时写入的——付款等待页会
+ * 轮播阶段提示、拼接订单号提示。这类文本没有 data-i18n 节点可替换，所以把 js.* 键的
+ * 两种语言都内嵌进去，由脚本按当前语言取值。
+ *
+ * js.* 的值可能带运行时占位符（如 js.orderHint 的 {{order}}），构建期不做替换：
+ * interpolate 只解析已知变量，未知的 {{order}} 原样保留，正好留给运行时填。
+ */
+export function buildJsCatalogScript(defaultLocale, altLocale) {
+  const catalogs = flatCatalogs();
+  const pick = (locale) => {
+    const subset = {};
+    for (const [key, value] of Object.entries(catalogs[locale])) {
+      if (key.startsWith('js.')) subset[key] = value;
+    }
+    return subset;
+  };
+  // 目录里写 {{order}} 保持统一写法；内嵌给运行时前，把构建期没能解析的占位符
+  // 换成 {order}，这样产物里不会残留 {{...}}——"无残留占位符"仍是可断言的不变量，
+  // 同时明确区分"构建期已解析"与"运行时待填"两类占位符。
+  const toRuntime = (value) => String(value).replace(/\{\{(\w+)\}\}/g, '{$1}');
+  const runtimePick = (locale) => Object.fromEntries(
+    Object.entries(pick(locale)).map(([key, value]) => [key, toRuntime(value)]),
+  );
+  const json = JSON.stringify({ default: runtimePick(defaultLocale), alt: runtimePick(altLocale) })
+    .replace(/</g, '\\u003c');
+  return `<script type="application/json" id="i18n-js" data-default-locale="${defaultLocale}" data-alt-locale="${altLocale}">${json}</script>`;
 }
 
 /**

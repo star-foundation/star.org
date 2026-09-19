@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import { createSandbox, runScript } from './helpers.mjs';
+import { createSandbox, runScript, claimLabel } from './helpers.mjs';
 
 /**
  * 购买入口三态（对应《测试用例说明书》TC-LP-02 / TC-ALLOC-04）：
@@ -41,7 +41,7 @@ test('TC-LP-02 配置结算链接后：购买按钮指向认领页（不再直�
   try {
     const html = buildLanding(sandbox, { LEMON_SQUEEZY_CHECKOUT_URL: CHECKOUT_URL });
     assert.ok(html.includes('register/'), '购买入口应指向认领页 /register/');
-    assert.ok(html.includes('认领一颗星'), '按钮文案应统一为「认领一颗星」');
+    assert.ok(html.includes(claimLabel()), '按钮文案应统一为「' + claimLabel() + '」');
     assert.ok(html.includes('US$29'), '页面应展示价格');
     assert.ok(!html.includes('购买通道接入中'), '已开启时不应出现接入中文案');
     assert.ok(!html.includes('候选库已售罄'), '有库存时不应出现售罄文案');

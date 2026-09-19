@@ -1,5 +1,42 @@
 // 站点交互：认领表检索、复制链接、X 分享、中英切换。无第三方依赖。
 (function () {
+  // ---- 前端脚本用的双语目录 ----
+  //
+  // 有些文案由脚本运行时写入（付款等待页的阶段提示、订单号提示），没有静态节点可替换，
+  // 因此构建期把 js.* 键的两种语言都内嵌在 <script id="i18n-js"> 里，这里按当前语言取值。
+  function jsCatalog() {
+    const el = document.getElementById('i18n-js');
+    if (!el) return null;
+    try {
+      return JSON.parse(el.textContent || '{}');
+    } catch {
+      return null;
+    }
+  }
+
+  function currentLocale() {
+    return document.documentElement.getAttribute('data-lang') || 'en';
+  }
+
+  function jsText(key, vars) {
+    const payload = jsCatalog();
+    if (!payload) return '';
+    const defaultLocale = payload.default && document.getElementById('i18n-js').getAttribute('data-default-locale');
+    const text = currentLocale() === defaultLocale
+      ? (payload.default || {})[key]
+      : (payload.alt || {})[key];
+    if (text === undefined) return '';
+    // 运行时占位符在产物里是 {name}（构建期已把 {{name}} 转换过，见 i18n.mjs）
+    return String(text).replace(/\{(\w+)\}/g, (whole, name) =>
+      vars && vars[name] !== undefined ? String(vars[name]) : whole);
+  }
+
+  // 语言切换后需要重画的动态文案自己订阅这个事件
+  function onLanguageChange(handler) {
+    document.addEventListener('starorg:lang', handler);
+    handler();
+  }
+
   // ---- 语言切换（DECISIONS D9）----
   //
   // 页面用站点默认语言渲染，另一种语言的文案以 JSON 内嵌在 <script id="i18n-alt"> 里，
@@ -45,6 +82,32 @@
           node.innerHTML = originals.get(node);
         }
       });
+      // 属性级文案（placeholder / aria-label）也要跟着切
+      document.querySelectorAll('[data-i18n-placeholder]').forEach((node) => {
+        const value = toAlt ? catalog[node.getAttribute('data-i18n-placeholder')] : undefined;
+        if (value === undefined) return;
+        if (node.getAttribute('data-ph-original') === null) {
+          node.setAttribute('data-ph-original', node.getAttribute('placeholder') || '');
+        }
+        node.setAttribute('placeholder', toAlt ? value : node.getAttribute('data-ph-original'));
+      });
+      document.querySelectorAll('[data-i18n-aria]').forEach((node) => {
+        const value = toAlt ? catalog[node.getAttribute('data-i18n-aria')] : undefined;
+        if (value === undefined) return;
+        if (node.getAttribute('data-aria-original') === null) {
+          node.setAttribute('data-aria-original', node.getAttribute('aria-label') || '');
+        }
+        node.setAttribute('aria-label', toAlt ? value : node.getAttribute('data-aria-original'));
+      });
+      // 数据值（星名、星等、距离、日期…）不是静态文案，另一种语言的写法由构建期算好
+      // 放在 data-i18n-alt 属性里：这些值跟具体这颗星有关，无法用目录键表达。
+      document.querySelectorAll('[data-i18n-alt]').forEach((node) => {
+        const alt = node.getAttribute('data-i18n-alt');
+        if (node.getAttribute('data-val-original') === null) {
+          node.setAttribute('data-val-original', node.textContent);
+        }
+        node.textContent = toAlt ? alt : node.getAttribute('data-val-original');
+      });
       root.setAttribute('data-lang', locale);
       root.setAttribute('lang', toAlt ? altLocale : defaultHtmlLang);
       document.title = toAlt ? altTitle : defaultTitle;
@@ -54,6 +117,7 @@
       } catch {
         /* 隐私模式下 localStorage 不可用，忽略 */
       }
+      document.dispatchEvent(new CustomEvent('starorg:lang', { detail: { locale } }));
     }
 
     let saved = null;
@@ -111,7 +175,9 @@
     if (order) {
       const safe = String(order).replace(/[^\w-]/g, '').slice(0, 64);
       if (safe) {
-        orderHint.textContent = '订单号：' + safe + '（如需人工协助，请把这串提供给客服）';
+        onLanguageChange(() => {
+          orderHint.textContent = jsText('js.orderHint', { order: safe }) || '';
+        });
         orderHint.hidden = false;
       }
     }
@@ -162,14 +228,17 @@
   // 只做"看起来在动"的提示，不声称真实服务端状态。
   const stage = document.querySelector('[data-thanks-stage]');
   if (stage) {
-    const stages = ['正在分配恒星…', '正在生成证书与永久链接…', '正在发送邮件…'];
     const startedAt = Date.now();
+    const stageKeys = ['js.stage1', 'js.stage2', 'js.stage3'];
     const tick = () => {
       const elapsed = (Date.now() - startedAt) / 1000;
-      stage.textContent = stages[elapsed < 20 ? 0 : elapsed < 70 ? 1 : 2];
+      const key = stageKeys[elapsed < 20 ? 0 : elapsed < 70 ? 1 : 2];
+      stage.textContent = jsText(key) || stage.textContent;
     };
     tick();
     window.setInterval(tick, 5000);
+    // 切换语言时立刻按当前进度重画，不必等下一次轮播
+    onLanguageChange(tick);
   }
 
   // 下单前认领表单：把姓名/献词/匿名拼进 Lemon Squeezy 结算 URL 后跳转。

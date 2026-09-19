@@ -70,6 +70,8 @@ export async function runRegistration(order, args = {}) {
     certificateUrl: certificateUrl(slug),
     ogImageUrl: ogImageUrl(slug),
     certificatePublic: record.artifacts?.certificate_public !== false,
+    // 交付物语言：优先用下单时记录的语言，缺失时由 renderCertificateHtml 回退默认
+    locale: record.locale || order.locale || undefined,
   });
 
   let certificate = null;

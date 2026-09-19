@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<title>恒星认领证书 · {{starTitle}}</title>
+<title>{{t.cert.title}} · {{starTitle}}</title>
 <style>
   @page { size: A4 landscape; margin: 0; }
   * { box-sizing: border-box; }
@@ -74,7 +74,7 @@
 
   <header>
     <div class="brand">{{brandName}}</div>
-    <h1>恒星认领证书</h1>
+    <h1>{{t.cert.title}}</h1>
     <div class="subtitle-en">Certificate of Stellar Registration</div>
     <div class="divider"></div>
   </header>
@@ -83,36 +83,36 @@
     <div class="left">
       <div class="chart">
         {{skyChartSvg!}}
-        <div class="chart-caption">{{starTitle}} 在天球上的位置（赤经 / 赤纬 等距投影）</div>
+        <div class="chart-caption">{{t.cert.chartCaption}}</div>
       </div>
       <table class="data">
-        <tr><td class="k">恒星标识</td><td class="v">{{starId}}</td></tr>
-        <tr><td class="k">星座与命名</td><td class="v">{{starSubtitle}}</td></tr>
-        <tr><td class="k">赤经</td><td class="v">{{raText}}</td></tr>
-        <tr><td class="k">赤纬</td><td class="v">{{decText}}</td></tr>
-        <tr><td class="k">视星等</td><td class="v">{{magnitudeText}}</td></tr>
-        <tr><td class="k">光谱型</td><td class="v">{{spectralText}}（{{spectralLabel}}）</td></tr>
-        <tr><td class="k">距地球</td><td class="v">{{distanceText}}</td></tr>
+        <tr><td class="k">{{t.star.identifier}}</td><td class="v">{{starId}}</td></tr>
+        <tr><td class="k">{{t.cert.constellationNaming}}</td><td class="v">{{starSubtitle}}</td></tr>
+        <tr><td class="k">{{t.star.ra}}</td><td class="v">{{raText}}</td></tr>
+        <tr><td class="k">{{t.star.dec}}</td><td class="v">{{decText}}</td></tr>
+        <tr><td class="k">{{t.star.magnitude}}</td><td class="v">{{magnitudeText}}</td></tr>
+        <tr><td class="k">{{t.star.spectralType}}</td><td class="v">{{t.cert.spectralValue}}</td></tr>
+        <tr><td class="k">{{t.star.distance}}</td><td class="v">{{distanceText}}</td></tr>
       </table>
     </div>
 
     <div class="right">
-      <div class="owner-label">认领人</div>
+      <div class="owner-label">{{t.cert.ownerLabel}}</div>
       <div class="owner-name">{{ownerName}}</div>
       {{#if dedication}}
       <div class="dedication">{{dedication}}</div>
       {{/if}}
       <div class="meta">
-        <div><span class="k">认领日期：</span>{{registeredDateZh}}</div>
-        <div><span class="k">认领编号：</span><code>{{slug}}</code></div>
-        <div><span class="k">永久链接：</span><code>{{permalink}}</code></div>
+        <div><span class="k">{{t.cert.dateLabel}}</span>{{registeredDate}}</div>
+        <div><span class="k">{{t.cert.numberLabel}}</span><code>{{slug}}</code></div>
+        <div><span class="k">{{t.cert.permalinkLabel}}</span><code>{{permalink}}</code></div>
       </div>
       <div class="verify">
-        <h2>如何自行核实</h2>
-        <p>1. 在 SIMBAD 天文数据库检索 <b>{{simbadIdent}}</b>（{{simbadUrl}}），确认这颗恒星真实存在，且本证书所载赤经/赤纬/视星等与数据库一致。</p>
-        <p>2. 打开永久链接 {{permalink}} ，页面上的认领编号与本证书一致。</p>
-        <p>3. 在公开认领表 {{registryUrl}} 中检索恒星标识 {{starId}}，应只出现一条记录；若同一颗恒星出现两条，说明认领表出现异常，可来信反馈。</p>
-        <p>4. 认领记录以文本文件形式存放于公开仓库的 data/registrations/ 目录，任何人无需注册即可查阅。</p>
+        <h2>{{t.cert.verifyTitle}}</h2>
+        <p>{{t.cert.verify1!}}</p>
+        <p>{{t.cert.verify2!}}</p>
+        <p>{{t.cert.verify3!}}</p>
+        <p>{{t.cert.verify4!}}</p>
       </div>
     </div>
   </div>

@@ -104,16 +104,16 @@
       <div class="sample">
         <div class="sample-head">
           <div class="kicker" data-i18n="{{sampleKickerKey}}">{{sampleKicker}}</div>
-          <h3>{{sample.starTitle}}</h3>
-          <div class="sub">{{sample.starSubtitle}}</div>
+          <h3 data-i18n-alt="{{sampleAlt.starTitle}}">{{sample.starTitle}}</h3>
+          <div class="sub" data-i18n-alt="{{sampleAlt.starSubtitle}}">{{sample.starSubtitle}}</div>
         </div>
         <div class="sample-body">
           <div><dt data-i18n="star.ra">{{t.star.ra}}</dt><dd class="mono">{{sample.raText}}</dd></div>
           <div><dt data-i18n="star.dec">{{t.star.dec}}</dt><dd class="mono">{{sample.decText}}</dd></div>
-          <div><dt data-i18n="star.magnitude">{{t.star.magnitude}}</dt><dd>{{sample.magnitudeText}}</dd></div>
-          <div><dt data-i18n="star.distance">{{t.star.distance}}</dt><dd>{{sample.distanceText}}</dd></div>
+          <div><dt data-i18n="star.magnitude">{{t.star.magnitude}}</dt><dd data-i18n-alt="{{sampleAlt.magnitudeText}}">{{sample.magnitudeText}}</dd></div>
+          <div><dt data-i18n="star.distance">{{t.star.distance}}</dt><dd data-i18n-alt="{{sampleAlt.distanceText}}">{{sample.distanceText}}</dd></div>
           <div><dt data-i18n="star.claimer">{{t.star.claimer}}</dt><dd>{{sample.displayName}}</dd></div>
-          <div><dt data-i18n="star.date">{{t.star.date}}</dt><dd>{{sample.registeredDateZh}}</dd></div>
+          <div><dt data-i18n="star.date">{{t.star.date}}</dt><dd data-i18n-alt="{{sampleAlt.registeredDate}}">{{sample.registeredDate}}</dd></div>
         </div>
         {{#if sample.dedication}}
         <div class="sample-quote">「{{sample.dedication}}」</div>

@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="{{htmlLang}}" data-lang="{{locale}}" data-alt-lang="{{altLocale}}" data-alt-title="{{altTitle}}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>付款已收到 · {{siteName}}</title>
+<title>{{t.thanks.metaTitle}} · {{siteName}}</title>
 <meta name="robots" content="noindex">
-<meta name="description" content="付款已收到，证书通常 1-3 分钟内生成并发送到你的邮箱。">
+<meta name="description" content="{{t.thanks.metaDescription}}">
 <link rel="canonical" href="{{baseUrl}}/thanks/">
 <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/assets/css/site.css">
@@ -15,9 +15,10 @@
   <div class="wrap nav">
     <div class="brand"><a href="/">{{siteName}}</a></div>
     <nav class="nav-links">
-      <a href="/registry/">公开认领表</a>
-      <a href="/#faq">常见问题</a>
-      {{#if checkoutReady}}<a class="btn btn-primary btn-sm" href="/register/">认领一颗星</a>{{/if}}
+      <a href="/registry/" data-i18n="common.nav.registry">{{t.common.nav.registry}}</a>
+      <a href="/#faq" data-i18n="common.nav.faq">{{t.common.nav.faq}}</a>
+      {{#if checkoutReady}}<a class="btn btn-primary btn-sm" href="/register/" data-i18n="common.nav.claim">{{t.common.nav.claim}}</a>{{/if}}
+      <button class="lang-toggle" type="button" data-lang-toggle data-self-name="{{selfLangName}}" data-alt-name="{{altLangName}}" aria-label="{{t.common.lang.switchAria}}">{{altLangName}}</button>
     </nav>
   </div>
 </header>
@@ -25,60 +26,55 @@
 <main>
   <section class="plain" style="padding-top:64px;">
     <div class="wrap narrow center">
-      <div class="eyebrow">付款已收到</div>
-      <h1 style="font-size:clamp(26px,4vw,38px);">谢谢，你的恒星正在路上</h1>
-      <p class="lede" style="margin-left:auto;margin-right:auto;">
-        证书与永久链接通常在 <b>1-3 分钟</b>内生成（最长不超过 5 分钟），
-        并发送到你在结算页填写的邮箱。这个页面可以安全关闭。
+      <div class="eyebrow" data-i18n="thanks.eyebrow">{{t.thanks.eyebrow}}</div>
+      <h1 style="font-size:clamp(26px,4vw,38px);" data-i18n="thanks.title">{{t.thanks.title}}</h1>
+      <p class="lede" style="margin-left:auto;margin-right:auto;" data-i18n="thanks.lede">
+        {{t.thanks.lede!}}
       </p>
 
       <div class="progress-card" style="max-width:560px;margin:24px auto 0;text-align:left;">
         <div class="progress-head">
-          <span>你的证书</span>
-          <span class="mono" data-thanks-stage>正在分配恒星…</span>
+          <span data-i18n="thanks.certLabel">{{t.thanks.certLabel}}</span>
+          <span class="mono" data-thanks-stage data-i18n="js.stage1">{{t.js.stage1}}</span>
         </div>
-        <div class="progress-track is-indeterminate" role="progressbar" aria-label="证书生成中"
-             aria-valuetext="正在生成">
+        <div class="progress-track is-indeterminate" role="progressbar" aria-label="{{t.thanks.progressAria}}"
+             aria-valuetext="{{t.thanks.progressValueText}}">
           <div class="progress-fill"></div>
         </div>
-        <div class="progress-foot">
-          通常 <strong>1-3 分钟</strong>完成，最长不超过 5 分钟；完成后会自动发送到你的邮箱，
-          本页可以安全关闭。
+        <div class="progress-foot" data-i18n="thanks.footNote">
+          {{t.thanks.footNote!}}
         </div>
       </div>
 
       <div class="progress-card" style="max-width:560px;margin:14px auto 0;text-align:left;">
         <div class="progress-head">
-          <span>候选库认领进度</span>
+          <span data-i18n="thanks.poolLabel">{{t.thanks.poolLabel}}</span>
           <span class="mono"><span data-pool-label>{{registryCount}} / {{poolTotal}}</span>　<strong data-pool-percent>{{poolPercent}}%</strong></span>
         </div>
-        <div class="progress-track" role="progressbar" aria-label="候选库认领进度"
+        <div class="progress-track" role="progressbar" aria-label="{{t.thanks.poolLabel}}"
              aria-valuenow="{{poolPercent}}" aria-valuemin="0" aria-valuemax="100" data-pool-track>
           <div class="progress-fill{{#if poolStarted}} is-started{{/if}}" style="width: {{poolPercent}}%" data-pool-fill></div>
         </div>
-        <div class="progress-foot" data-pool-note>
-          已认领 <strong data-pool-count>{{registryCount}}</strong> 颗，候选库共 <strong>{{poolTotal}}</strong> 颗。
-          你这一颗写入认领表后，这里的数字会 <strong>+1</strong>——数字变了就说明已经生成好了。
-          <span data-pool-done hidden>🎉 <strong>数字已增加，你的认领很可能已经写入</strong>，可到
-            <a href="/registry/">公开认领表</a>查看最新记录（页面会自动刷新）。</span>
+        <div class="progress-foot" data-pool-note data-i18n="thanks.poolNote">
+          {{t.thanks.poolNote!}}
+          <span data-pool-done hidden data-i18n="thanks.poolDone">{{t.thanks.poolDone!}}</span>
         </div>
       </div>
 
       <ol class="steps" style="text-align:left;max-width:560px;margin:26px auto 0;">
-        <li><b>系统分配恒星</b> —— 随机分配一颗真实恒星，并生成载有真实天文数据的 PDF 证书。</li>
-        <li><b>证书发到你的邮箱</b> —— 邮件里有证书下载链接和永久链接。</li>
-        <li><b>永久链接可随时分享</b> —— 页面与认领表都可被公开核实，且不依赖你保留邮件。</li>
+        <li><b data-i18n="thanks.step1Title">{{t.thanks.step1Title}}</b> —— <span data-i18n="thanks.step1Body">{{t.thanks.step1Body}}</span></li>
+        <li><b data-i18n="thanks.step2Title">{{t.thanks.step2Title}}</b> —— <span data-i18n="thanks.step2Body">{{t.thanks.step2Body}}</span></li>
+        <li><b data-i18n="thanks.step3Title">{{t.thanks.step3Title}}</b> —— <span data-i18n="thanks.step3Body">{{t.thanks.step3Body}}</span></li>
       </ol>
 
       <div class="hero-actions" style="justify-content:center;margin-top:26px;">
-        <a class="btn btn-primary" href="/registry/">查看公开认领表</a>
-        <a class="btn btn-ghost" href="/">返回首页</a>
+        <a class="btn btn-primary" href="/registry/" data-i18n="thanks.ctaRegistry">{{t.thanks.ctaRegistry}}</a>
+        <a class="btn btn-ghost" href="/" data-i18n="thanks.ctaHome">{{t.thanks.ctaHome}}</a>
       </div>
 
       <p data-order-hint class="muted" style="margin-top:22px;font-size:14px;" hidden></p>
-      <p class="muted" style="margin-top:14px;font-size:14px;">
-        超过 5 分钟仍未收到？请来信 <a href="mailto:{{supportEmail}}">{{supportEmail}}</a>，
-        并附上结算时使用的邮箱，我们会人工补发。
+      <p class="muted" style="margin-top:14px;font-size:14px;" data-i18n="thanks.supportNote">
+        {{t.thanks.supportNote!}}
       </p>
     </div>
   </section>
@@ -87,18 +83,19 @@
 <footer class="site">
   <div class="wrap foot-grid">
     <div class="disclaimer">
-      {{siteName}} 提供纪念性质的公开可验证恒星认领服务，不构成国际天文学联合会（IAU）官方命名，
-      亦不代表任何天体命名权。证书所载天文数据来自公开星表。
-      <br>联系：<a href="mailto:{{supportEmail}}">{{supportEmail}}</a>
+      <span data-i18n="landing.footerDisclaimer">{{t.landing.footerDisclaimer}}</span>
+      <br><span data-i18n="common.footer.contact">{{t.common.footer.contact}}</span><a href="mailto:{{supportEmail}}">{{supportEmail}}</a>
     </div>
     <div>
-      <a href="/registry/">公开认领表</a> ·
-      <a href="/#faq">常见问题</a>
-      {{#if registryRepoUrl}}· <a href="{{registryRepoUrl}}" rel="noopener">公开仓库</a>{{/if}}
+      <a href="/registry/" data-i18n="common.nav.registry">{{t.common.nav.registry}}</a> ·
+      <a href="/#faq" data-i18n="common.nav.faq">{{t.common.nav.faq}}</a>
+      {{#if registryRepoUrl}}· <a href="{{registryRepoUrl}}" rel="noopener" data-i18n="common.nav.repo">{{t.common.nav.repo}}</a>{{/if}}
       <div class="muted" style="margin-top:8px;">© {{year}} {{siteName}}</div>
     </div>
   </div>
 </footer>
+{{i18nJsScript!}}
+{{i18nAltScript!}}
 <script src="/assets/js/site.js" defer></script>
 </body>
 </html>

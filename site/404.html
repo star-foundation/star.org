@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="{{htmlLang}}" data-lang="{{locale}}" data-alt-lang="{{altLocale}}" data-alt-title="{{altTitle}}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>页面不存在 · {{siteName}}</title>
+<title>{{t.notfound.metaTitle}} · {{siteName}}</title>
 <script>
 // 这个文件会被 GitHub Pages 用来兜底任意不存在的路径，页面自身的 URL 层级不可预知。
 // 先把站点根固定下来，下面的相对路径在「自定义域名根路径」与「项目子路径」下才能都解析正确。
@@ -21,25 +21,26 @@
   <div class="wrap nav">
     <div class="brand"><a href="/">{{siteName}}</a></div>
     <nav class="nav-links">
-      <a href="/registry/">公开认领表</a>
-      <a href="/#faq">常见问题</a>
-      {{#if checkoutReady}}<a class="btn btn-primary btn-sm" href="/register/">认领一颗星</a>{{/if}}
+      <a href="/registry/" data-i18n="common.nav.registry">{{t.common.nav.registry}}</a>
+      <a href="/#faq" data-i18n="common.nav.faq">{{t.common.nav.faq}}</a>
+      {{#if checkoutReady}}<a class="btn btn-primary btn-sm" href="/register/" data-i18n="common.nav.claim">{{t.common.nav.claim}}</a>{{/if}}
+      <button class="lang-toggle" type="button" data-lang-toggle data-self-name="{{selfLangName}}" data-alt-name="{{altLangName}}" aria-label="{{t.common.lang.switchAria}}">{{altLangName}}</button>
     </nav>
   </div>
 </header>
 <main>
   <section class="plain" style="padding-top:80px;">
     <div class="wrap narrow center">
-      <h1 style="font-size:clamp(26px,4vw,38px);">这条链接上暂时没有记录</h1>
-      <p class="lede" style="margin-left:auto;margin-right:auto;">
-        可能是链接被复制得不完整，或者这条认领尚未生成完成（生成通常在付款后几分钟内完成）。
+      <h1 style="font-size:clamp(26px,4vw,38px);" data-i18n="notfound.title">{{t.notfound.title}}</h1>
+      <p class="lede" style="margin-left:auto;margin-right:auto;" data-i18n="notfound.lede">
+        {{t.notfound.lede}}
       </p>
       <div class="hero-actions" style="justify-content:center;">
-        <a class="btn btn-primary" href="/registry/">去公开认领表查找</a>
-        <a class="btn btn-ghost" href="/">返回首页</a>
+        <a class="btn btn-primary" href="/registry/" data-i18n="notfound.ctaRegistry">{{t.notfound.ctaRegistry}}</a>
+        <a class="btn btn-ghost" href="/" data-i18n="notfound.ctaHome">{{t.notfound.ctaHome}}</a>
       </div>
-      <p class="muted" style="margin-top:22px;font-size:14px;">
-        如果刚刚完成付款、超过 5 分钟仍打不开链接，请来信 {{supportEmail}}，我们会人工处理。
+      <p class="muted" style="margin-top:22px;font-size:14px;" data-i18n="notfound.note">
+        {{t.notfound.note}}
       </p>
     </div>
   </section>
@@ -47,5 +48,7 @@
 <footer class="site">
   <div class="wrap muted">© {{year}} {{siteName}}</div>
 </footer>
+{{i18nAltScript!}}
+<script src="/assets/js/site.js" defer></script>
 </body>
 </html>
