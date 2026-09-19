@@ -1,24 +1,38 @@
 name: 准备渲染环境（中文字体 + Chrome）
 description: >-
-  安装 Noto CJK 字体与 Google Chrome，供证书 PDF 与 OG 分享图渲染使用。
-  三个 workflow 共用同一份安装逻辑：这段逻辑原先被复制了三份，
-  其中 register.yml 那份悄悄走偏成了 snap 占位包，导致证书渲染会失败。
+  证书 PDF 与 OG 分享图靠无头 Chrome 渲染，中文靠 Noto CJK 字体。
+  两个前提决定了这里的做法：
+    1. ubuntu-latest 镜像**已预装 Google Chrome**（见 actions/runner-images 的
+       Ubuntu2404-Readme），每次再 apt 装一遍纯属浪费；
+    2. 镜像**没有**预装 fonts-noto-cjk，确实要装，但可以缓存复用。
+  三个 workflow 共用这一份逻辑，避免再次出现"某一份悄悄走偏"——register.yml
+  曾误用 snap 占位包 chromium-browser，导致第一笔真实订单会卡在生成证书。
+
+outputs:
+  chrome-path:
+    description: 可用的 Chrome 可执行文件路径
+    value: ${{ steps.detect.outputs.path }}
 
 runs:
   using: composite
   steps:
-    - name: 安装中文字体
+    - name: 定位 Chrome（优先复用镜像预装）
+      id: detect
       shell: bash
       run: |
-        sudo apt-get update
-        sudo apt-get install -y --no-install-recommends fonts-noto-cjk
-        fc-list | grep -i noto | head -3
+        set -euo pipefail
+        for candidate in "${CHROME_PATH:-}" /usr/bin/google-chrome /usr/bin/google-chrome-stable /opt/google/chrome/chrome; do
+          if [ -n "$candidate" ] && [ -x "$candidate" ]; then
+            echo "复用镜像预装的 Chrome：$candidate"
+            "$candidate" --version
+            echo "path=$candidate" >> "$GITHUB_OUTPUT"
+            # 统一导出给后续步骤，避免每个 workflow 各写一份路径（写错就整条链路失败）
+            echo "CHROME_PATH=$candidate" >> "$GITHUB_ENV"
+            exit 0
+          fi
+        done
 
-    - name: 安装 Google Chrome
-      shell: bash
-      run: |
-        # Ubuntu 24.04 上 chromium-browser 是 snap 占位包（装了也跑不起来），
-        # chromium 包已不存在，因此统一改用 Google 官方 apt 源。
+        echo "::warning::未找到预装 Chrome，回退到官方 apt 源安装（较慢）"
         # 注意：gpg 不能以 sudo 运行（无 TTY 时会报 cannot open /dev/tty），
         # 改为普通用户解钥、再用 sudo install 落盘。
         wget -q -O /tmp/google-chrome.pub https://dl-ssl.google.com/linux/linux_signing_key.pub
@@ -28,13 +42,52 @@ runs:
           | sudo tee /etc/apt/sources.list.d/google-chrome.list > /dev/null
         sudo apt-get update
         sudo apt-get install -y --no-install-recommends google-chrome-stable
-        google-chrome --version
+        echo "path=/usr/bin/google-chrome" >> "$GITHUB_OUTPUT"
+        echo "CHROME_PATH=/usr/bin/google-chrome" >> "$GITHUB_ENV"
+        /usr/bin/google-chrome --version
+
+    - name: 恢复中文字体缓存
+      id: fontcache
+      uses: actions/cache@v4
+      with:
+        # 装在用户字体目录，避免每次跑 sudo 写系统目录
+        path: ~/.local/share/fonts
+        # 换字体版本时改这个后缀即可让缓存失效
+        key: noto-cjk-${{ runner.os }}-v1
+
+    - name: 安装中文字体（仅缓存未命中时）
+      if: steps.fontcache.outputs.cache-hit != 'true'
+      shell: bash
+      run: |
+        set -euo pipefail
+        sudo apt-get update -qq
+        sudo apt-get install -y --no-install-recommends fonts-noto-cjk
+        mkdir -p "$HOME/.local/share/fonts"
+        # 只把字体文件本身放进缓存目录，不带 apt 元数据
+        find /usr/share/fonts -type f \( -iname '*NotoSansCJK*' -o -iname '*NotoSerifCJK*' \) \
+          -exec cp -f {} "$HOME/.local/share/fonts/" \;
+        ls "$HOME/.local/share/fonts" | head -5
 
     - name: 校验渲染环境可用
       shell: bash
       run: |
-        if [ ! -x /usr/bin/google-chrome ]; then
-          echo "::error::/usr/bin/google-chrome 不存在，证书与 OG 图将无法渲染"
+        set -euo pipefail
+        fc-cache -f "$HOME/.local/share/fonts" > /dev/null 2>&1 || true
+
+        if [ ! -x "${CHROME_PATH:-}" ]; then
+          echo "::error::CHROME_PATH=${CHROME_PATH:-<未设置>} 不可执行，证书与 OG 图将无法渲染"
           exit 1
         fi
-        echo "Noto 字体 $(fc-list | grep -ci noto) 条"
+
+        # 关键校验：必须真的能解析出中文字体。
+        # 镜像预装的是 fonts-noto-color-emoji，只数 "noto" 条数会误判为通过，
+        # 而字体缺失的表现是证书上的中文变成方框——线上看到就已经晚了。
+        if ! fc-list :lang=zh | grep -q .; then
+          echo "::error::没有可用中文字体，证书上的中文会渲染成方框"
+          fc-list | grep -i noto | head -3 || true
+          exit 1
+        fi
+
+        echo "Chrome：$CHROME_PATH"
+        "$CHROME_PATH" --version
+        echo "中文字体：$(fc-list :lang=zh | wc -l) 个"

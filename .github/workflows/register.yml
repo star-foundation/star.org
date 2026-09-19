@@ -41,12 +41,18 @@ jobs:
       - name: 取出仓库
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          # 只需要最新一份树；完整历史会随每次认领提交的证书与 OG 图（约 600KB/笔）
+          # 不断变大，浅克隆可让这部分成本不随时间增长。
+          # 下面的 push 重试逻辑已实测在 --depth 1 下可用（必要时 git 会自动加深）。
+          fetch-depth: 1
 
-      - name: 准备 Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
+      # 镜像自带 Node 22（满足 package.json 的 engines: >=20），
+      # 原先 setup-node 请求 Node 20 不在镜像缓存里，每次要下载一遍（实测 5s）。
+      # 这里改为直接用镜像的 Node，并显式断言版本，避免悄悄跑在过旧的运行时上。
+      - name: 确认 Node 版本
+        run: |
+          node --version
+          node -e "const major = Number(process.versions.node.split('.')[0]); if (major < 20) { console.error('Node 版本过低：' + process.versions.node); process.exit(1); }"
 
       # 证书 PDF 与 OG 图都靠无头 Chrome 渲染。这里原先装的是 chromium-browser，
       # 而 Ubuntu 24.04 上那只是 snap 占位包，渲染必然失败——第一笔真实订单会卡在
@@ -70,7 +76,6 @@ jobs:
           OPERATOR_EMAIL: ${{ secrets.OPERATOR_EMAIL }}
           SITE_BASE_URL: ${{ vars.SITE_BASE_URL || 'https://star.org' }}
           REGISTRY_REPO_URL: ${{ github.server_url }}/${{ github.repository }}
-          CHROME_PATH: /usr/bin/google-chrome
         run: |
           if [ -n "${{ inputs.display_name }}" ]; then
             export STARORG_ORDER_JSON=$(jq -n \
