@@ -353,6 +353,8 @@ const DATA = [
         note: "scripts/allocate.mjs，均匀随机分配（订单号 HMAC 派生种子，可复现）；TC-ALLOC-01/02/06/07 已测" },
       { t: "concurrency 分组配置，确保排队执行", tag: "p0", done: true,
         note: "concurrency: star-registration + mkdir 原子锁双保险；TC-ALLOC-03 三轮并发测试通过" },
+      { t: "中文字体随仓库内置（不依赖 CI 安装）", tag: "p0", done: true,
+        note: "fonts/ 内置 12.5MB 裁剪子集（全 CJK 统一表意文字），chrome.mjs 以 @font-face + file:// 引入；scripts/fetch-fonts.mjs 可复现拉取 + sha256 校验；见 DECISIONS D10" },
       { t: "双语站点：默认英文 + 中英切换", tag: "p0", done: true,
         note: "文案目录 site/i18n/{en,zh}.json（213 键，两侧强一致）+ 客户端切换（URL 不变）+ 数据值 data-i18n-alt + /zh/s/<slug>/ 中文入口与 hreflang；TC-* 覆盖；见 DECISIONS D9" },
       { t: "slug 唯一性生成逻辑", tag: "", done: true,

@@ -1,10 +1,13 @@
-name: 准备渲染环境（中文字体 + Chrome）
+name: 准备渲染环境（Chrome + 内置中文字体）
 description: >-
-  证书 PDF 与 OG 分享图靠无头 Chrome 渲染，中文靠 Noto CJK 字体。
+  证书 PDF 与 OG 分享图靠无头 Chrome 渲染，中文靠仓库内置的字体子集。
   两个前提决定了这里的做法：
     1. ubuntu-latest 镜像**已预装 Google Chrome**（见 actions/runner-images 的
        Ubuntu2404-Readme），每次再 apt 装一遍纯属浪费；
-    2. 镜像**没有**预装 fonts-noto-cjk，确实要装，但可以缓存复用。
+    2. 中文字体**随仓库内置**（assets/fonts，约 12.5MB 的裁剪子集，见 DECISIONS D10）。
+      镜像里没有中文字体，原先每次 CI 都 apt 安装 fonts-noto-cjk（多语言全量版，
+      约 60MB）并缓存——那让"证书长什么样"依赖运行环境是否装过字体。
+      改为内置后渲染完全确定、离线可复现，这一步不再需要任何网络与安装。
   三个 workflow 共用这一份逻辑，避免再次出现"某一份悄悄走偏"——register.yml
   曾误用 snap 占位包 chromium-browser，导致第一笔真实订单会卡在生成证书。
 
@@ -46,48 +49,18 @@ runs:
         echo "CHROME_PATH=/usr/bin/google-chrome" >> "$GITHUB_ENV"
         /usr/bin/google-chrome --version
 
-    - name: 恢复中文字体缓存
-      id: fontcache
-      uses: actions/cache@v4
-      with:
-        # 装在用户字体目录，避免每次跑 sudo 写系统目录
-        path: ~/.local/share/fonts
-        # 换字体版本时改这个后缀即可让缓存失效
-        key: noto-cjk-${{ runner.os }}-v1
-
-    - name: 安装中文字体（仅缓存未命中时）
-      if: steps.fontcache.outputs.cache-hit != 'true'
-      shell: bash
-      run: |
-        set -euo pipefail
-        sudo apt-get update -qq
-        sudo apt-get install -y --no-install-recommends fonts-noto-cjk
-        mkdir -p "$HOME/.local/share/fonts"
-        # 只把字体文件本身放进缓存目录，不带 apt 元数据
-        find /usr/share/fonts -type f \( -iname '*NotoSansCJK*' -o -iname '*NotoSerifCJK*' \) \
-          -exec cp -f {} "$HOME/.local/share/fonts/" \;
-        ls "$HOME/.local/share/fonts" | head -5
-
     - name: 校验渲染环境可用
       shell: bash
       run: |
         set -euo pipefail
-        fc-cache -f "$HOME/.local/share/fonts" > /dev/null 2>&1 || true
 
         if [ ! -x "${CHROME_PATH:-}" ]; then
           echo "::error::CHROME_PATH=${CHROME_PATH:-<未设置>} 不可执行，证书与 OG 图将无法渲染"
           exit 1
         fi
-
-        # 关键校验：必须真的能解析出中文字体。
-        # 镜像预装的是 fonts-noto-color-emoji，只数 "noto" 条数会误判为通过，
-        # 而字体缺失的表现是证书上的中文变成方框——线上看到就已经晚了。
-        if ! fc-list :lang=zh | grep -q .; then
-          echo "::error::没有可用中文字体，证书上的中文会渲染成方框"
-          fc-list | grep -i noto | head -3 || true
-          exit 1
-        fi
-
         echo "Chrome：$CHROME_PATH"
         "$CHROME_PATH" --version
-        echo "中文字体：$(fc-list :lang=zh | wc -l) 个"
+
+        # 内置字体必须与清单一致：字节被换掉而没人发现的话，
+        # 变化会直接体现到已发给客户的证书上。
+        node scripts/fetch-fonts.mjs --check

@@ -2,8 +2,49 @@ import { spawn, spawnSync } from 'node:child_process';
 import { existsSync, mkdtempSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { ensureDir } from './fsx.mjs';
+
+/**
+ * 内置中文字体（DECISIONS D10）。
+ *
+ * ubuntu-latest 镜像没有中文字体，而证书 PDF 与 OG 图必须有中文。
+ * 与其每次 CI 装一遍（约 60MB、且渲染结果依赖运行环境），不如随仓库带一份
+ * 裁剪后的子集（fonts/，约 12.5MB），渲染完全确定、离线可复现。
+ *
+ * 通过 @font-face 以 file:// 引入：这条路子在 headless Chrome 上实测可用
+ * （对照实验：不加载字体时渲染结果不同），而且不依赖系统的 fontconfig 状态。
+ */
+const FONT_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..', 'fonts');
+const BUNDLED_FONTS = [
+  { family: 'StarOrg Sans', file: 'NotoSansSC-Regular.subset.otf' },
+  { family: 'StarOrg Serif', file: 'NotoSerifSC-Regular.subset.otf' },
+];
+
+/** 字体缺失时必须显式失败：否则中文会静默渲染成方框，而证书已经发给客户了 */
+function bundledFontCss() {
+  const rules = [];
+  for (const font of BUNDLED_FONTS) {
+    const file = path.join(FONT_DIR, font.file);
+    if (!existsSync(file)) {
+      throw new Error(`缺少内置中文字体 ${font.file}，请运行 node scripts/fetch-fonts.mjs 生成（见 DECISIONS D10）`);
+    }
+    // 同一份文件声明 400/500/600 三个字重：仓库只带 Regular，
+    // 不声明的话 500/600 会被 Chrome 合成加粗，CJK 合成加粗会发虚。
+    for (const weight of [400, 500, 600]) {
+      rules.push(`@font-face{font-family:'${font.family}';font-weight:${weight};src:url('${pathToFileURL(file).href}');}`);
+    }
+  }
+  return rules.join('\n');
+}
+
+/** 把内置字体的 @font-face 与"优先使用内置字体"的栈注入页面 */
+function withBundledFonts(html) {
+  const css = `<style id="starorg-bundled-fonts">
+${bundledFontCss()}
+</style>`;
+  return html.includes('</head>') ? html.replace('</head>', `${css}\n</head>`) : css + html;
+}
 
 const MAC_CANDIDATES = [
   '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
@@ -89,8 +130,8 @@ function sleepSync(ms) {
 function writeTempHtml(html) {
   const dir = mkdtempSync(path.join(os.tmpdir(), 'starorg-html-'));
   const file = path.join(dir, 'page.html');
-  // 页面本身不引用任何外部资源，配合 --host-resolver-rules 可完全离线渲染
-  writeFileSync(file, html, 'utf8');
+  // 页面本身不引用任何外部资源（字体也是本地 file://），配合 --host-resolver-rules 可完全离线渲染
+  writeFileSync(file, withBundledFonts(html), 'utf8');
   return file;
 }
 
