@@ -5,6 +5,7 @@ import { BANNED_TERMS, BANNED_ENGLISH, BANNED_PAYMENT_HOSTS } from '../scripts/c
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { ROOT } from './helpers.mjs';
+import { flatCatalogs } from '../scripts/lib/i18n.mjs';
 
 test('TC-COMP-01 站点源文件与模板不含禁用措辞', () => {
   const files = [
@@ -24,12 +25,19 @@ test('TC-COMP-01 站点源文件与模板不含禁用措辞', () => {
   assert.deepEqual(hits, [], `发现禁用措辞：\n${hits.join('\n')}`);
 });
 
-test('TC-COMP-02 / TC-COMP-04 落地页包含 IAU 澄清与退款政策', () => {
-  const landing = readFileSync(path.join(ROOT, 'site', 'index.html'), 'utf8');
-  assert.ok(landing.includes('IAU'));
-  assert.ok(landing.includes('不是'), '需明确回答"不是官方命名"');
-  assert.ok(landing.includes('退款'));
-  assert.ok(landing.includes('纪念性质'));
+test('TC-COMP-02 / TC-COMP-04 两种语言的落地页文案都含 IAU 澄清与退款政策', () => {
+  // 文案自阶段 1 起集中在 site/i18n/*.json（DECISIONS D9），模板里只有 {{t.*}} 键，
+  // 因此断言必须落在目录上，而不是 site/index.html 源码。
+  const catalogs = flatCatalogs({ reload: true });
+  for (const locale of Object.keys(catalogs)) {
+    const landing = Object.entries(catalogs[locale])
+      .filter(([key]) => key.startsWith('landing.'))
+      .map(([, value]) => (typeof value === 'string' ? value : Object.values(value).join(' ')))
+      .join(' ');
+    assert.ok(/IAU|国际天文学联合会/.test(landing), `[${locale}] 需点明 IAU`);
+    assert.ok(/不构成|不是|并非|非|cannot|do not/i.test(landing), `[${locale}] 需明确否定官方命名`);
+    assert.ok(/退款|refund/i.test(landing), `[${locale}] 需说明退款政策`);
+  }
 });
 
 test('TC-COMP-03 结算入口仅指向 Lemon Squeezy（法币渠道）', () => {

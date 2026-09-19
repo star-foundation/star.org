@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { PATHS, loadConfig } from './config.mjs';
 import { render } from './template.mjs';
+import { t, resolveDefaultLocale } from './i18n.mjs';
 
 export function loadTemplate(name) {
   return readFileSync(path.join(PATHS.templates, name), 'utf8');
@@ -30,21 +31,25 @@ export function renderCertificateHtml(view) {
 
 export function renderOgHtml(view) {
   const cfg = loadConfig();
+  const locale = view.locale || resolveDefaultLocale();
   return render(template('og-image.html'), {
     ...view,
     brandName: cfg.site.name,
-    tagline: cfg.site.tagline,
+    tagline: t(locale, 'brand.tagline'),
   });
 }
 
 export function renderEmail(view) {
   const cfg = loadConfig();
+  const locale = view.locale || resolveDefaultLocale();
+  // 邮件主题来自文案目录（阶段 3 起会按买家下单时的语言取值）
+  const subject = t(locale, 'email.subject', { starName: view.starTitle });
   const data = {
     ...view,
     brandName: cfg.site.name,
     supportEmail: cfg.site.supportEmail,
     registryDirUrl: cfg.site.registryDirUrl,
-    subject: render(cfg.email.subject, { starName: view.starTitle }),
+    subject,
   };
   return {
     subject: data.subject,

@@ -4,6 +4,7 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'nod
 import os from 'node:os';
 import path from 'node:path';
 import { ROOT } from './helpers.mjs';
+import { flatCatalogs } from '../scripts/lib/i18n.mjs';
 
 const templates = ['index.html', 'registry.html', 'permanent.html', '404.html'];
 
@@ -30,7 +31,9 @@ test('站点基础文件齐全（favicon / 交互脚本 / 站点配置）', () =
   assert.ok(js.includes('data-copy'), '永久页需支持复制链接');
   const config = JSON.parse(readFileSync(path.join(ROOT, 'site.config.json'), 'utf8'));
   assert.equal(config.product.maxDedicationChars, 100);
-  assert.ok(config.policy.soldOutMessage);
+  // 售罄/接入中文案自阶段 1 起归入文案目录，不再放在 site.config.json
+  assert.ok(flatCatalogs().zh['state.soldOutMessage']);
+  assert.ok(flatCatalogs().en['state.soldOutMessage']);
 });
 
 test('TC-LP-06 构建产物使用相对路径：项目子路径 /star.org/ 下样式不会丢失', async () => {

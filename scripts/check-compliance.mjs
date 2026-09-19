@@ -10,6 +10,7 @@
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { PATHS } from './lib/config.mjs';
+import { LOCALES, flatCatalogs, resolveDefaultLocale, otherLocale } from './lib/i18n.mjs';
 
 /** 禁用措辞（产品需求文档 5 章 / 技术说明书第 5 章合规要求） */
 export const BANNED_TERMS = [
@@ -80,55 +81,139 @@ export function scanFiles(dirs) {
  * 构建产物（_site/）存在时一并校验，防止"源码合规但产物跑偏"。
  * 这样在没有执行构建的环境（例如只跑测试的流水线）里也不会误报。
  */
-export function disclosureTargets() {
-  const landing = [
-    path.join(PATHS.siteSrc, 'index.html'),
-    path.join(PATHS.out, 'index.html'),
-  ].filter((file) => existsSync(file));
-  const registry = [
-    path.join(PATHS.siteSrc, 'registry.html'),
-    path.join(PATHS.out, 'registry', 'index.html'),
-  ].filter((file) => existsSync(file));
-  return { landing, registry };
-}
+/**
+ * 披露声明的校验对象与规则。
+ *
+ * 站点是**客户端双语**（见 DECISIONS D9）：同一个 HTML 里既有默认语言的文案，
+ * 又内嵌了另一种语言的整个目录。因此绝不能"扫一遍 HTML"了事——那样中文声明会
+ * 顺带满足英文规则，规则形同虚设。正确做法是按语言分开校验：
+ *
+ *   1. 渲染产物（_site/）代表**默认语言**最终上线看到的内容；校验前必须先剥掉
+ *      内嵌目录的 <script>，否则另一种语言的文案会把默认语言的规则"喂饱"。
+ *   2. 另一种语言的文案以 site/i18n/<locale>.json 为准，直接校验目录值——
+ *      目录就是内嵌到页面里的那份数据，不存在"目录合规但产物跑偏"的缝隙。
+ */
+const DISCLOSURE_RULES = {
+  en: {
+    // 必须同时做到两件事：点明 IAU，并明确否定"官方命名"。
+    // 只要求出现 IAU 三个字母太弱；只做否定匹配又会漏掉没提 IAU 的页面。
+    iau: (text) =>
+      /IAU|International Astronomical Union/i.test(text)
+      && /(?:cannot|can not|do not|does not|not|no|never)[^.]{0,60}official[^.]{0,30}(?:naming|designation)/i.test(text),
+    refund: (text) =>
+      /refund/i.test(text)
+      && /(?:do not offer refunds|no refunds|not refundable|refund unconditionally|refunds? unconditionally|unconditional refund)/i.test(text),
+    loginGate: /sign in to view|log in to view/i,
+  },
+  zh: {
+    // 中文文案里 IAU 常写成全称「国际天文学联合会」，且澄清句可能跨句，
+    // 所以逐句边界不能限死（[^。] 会误杀合法的跨句写法）。
+    iau: (text) =>
+      /IAU|国际天文学联合会/.test(text)
+      && /(?:不构成|不是|并非|非|不会|无法|不代表)[^。]{0,40}(?:官方命名|官方名称|命名权)/.test(text),
+    refund: (text) =>
+      /退款/.test(text)
+      && /(?:不支持退款|无条件退款|退款或重新处理)/.test(text),
+    loginGate: /登录后|请先登录/,
+  },
+};
 
 /** 去掉标签与多余空白，便于按整句判断声明是否存在 */
 function plainText(html) {
   return html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
-export function checkRequiredDisclosures() {
-  const { landing, registry } = disclosureTargets();
-  const landingRaw = landing.map((file) => readFileSync(file, 'utf8'));
-  const landingTexts = landingRaw.map(plainText);
-  const registryTexts = registry.map((file) => plainText(readFileSync(file, 'utf8')));
-  // 每个校验对象都必须满足，缺文件即视为不通过
-  const every = (texts, predicate) => texts.length > 0 && texts.every(predicate);
+/** 去掉标签、内嵌目录与样式，只留下该语言真正渲染出来的文本 */
+function renderedText(html) {
+  return plainText(
+    html
+      .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+      .replace(/<style[\s\S]*?<\/style>/gi, ' '),
+  );
+}
 
+/** 读构建产物里的某个页面；不存在时返回 null */
+function builtPage(...segments) {
+  const file = path.join(PATHS.out, ...segments);
+  return existsSync(file) ? readFileSync(file, 'utf8') : null;
+}
+
+/**
+ * 承载必备声明的**具体文案键**。
+ *
+ * 不能拿"整页文案的并集"去匹配规则：只要页面上任何一处凑巧命中，规则就通过，
+ * 哪怕真正该放澄清句的那一段被改成了相反的意思（负向测试验证过这一点）。
+ * 所以逐键校验，缺哪个键、哪个键不合规都直接报出来。
+ */
+const DISCLOSURE_KEYS = {
+  iau: ['landing.faq.a1', 'landing.footerDisclaimer'],
+  refund: ['landing.faq.a4'],
+};
+
+function catalogValue(locale, key) {
+  const flat = flatCatalogs({ reload: true })[locale] || {};
+  const value = flat[key];
+  return typeof value === 'string' ? value : '';
+}
+
+export function checkRequiredDisclosures() {
   const checks = [];
-  checks.push({
-    id: 'IAU_DISCLAIMER',
-    // 必须是完整的一句澄清，而不只是出现了 "IAU" 三个字母
-    ok: every(landingTexts, (text) => /(不构成|不是|并非|非)[^。]{0,40}IAU[^。]{0,20}(官方|命名)/.test(text)),
-    message: '落地页需明确澄清不是 IAU 官方命名（TC-COMP-02）',
-  });
-  checks.push({
-    id: 'REFUND_POLICY',
-    // 既要提到退款，也要给出具体规则（不退的情形或退款承诺）
-    ok: every(landingTexts, (text) => text.includes('退款') && /(不支持退款|无条件退款)/.test(text)),
-    message: '落地页 FAQ 需展示退款政策（TC-COMP-04）',
-  });
+  const defaultLocale = resolveDefaultLocale();
+  const altLocale = otherLocale(defaultLocale);
+
+  // ---- 必备声明的文案：两种语言都要有，且各自满足本语言的规则 ----
+  for (const locale of LOCALES) {
+    const rule = DISCLOSURE_RULES[locale];
+
+    // IAU 澄清：每个承载键都必须自己写出完整的澄清句
+    const iauMissing = DISCLOSURE_KEYS.iau.filter((key) => !rule.iau(catalogValue(locale, key)));
+    checks.push({
+      id: `IAU_DISCLAIMER_${locale.toUpperCase()}`,
+      ok: iauMissing.length === 0,
+      message: `[${locale}] 需在 ${DISCLOSURE_KEYS.iau.join('、')} 各写出完整的 IAU 澄清句（TC-COMP-02）`
+        + (iauMissing.length ? `；不通过：${iauMissing.join('、')}` : ''),
+    });
+
+    // 退款政策：既要有"退款"，也要给出具体规则（不退的情形或退款承诺）
+    const refundText = DISCLOSURE_KEYS.refund.map((key) => catalogValue(locale, key)).join(' ');
+    checks.push({
+      id: `REFUND_POLICY_${locale.toUpperCase()}`,
+      ok: rule.refund(refundText),
+      message: `[${locale}] 需在 ${DISCLOSURE_KEYS.refund.join('、')} 给出具体退款政策（TC-COMP-04）`,
+    });
+  }
+
+  // ---- 目录确实落到了产物里：防止"目录合规但页面根本没渲染这两句" ----
+  const landingHtml = builtPage('index.html');
+  if (landingHtml) {
+    const text = renderedText(landingHtml);
+    const rule = DISCLOSURE_RULES[defaultLocale];
+    checks.push({
+      id: 'IAU_DISCLAIMER_RENDERED',
+      ok: rule.iau(text),
+      message: '构建产物的落地页需渲染出 IAU 澄清句（不只是目录里有）',
+    });
+    checks.push({
+      id: 'REFUND_POLICY_RENDERED',
+      ok: rule.refund(text),
+      message: '构建产物的落地页需渲染出退款政策',
+    });
+  }
+
+  // ---- 结构类声明与语言无关，仍然校验产物 ----
+  const sourceLanding = readFileSync(path.join(PATHS.siteSrc, 'index.html'), 'utf8');
+  const registryHtml = builtPage('registry', 'index.html') ?? readFileSync(path.join(PATHS.siteSrc, 'registry.html'), 'utf8');
   checks.push({
     id: 'VERIFY_ENTRY',
-    // 必须是真实可点的链接（href），而不是正文里提一句
-    ok: every(landingRaw, (html) => /href=["'][^"']*\/registry\/["']/.test(html)),
+    ok: /href=["'][^"']*\/registry\/["']/.test(sourceLanding),
     message: '落地页需提供公开认领表入口（信任背书区块）',
   });
   checks.push({
-    id: 'REGISTRY_NO_LOGIN',
-    ok: every(registryTexts, (text) => !/登录后|请先登录|sign in to view/i.test(text)),
-    message: '公开认领表不得设置访问门槛（TC-REG-01）',
+    id: 'REGISTRY_NO_LOGIN_RENDERED',
+    ok: !DISCLOSURE_RULES[defaultLocale].loginGate.test(renderedText(registryHtml)),
+    message: '构建产物的公开认领表不得设置访问门槛（TC-REG-01）',
   });
+
   return checks;
 }
 
@@ -139,11 +224,12 @@ function main() {
   const disclosures = checkRequiredDisclosures();
   const failed = disclosures.filter((check) => !check.ok);
 
-  const targets = disclosureTargets();
-  const label = (file) => path.relative(PATHS.root, file);
+  const defaultLocale = resolveDefaultLocale();
+  const altLocale = otherLocale(defaultLocale);
 
   console.log(`合规扫描：检查 ${fileCount} 个文件`);
-  console.log(`  声明校验对象：${[...targets.landing, ...targets.registry].map(label).join('、') || '（未找到落地页/认领表文件）'}`);
+  console.log(`  默认语言：${defaultLocale}（另一种语言 ${altLocale} 按 site/i18n/${altLocale}.json 校验）`);
+  console.log(`  声明校验对象：site/i18n/*.json 的落地页文案 + 构建产物 _site/index.html（${existsSync(PATHS.out) ? '存在' : '不存在，跳过产物校验'}）`);
   if (violations.length === 0) console.log('  ✓ 未发现禁用措辞或违规收款渠道');
   for (const violation of violations) {
     console.log(`  ✗ [${violation.type}] ${path.relative(PATHS.root, violation.file)}:${violation.line} 命中「${violation.term}」→ ${violation.text}`);

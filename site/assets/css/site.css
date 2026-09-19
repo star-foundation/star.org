@@ -360,3 +360,18 @@ footer.site .disclaimer { max-width: 620px; line-height: 1.8; }
 @media (prefers-reduced-motion: reduce) {
   .progress-track.is-indeterminate .progress-fill { animation: none; width: 100%; }
 }
+
+/* 语言切换：导航里的小按钮，默认语言下显示"可切换到的语言名" */
+.lang-toggle {
+  appearance: none;
+  border: 1px solid var(--line, rgba(143, 166, 209, 0.4));
+  background: transparent;
+  color: var(--ink-soft);
+  font: inherit;
+  font-size: 13px;
+  line-height: 1;
+  padding: 6px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.lang-toggle:hover { color: var(--ink); border-color: var(--ink-soft); }

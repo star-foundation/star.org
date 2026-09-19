@@ -1,5 +1,73 @@
-// 站点交互：认领表检索、复制链接、X 分享。无第三方依赖。
+// 站点交互：认领表检索、复制链接、X 分享、中英切换。无第三方依赖。
 (function () {
+  // ---- 语言切换（DECISIONS D9）----
+  //
+  // 页面用站点默认语言渲染，另一种语言的文案以 JSON 内嵌在 <script id="i18n-alt"> 里，
+  // 切换时只替换文本、**不改变 URL**，因此永久链接保持稳定。
+  // 没有 JS 时页面停留在默认语言，依然完整可读——这是选"客户端切换"的前提。
+  (function languageToggle() {
+    const toggle = document.querySelector('[data-lang-toggle]');
+    const altScript = document.getElementById('i18n-alt');
+    if (!toggle || !altScript) return;
+
+    const root = document.documentElement;
+    const defaultLocale = root.getAttribute('data-lang') || 'en';
+    const altLocale = altScript.getAttribute('data-locale') || '';
+    if (!altLocale) return;
+
+    let catalog = {};
+    try {
+      catalog = JSON.parse(altScript.textContent || '{}');
+    } catch {
+      return; // 内嵌目录损坏时保持默认语言，不影响页面其余功能
+    }
+
+    const nodes = Array.from(document.querySelectorAll('[data-i18n]'));
+    // 记下默认语言的原文，切回来时直接还原，不必再内嵌一份默认目录
+    const originals = new Map(nodes.map((node) => [node, node.innerHTML]));
+    const defaultTitle = document.title;
+    const altTitle = root.getAttribute('data-alt-title') || defaultTitle;
+    const selfName = toggle.getAttribute('data-self-name') || defaultLocale;
+    const altName = toggle.getAttribute('data-alt-name') || altLocale;
+    const defaultHtmlLang = root.getAttribute('lang') || defaultLocale;
+
+    function render(locale) {
+      const toAlt = locale === altLocale;
+      nodes.forEach((node) => {
+        const value = toAlt ? catalog[node.getAttribute('data-i18n')] : undefined;
+        if (toAlt && value === undefined) return; // 该键没有译文，保留默认语言
+        if (toAlt && value.includes('<')) {
+          // 少量文案自带 <strong>/<a>；目录是构建期受信任的文件，不含用户输入
+          node.innerHTML = value;
+        } else if (toAlt) {
+          node.textContent = value;
+        } else {
+          node.innerHTML = originals.get(node);
+        }
+      });
+      root.setAttribute('data-lang', locale);
+      root.setAttribute('lang', toAlt ? altLocale : defaultHtmlLang);
+      document.title = toAlt ? altTitle : defaultTitle;
+      toggle.textContent = toAlt ? selfName : altName;
+      try {
+        localStorage.setItem('starorg-lang', locale);
+      } catch {
+        /* 隐私模式下 localStorage 不可用，忽略 */
+      }
+    }
+
+    let saved = null;
+    try {
+      saved = localStorage.getItem('starorg-lang');
+    } catch {
+      /* 忽略 */
+    }
+    if (saved === altLocale) render(altLocale);
+    toggle.addEventListener('click', () => {
+      render(root.getAttribute('data-lang') === altLocale ? defaultLocale : altLocale);
+    });
+  })();
+
   const search = document.querySelector('[data-registry-search]');
   if (search) {
     const rows = Array.from(document.querySelectorAll('[data-registry-row]'));

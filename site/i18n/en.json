@@ -1,0 +1,107 @@
+{
+  "_comment": "English copy catalog. Keys must match zh.json exactly — validateCatalogs() fails the build otherwise. Terminology: claim (= 认领), dedication (= 献词), claim registry (= 公开认领表). Never use \"name a star\" or \"own/ownership\": this product is explicitly not an IAU naming service and is not a sale of ownership.",
+  "brand": {
+    "tagline": "Every claim is publicly verifiable"
+  },
+  "email": {
+    "subject": "Your star certificate is ready · {{starName}}"
+  },
+  "common": {
+    "lang": {
+      "name": "English",
+      "switchAria": "Switch language"
+    },
+    "nav": {
+      "registry": "Public registry",
+      "faq": "FAQ",
+      "claim": "Claim a star",
+      "repo": "Public repository"
+    },
+    "footer": {
+      "contact": "Contact: "
+    }
+  },
+  "state": {
+    "soldOut": "Sold out",
+    "checkoutPending": "Checkout coming soon",
+    "soldOutMessage": "The star pool is being restocked; checkout is temporarily closed.",
+    "checkoutPendingMessage": "Payment is being connected — once it is live you can complete your claim right here.",
+    "soldOutNote": "(No stars remaining right now; checkout reopens automatically after restocking.)"
+  },
+  "product": {
+    "price": "US$29",
+    "priceNote": "One-time payment, includes a PDF certificate and a permanent link page"
+  },
+  "star": {
+    "ra": "Right ascension",
+    "dec": "Declination",
+    "magnitude": "Apparent magnitude",
+    "distance": "Distance",
+    "claimer": "Claimed by",
+    "date": "Claim date"
+  },
+  "landing": {
+    "eyebrow": "A publicly verifiable star claim",
+    "lede": "Claim a real star for a milestone, a dedication, or someone you are thinking of. You get a certificate carrying real astronomical data, and a permanent link you can keep sharing.",
+    "metaDescription": "Claim a real star and receive a PDF certificate with real astronomical data plus a permanent link. Every claim is written to a public registry that anyone can check for duplicates.",
+    "metaOgDescription": "Claim a real star and receive a PDF certificate with real astronomical data plus a permanent link. Every claim can be publicly verified.",
+    "ctaBrowse": "Browse the public registry first",
+    "ctaRegistry": "View the public registry",
+    "trust": {
+      "title": "Why this claim can be verified",
+      "lede": "The unsettling part of services like this is that you cannot verify anything: you do not know whether your name will be resold to the next person, or how long the records will survive. We address the first problem by publishing the entire registry.",
+      "claimedLabel": "Stars claimed",
+      "claimedNote": "Every claim is written to the public registry immediately, and anyone can look it up.",
+      "availableLabel": "Stars still available",
+      "availableNote": "Each star is allocated exactly once, and leaves the pool the moment it is claimed.",
+      "noLoginLabel": "Records that require a login",
+      "noLoginNote": "The registry is plain text — no account and no payment needed to read it.",
+      "ctaRegistry": "Open the registry now",
+      "ctaRaw": "View the raw record files"
+    },
+    "sample": {
+      "titleReal": "Most recent claim",
+      "ledeReal": "This is the most recent real claim (number {{count}}). Anyone can open it and check; it is exactly what your own page will look like after payment.",
+      "titleSample": "What you will receive",
+      "ledeSample": "Below is a styling sample of the permanent link page (sample data), so you can see the final deliverable before buying.",
+      "kickerReal": "STAR CLAIM · LATEST RECORD {{slug}}",
+      "kickerSample": "STAR CLAIM · SAMPLE PERMANENT LINK PAGE",
+      "viewFull": "Open the full page for this claim →",
+      "verifySimbad": "Verify {{ident}} on SIMBAD ↗",
+      "viewOneReal": "See a real claim",
+      "browseAll": "Browse all claims"
+    },
+    "how": {
+      "title": "How it works",
+      "step1Title": "Fill in and pay",
+      "step1Body": "At checkout you provide the display name, an optional dedication, and the email address for the certificate. You can choose to stay anonymous.",
+      "step2Title": "We allocate a star",
+      "step2Body": "The system randomly assigns you a star that has not been claimed yet, and generates the PDF certificate and permanent link page.",
+      "step3Title": "Get the email and share",
+      "step3Body": "Within minutes you receive an email with the certificate and permanent link; the link renders a card when shared on social platforms."
+    },
+    "buy": {
+      "title": "Claim a star of your own",
+      "lede": "{{price}} · {{priceNote}}. Checkout is handled by Lemon Squeezy as the Merchant of Record, and supports ordinary fiat payment methods such as credit cards.",
+      "nextNote": "Next you enter the claimer name and an optional dedication, then continue to checkout."
+    },
+    "faq": {
+      "title": "Frequently asked questions",
+      "q1": "Is this official naming by the International Astronomical Union (IAU)?",
+      "a1": "No. Scientific naming of stars is administered by the International Astronomical Union, and we cannot and do not claim to provide official naming. What this service offers is a <strong>commemorative, publicly verifiable claim</strong>: the star itself is real, and the coordinates, magnitude, spectral type and distance on the certificate come from public astronomical catalogues — but this claim confers no naming right over any celestial body, and will not be used by the astronomical community as an official name. Please confirm before ordering that this matches what you expect.",
+      "q2": "Could my star be claimed by someone else too?",
+      "a2": "No. Each star in the pool is allocated exactly once, is written to the public registry the moment it is allocated, and the allocation runs serially so two orders arriving at the same instant cannot take the same star. Anyone can search the star identifier in the <a href=\"/registry/\">public registry</a> and confirm there is only one record. If a duplicate ever occurs through our mistake, we refund it unconditionally or reprocess it.",
+      "q3": "What can I do with the claim afterwards?",
+      "a3": "You can download the PDF certificate (printable, displayable), share the permanent link on social platforms (optimised for the X share card), or simply keep it as a record belonging to the two of you. The permanent link is never deleted, and does not depend on you keeping the email.",
+      "q4": "Do you offer refunds?",
+      "a4": "This service delivers an instantly generated digital keepsake, so we do not offer refunds for reasons other than quality — please confirm this before buying. If the problem is on our side — a duplicate allocation, an incorrect certificate, or a payment that produced no certificate — we will contact you within 24 hours and refund unconditionally or reprocess it.",
+      "q5": "How soon after payment do I get the certificate?",
+      "a5": "Usually within 1–3 minutes, and never more than 5. The checkout completion page also states that the certificate will be sent to your email address. If you have not received it within 24 hours, write to {{supportEmail}} with the email address you used at checkout and we will resend it manually.",
+      "q6": "Will my personal information be made public?",
+      "a6": "The public registry contains only the star identifier, the display name, the dedication (if any) and the claim date. Email addresses and order details are never written to any public file. You can choose anonymous display at checkout, in which case not even the display name appears on the public page or in the registry.",
+      "q7": "Why can't I pick my own star?",
+      "a7": "The system randomly assigns one unclaimed star from the pool, so everyone has the same chance and nobody can know in advance which star they will get. Every claim therefore corresponds to a real, naked-eye star (fainter ones are easier to see away from light pollution), and it removes the hesitation and waiting that a \"pick your star\" step would introduce."
+    },
+    "footerDisclaimer": "{{siteName}} provides a commemorative, publicly verifiable star claim service. It does not constitute official naming by the International Astronomical Union (IAU) and confers no naming right over any celestial body. Astronomical data shown on certificates comes from public catalogues."
+  }
+}

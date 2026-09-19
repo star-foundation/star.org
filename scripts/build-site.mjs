@@ -19,11 +19,45 @@ import { readPool } from './lib/pool.mjs';
 import { buildRegistryIndex, sortedRegistrations } from './lib/registry.mjs';
 import { buildStarView } from './lib/view.mjs';
 import { render } from './lib/template.mjs';
+import {
+  resolveDefaultLocale, otherLocale, htmlLang, loadCatalogs, interpolateCatalog,
+  flattenCatalog, switchableKeys, missingKeysFor, buildAltCatalogScript,
+} from './lib/i18n.mjs';
 import { renderOgHtml } from './lib/render.mjs';
 import { renderPng } from './lib/chrome.mjs';
 
 function tpl(name) {
   return readFileSync(path.join(PATHS.siteSrc, name), 'utf8');
+}
+
+/** og:locale 用的是「语言_地区」格式，与 HTML lang 不完全一样 */
+function ogLocale(locale) {
+  return locale === 'zh' ? 'zh_CN' : 'en_US';
+}
+
+/**
+ * 渲染一个页面，并自动完成文案层的两件事：
+ *
+ *   1. 从**渲染产物**里抽出所有 data-i18n 键，校验它们在每种语言里都存在，
+ *      缺任何一条就直接构建失败——避免"页面上有个标题永远切不动"这种隐性残缺。
+ *   2. 把另一种语言的目录（只含本页用到的键）内嵌成 JSON，供客户端切换读取。
+ *
+ * 为什么要渲染两遍：真实键名有一部分是构建期动态拼进 data-i18n 的
+ * （data-i18n="{{entryLabelKey}}"），只有渲染后才知道键名；而内嵌脚本又要写回页面里。
+ */
+function renderPage(name, scope) {
+  const template = tpl(name);
+  const probe = render(template, { ...scope, i18nAltScript: '' });
+  const keys = [...switchableKeys(probe)];
+  const missing = missingKeysFor(keys);
+  if (missing.length > 0) {
+    const detail = missing.map((m) => `${m.key}（缺 ${m.locales.join('、')}）`).join('；');
+    throw new Error(`${name} 引用了不存在的文案键：${detail}`);
+  }
+  return render(template, {
+    ...scope,
+    i18nAltScript: buildAltCatalogScript(scope.altLocale, scope.tAltFlat ?? {}, keys),
+  });
 }
 
 function copyDir(from, to) {
@@ -124,7 +158,6 @@ async function buildDefaultOg(cfg, outDir) {
         ...sampleView(cfg, []),
         slug: 'star-org',
         starFieldSvg: '',
-        tagline: cfg.site.tagline,
         brandName: cfg.site.name,
       }),
       file,
@@ -152,8 +185,27 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
   // 购买入口有三种状态，文案必须分开：售罄（补货后自动恢复）与「通道尚未接入」
   // 是两件完全不同的事，混用会让访客以为候选库空了，而实际库存是充足的。
   const checkoutPending = !checkoutConfigured;
-  const entryLabel = soldOut ? '候选库已售罄' : '购买通道接入中';
-  const entryMessage = soldOut ? cfg.policy.soldOutMessage : cfg.policy.checkoutPendingMessage;
+
+  // ---- 文案层（阶段 1 起：文案唯一来源是 site/i18n/*.json）----
+  const locale = resolveDefaultLocale();
+  const altLocale = otherLocale(locale);
+  const baseVars = {
+    siteName: cfg.site.name,
+    supportEmail: cfg.site.supportEmail,
+    year: new Date().getFullYear(),
+  };
+  // 目录里可能带 {{siteName}} / {{supportEmail}} / {{price}} 之类的占位符，先解析再喂模板
+  const nested = loadCatalogs()[locale];
+  const pricing = { price: nested.product.price, priceNote: nested.product.priceNote };
+  const vars = { ...baseVars, ...pricing };
+  const t = interpolateCatalog(loadCatalogs()[locale], vars);
+  const tAlt = interpolateCatalog(loadCatalogs()[altLocale], vars);
+  // 购买入口的状态文案也来自目录，配置里不再保留第二份
+  const entryLabelKey = soldOut ? 'state.soldOut' : 'state.checkoutPending';
+  const entryMessageKey = soldOut ? 'state.soldOutMessage' : 'state.checkoutPendingMessage';
+  const entryLabel = t.state[soldOut ? 'soldOut' : 'checkoutPending'];
+  const entryMessage = t.state[soldOut ? 'soldOutMessage' : 'checkoutPendingMessage'];
+
   const latest = records[0] ?? null;
   // 认领进度（公开认领表与付款等待页共用）：已认领 / 候选库总数
   const poolTotal = pool.stars.length || 1;
@@ -162,24 +214,32 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
 
   const common = {
     siteName: cfg.site.name,
-    tagline: cfg.site.tagline,
     domain: cfg.site.domain,
     baseUrl: cfg.site.baseUrl,
-    year: new Date().getFullYear(),
+    year: baseVars.year,
     supportEmail: cfg.site.supportEmail,
     registryRepoUrl: cfg.site.registryRepoUrl,
     registryDirUrl: cfg.site.registryDirUrl,
     registryUrl: `${cfg.site.baseUrl}/registry/`,
-    priceDisplay: cfg.product.priceDisplay,
-    priceNote: cfg.product.priceNote,
+    priceDisplay: t.product.price,
+    priceNote: t.product.priceNote,
     checkoutUrl: cfg.site.checkoutUrl,
     checkoutReady,
     checkoutConfigured,
     checkoutPending,
     soldOut,
     entryLabel,
+    entryLabelKey,
     entryMessage,
-    soldOutMessage: cfg.policy.soldOutMessage,
+    entryMessageKey,
+    t,
+    locale,
+    altLocale,
+    htmlLang: htmlLang(locale),
+    ogLocale: ogLocale(locale),
+    altLangName: tAlt.common.lang.name,
+    selfLangName: t.common.lang.name,
+    altTitle: `${cfg.site.name} · ${tAlt.brand.tagline}`,
     registryCount: index.count,
     availableCount: available,
     poolTotal,
@@ -194,10 +254,30 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
   };
 
   // 落地页
-  const landing = render(tpl('index.html'), {
+  // 示例区的文案里带 {{count}} / {{slug}} / {{ident}}，这些值只有拿到 sample 之后才知道，
+  // 所以落地页用自己那一份目录（在基础变量上补这三个值），不从 common.t 复用。
+  const sample = sampleView(cfg, records);
+  const sampleVars = {
+    ...vars,
+    count: index.count,
+    slug: sample.slug,
+    ident: sample.simbadIdent,
+  };
+  const sampleKey = sample.isReal ? 'Real' : 'Sample';
+  const landingT = interpolateCatalog(loadCatalogs()[locale], sampleVars);
+  const landingTAlt = interpolateCatalog(loadCatalogs()[altLocale], sampleVars);
+  const landing = renderPage('index.html', {
     ...common,
-    sample: sampleView(cfg, records),
+    t: landingT,
+    tAltFlat: flattenCatalog(landingTAlt),
+    sample,
     registryPreview: index.entries.slice(0, 5),
+    sampleLedeKey: `landing.sample.lede${sampleKey}`,
+    sampleLede: landingT.landing.sample[`lede${sampleKey}`],
+    sampleKickerKey: `landing.sample.kicker${sampleKey}`,
+    sampleKicker: landingT.landing.sample[`kicker${sampleKey}`],
+    sampleSimbadKey: 'landing.sample.verifySimbad',
+    sampleSimbadText: landingT.landing.sample.verifySimbad,
   });
   writeFileAtomic(path.join(outDir, 'index.html'), relativize(landing, 0));
 
