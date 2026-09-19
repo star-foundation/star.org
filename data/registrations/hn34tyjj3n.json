@@ -1,0 +1,29 @@
+{
+  "slug": "hn34tyjj3n",
+  "star_id": "HIP-32349",
+  "owner_display_name": "链路验收测试",
+  "anonymous": false,
+  "dedication_message": "这笔订单只用于验证支付成功后的登记链路，验证完成后会被清理。",
+  "registered_at": "2026-09-19T00:02:48.356Z",
+  "star": {
+    "id": "HIP-32349",
+    "hip": 32349,
+    "hd": 48915,
+    "proper_name": "Sirius",
+    "bayer": "Alp",
+    "flam": "9",
+    "constellation": "CMa",
+    "ra": 101.287214,
+    "dec": -16.716116,
+    "magnitude": -1.44,
+    "spectral_type": "A0",
+    "distance_ly": 8.6
+  },
+  "artifacts": {
+    "certificate": "certificates/hn34tyjj3n.pdf",
+    "certificate_sha256": "1c8587ee6555568881640887a0da492acac68c5c37be6fe1860084594e7ca678",
+    "og_image": "og/hn34tyjj3n.png",
+    "og_sha256": "e31dd6e6db689c468b6f3068716221d1a7faa16dbfaf243f762123eec7804a31",
+    "certificate_public": true
+  }
+}
