@@ -247,7 +247,7 @@
   <header>
     <h1>⭐ Star.org 开发进度 CheckList</h1>
     <p class="subtitle">依据《技术需求说明书 v0.2》《产品需求文档 v1.0》《测试用例说明书 v1.0》整理 · 勾选状态自动保存在本机浏览器</p>
-    <p class="meta-line">进度已同步至代码仓库当前实现：66 个自动化测试全部通过，端到端验收、登记表自检与合规扫描均通过；站点已绑定 www.star.org 并开启购买入口；下单前登记表单（姓名/献词/匿名）已上线，LS→Zapier→GitHub 全链路已用真实订单验证。</p>
+    <p class="meta-line">进度已同步至代码仓库当前实现：67 个自动化测试全部通过，端到端验收、登记表自检与合规扫描均通过；站点已绑定 www.star.org 并开启购买入口；下单前登记表单（姓名/献词/匿名）已上线，LS→Zapier→GitHub 全链路已用真实订单验证。</p>
   </header>
 
   <div class="progress-card">
@@ -441,7 +441,7 @@ const DATA = [
     days: "已完成",
     desc: "代码实现之外的验证证据：测试、端到端、合规、数据核对",
     items: [
-      { t: "66 个自动化测试全部通过（npm test）", tag: "", done: true,
+      { t: "67 个自动化测试全部通过（npm test）", tag: "", done: true,
         note: "覆盖 TC-ALLOC / TC-PDF / TC-PAGE / TC-REG / TC-MAIL / TC-COMP / TC-PAY / TC-LP / TC-ERR" },
       { t: "防超卖并发测试连续 3 轮通过", tag: "", done: true,
         note: "6 个真实子进程抢 1 颗星：恰好 1 笔成功、5 笔判定售罄、零重复记录" },
@@ -465,6 +465,8 @@ const DATA = [
         note: "根因：register.yml 用默认 GITHUB_TOKEN 推提交，GitHub 防循环机制下这种提交不触发 on:push，所以客户登记后永久链接页/证书一直 404。已在 deploy-pages.yml 加 workflow_run 监听「登记」工作流、成功完成后强制重建，并用真实派发验证：登记跑完自动出现 event=workflow_run 的部署并把新登记发布上线" },
       { t: "下单前登记表单（姓名 / 献词 / 匿名），解决 LS 无自定义字段的产品缺口", tag: "p0", done: true,
         note: "【真实链路联调又暴露并修掉一个缺陷】Lemon Squeezy 的 custom data 值都是字符串，登记页传来的匿名开关是 \"false\" 字符串，而 normalizeOrder 用 Boolean() 判断——字符串 \"false\" 是真值，导致没勾匿名的订单被当成匿名、错误隐藏客户名字。现新增 parseBool() 识别 true/false 与 \"1\"/\"0\"/\"yes\"/\"是\" 等写法（TC-PAY-08 覆盖 11 种取值）。Lemon Squeezy 结算页不收集自定义字段（该需求在其反馈板挂了四年未实现），导致客户自填的登记名/献词/匿名没有来源、证书只能退化成持卡人姓名，且违反 PRD 5.4 的匿名选择权。已在落地页加入登记表单，提交时把三个值作为 ?checkout[custom][...] 拼进结算链接（LS 官方支持的传入路径）。URL 构建抽成纯函数 site/assets/js/checkout-url.mjs 并单测；端到端验证：派发带 meta.custom_data 的载荷后，公开记录 owner_display_name=null（匿名生效）、献词正确保留、持卡人姓名未泄漏，线上匿名页显示「匿名登记人」且献词可见。另加登记名回退：客户自填名优先，为空（例如绕过落地页直接打开结算链接）时回退到持卡人姓名，避免已付款订单被拒" },
+      { t: "付款完成等待页 /thanks/（客户可回到 Star.org）", tag: "p0", done: true,
+        note: "付款后客户停在 Lemon Squeezy 的确认弹窗与收据页，没有任何回站路径。已新增 /thanks/ 等待页（确认付款已收到、说明 1-3 分钟出证书并发送到邮箱、三步说明、回站入口与客服邮箱），并在 DEPLOY.md 写明 LS 侧配置：Products → Settings → Confirmation modal 的 Button link 设为 https://www.star.org/thanks/?order=[order_identifier]（[order_identifier] 为官方支持的订单变量）。页面读到的订单号仅用于展示（textContent + 字符过滤），不存储不外发；该页 noindex 且不进 sitemap" },
       { t: "购买入口统一 + 独立登记页 /register/", tag: "p0", done: true,
         note: "原先三个申请入口表现不一：导航「立即登记」与主视觉按钮直接跳结算页、购买区却内嵌表单——直接跳结算会绕过表单，客户自填的姓名/献词丢失（只剩持卡人姓名）。现统一为三个入口文案一致（「登记一颗星」）、目标一致（/register/），姓名与献词在登记页一次填完再带 checkout[custom] 跳结算；登记页同时承担已开启/接入中/售罄三态并附三步说明与隐私说明，sitemap 已收录。测试改为 TC-LP-09~13 锁死入口数量、文案、表单位置与跨页一致性。**全部页面（首页/登记页/登记表/永久链接页/404）导航按钮也已统一**为「登记一颗星」→ 登记页，且除登记页外任何页面都不再内嵌结算链接（此前登记表页是「立即登记」、永久链接页是「我也要登记一颗」且都直接跳结算，会绕过表单）" },
       { t: "Zap→GitHub 字段映射真实验证（非写死）", tag: "p0", done: true,
