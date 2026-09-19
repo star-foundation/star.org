@@ -1,9 +1,20 @@
 {
-  "generated_at": "2026-09-19T10:07:02.974Z",
-  "count": 1,
-  "unique_stars": 1,
+  "generated_at": "2026-09-19T11:04:26.224Z",
+  "count": 2,
+  "unique_stars": 2,
   "duplicates": [],
   "entries": [
+    {
+      "slug": "pmzyvftrxf",
+      "star_id": "HIP-30438",
+      "star_name": "Canopus",
+      "constellation": "Car",
+      "magnitude": -0.62,
+      "owner_display_name": "Tong",
+      "anonymous": false,
+      "registered_at": "2026-09-19T11:04:23.621Z",
+      "dedication_message": "Hello Star.org!"
+    },
     {
       "slug": "6rny8htcgb",
       "star_id": "HIP-32349",

@@ -1,0 +1,29 @@
+{
+  "slug": "pmzyvftrxf",
+  "star_id": "HIP-30438",
+  "owner_display_name": "Tong",
+  "anonymous": false,
+  "dedication_message": "Hello Star.org!",
+  "registered_at": "2026-09-19T11:04:23.621Z",
+  "star": {
+    "id": "HIP-30438",
+    "hip": 30438,
+    "hd": 45348,
+    "proper_name": "Canopus",
+    "bayer": "Alp",
+    "flam": null,
+    "constellation": "Car",
+    "ra": 95.987926,
+    "dec": -52.69566,
+    "magnitude": -0.62,
+    "spectral_type": "F0I",
+    "distance_ly": 309.2
+  },
+  "artifacts": {
+    "certificate": "certificates/pmzyvftrxf.pdf",
+    "certificate_sha256": "b397b3ec74cdd6dc565e03f91944150c4e115c6c19e7e31362913c34712c12e0",
+    "og_image": "og/pmzyvftrxf.png",
+    "og_sha256": "09a19d86b4b50e27591a32a67820c6dd4dc4b555278b0a1b15cd23f790cf7ecf",
+    "certificate_public": true
+  }
+}
