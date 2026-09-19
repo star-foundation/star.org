@@ -1,0 +1,29 @@
+{
+  "slug": "rvm180zb1j",
+  "star_id": "HIP-30438",
+  "owner_display_name": "自动部署验证",
+  "anonymous": false,
+  "dedication_message": null,
+  "registered_at": "2026-09-19T05:19:13.985Z",
+  "star": {
+    "id": "HIP-30438",
+    "hip": 30438,
+    "hd": 45348,
+    "proper_name": "Canopus",
+    "bayer": "Alp",
+    "flam": null,
+    "constellation": "Car",
+    "ra": 95.987926,
+    "dec": -52.69566,
+    "magnitude": -0.62,
+    "spectral_type": "F0I",
+    "distance_ly": 309.2
+  },
+  "artifacts": {
+    "certificate": "certificates/rvm180zb1j.pdf",
+    "certificate_sha256": "94bacb3374e19cbe8bb680fe403cf8a6f9124ba93c76056225e85f6607358236",
+    "og_image": "og/rvm180zb1j.png",
+    "og_sha256": "f4cf5ff5ad50ed4625671227fbfe33a7279c9cf0d8080136338ba1d3c4552074",
+    "certificate_public": true
+  }
+}

@@ -1,9 +1,20 @@
 {
-  "generated_at": "2026-09-19T05:17:24.688Z",
-  "count": 1,
-  "unique_stars": 1,
+  "generated_at": "2026-09-19T05:19:16.434Z",
+  "count": 2,
+  "unique_stars": 2,
   "duplicates": [],
   "entries": [
+    {
+      "slug": "rvm180zb1j",
+      "star_id": "HIP-30438",
+      "star_name": "Canopus",
+      "constellation": "Car",
+      "magnitude": -0.62,
+      "owner_display_name": "自动部署验证",
+      "anonymous": false,
+      "registered_at": "2026-09-19T05:19:13.985Z",
+      "dedication_message": null
+    },
     {
       "slug": "p39pwec7j2",
       "star_id": "HIP-32349",
