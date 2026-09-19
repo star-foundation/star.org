@@ -1,0 +1,29 @@
+{
+  "slug": "p39pwec7j2",
+  "star_id": "HIP-32349",
+  "owner_display_name": "李明远",
+  "anonymous": false,
+  "dedication_message": null,
+  "registered_at": "2026-09-19T05:08:44.560Z",
+  "star": {
+    "id": "HIP-32349",
+    "hip": 32349,
+    "hd": 48915,
+    "proper_name": "Sirius",
+    "bayer": "Alp",
+    "flam": "9",
+    "constellation": "CMa",
+    "ra": 101.287214,
+    "dec": -16.716116,
+    "magnitude": -1.44,
+    "spectral_type": "A0",
+    "distance_ly": 8.6
+  },
+  "artifacts": {
+    "certificate": "certificates/p39pwec7j2.pdf",
+    "certificate_sha256": "5ff051c1227139fd2aa5d99fb00c2397e1585f8322819461a974092c26fc995c",
+    "og_image": "og/p39pwec7j2.png",
+    "og_sha256": "41045b799d0fca850596ee96491acee1015fee6904d5815c86d22e78edad09b9",
+    "certificate_public": true
+  }
+}
