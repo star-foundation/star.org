@@ -1,7 +1,19 @@
 {
-  "generated_at": "2026-09-18T10:52:30.907Z",
-  "count": 0,
-  "unique_stars": 0,
+  "generated_at": "2026-09-19T07:07:07.054Z",
+  "count": 1,
+  "unique_stars": 1,
   "duplicates": [],
-  "entries": []
+  "entries": [
+    {
+      "slug": "hdwyn5gjkk",
+      "star_id": "HIP-32349",
+      "star_name": "Sirius",
+      "constellation": "CMa",
+      "magnitude": -1.44,
+      "owner_display_name": null,
+      "anonymous": true,
+      "registered_at": "2026-09-19T07:07:04.603Z",
+      "dedication_message": "愿你此后的每个夜晚都有星光"
+    }
+  ]
 }
