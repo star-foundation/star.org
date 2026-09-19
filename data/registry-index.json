@@ -1,7 +1,19 @@
 {
-  "generated_at": "2026-09-18T10:52:30.907Z",
-  "count": 0,
-  "unique_stars": 0,
+  "generated_at": "2026-09-19T06:39:43.949Z",
+  "count": 1,
+  "unique_stars": 1,
   "duplicates": [],
-  "entries": []
+  "entries": [
+    {
+      "slug": "p39pwec7j2",
+      "star_id": "HIP-32349",
+      "star_name": "Sirius",
+      "constellation": "CMa",
+      "magnitude": -1.44,
+      "owner_display_name": "李明月",
+      "anonymous": false,
+      "registered_at": "2026-09-19T06:39:39.245Z",
+      "dedication_message": null
+    }
+  ]
 }
