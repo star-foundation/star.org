@@ -1,0 +1,30 @@
+{
+  "slug": "hst5hej7k9",
+  "star_id": "HIP-8903",
+  "owner_display_name": "Hello",
+  "anonymous": false,
+  "locale": null,
+  "dedication_message": "Hello Hello Star.org",
+  "registered_at": "2026-09-19T23:44:34.074Z",
+  "star": {
+    "id": "HIP-8903",
+    "hip": 8903,
+    "hd": 11636,
+    "proper_name": "Sheratan",
+    "bayer": "Bet",
+    "flam": "6",
+    "constellation": "Ari",
+    "ra": 28.660022,
+    "dec": 20.808035,
+    "magnitude": 2.64,
+    "spectral_type": "A5V",
+    "distance_ly": 58.7
+  },
+  "artifacts": {
+    "certificate": "certificates/hst5hej7k9.pdf",
+    "certificate_sha256": "bb8136669617bea3adf623757addda5861a8da7f52f810acbc07cb9653dc2fe6",
+    "og_image": "og/hst5hej7k9.png",
+    "og_sha256": "041245bd81f57a624fb65233953ad6501e27175343ac62d0b166d5203d2475fa",
+    "certificate_public": true
+  }
+}

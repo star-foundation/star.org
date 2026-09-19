@@ -1,9 +1,20 @@
 {
-  "generated_at": "2026-09-19T23:26:43.494Z",
-  "count": 6,
-  "unique_stars": 6,
+  "generated_at": "2026-09-19T23:44:37.444Z",
+  "count": 7,
+  "unique_stars": 7,
   "duplicates": [],
   "entries": [
+    {
+      "slug": "hst5hej7k9",
+      "star_id": "HIP-8903",
+      "star_name": "Sheratan",
+      "constellation": "Ari",
+      "magnitude": 2.64,
+      "owner_display_name": "Hello",
+      "anonymous": false,
+      "registered_at": "2026-09-19T23:44:34.074Z",
+      "dedication_message": "Hello Hello Star.org"
+    },
     {
       "slug": "0c7vef2ez5",
       "star_id": "HIP-105502",
