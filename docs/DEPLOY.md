@@ -137,7 +137,8 @@ Events 只勾 `order_created`，Signing secret 保存好（Zapier 侧可用于�
 | `client_payload` 字段 | 取自 | 说明 |
 | --- | --- | --- |
 | `order_id` | `data.id` | **幂等键**：同一订单号永远映射到同一登记编号，重复触发不会占第二颗星 |
-| `display_name` | **`meta.custom_data.display_name`（下单前表单）**；缺省用 `data.attributes.user_name` | 必填；超过 40 字截断 |
+| `display_name` | **`meta.custom_data.display_name`（下单前表单）** | 优先取客户自填的登记名；超过 40 字截断 |
+| `fallback_display_name` | `data.attributes.user_name` | **建议同时映射**：访客绕过落地页、直接打开结算链接时 `custom_data` 为空，此时回退到持卡人姓名，正常付款不会被拒 |
 | `email` | `data.attributes.user_email` | 只用于发证书邮件，绝不写入公开仓库 |
 | `dedication` | **`meta.custom_data.dedication`（下单前表单）** | 选填；超过 100 字截断 |
 | `anonymous` | **`meta.custom_data.anonymous`（下单前表单，勾选为 true）** | 勾选后公开记录与页面不显示称呼 |

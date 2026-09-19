@@ -10,7 +10,15 @@ export function normalizeOrder(input = {}) {
   const cfg = loadConfig();
   const maxDedication = cfg.product.maxDedicationChars || 100;
 
-  const displayName = clean(input.display_name ?? input.displayName ?? '', MAX_DISPLAY_NAME);
+  // 登记名优先用客户在下单前表单自填的（LS 会放进 meta.custom_data → client_payload.display_name）；
+  // 若为空（例如访客绕过落地页、直接打开结算链接下单），回退到 LS 订单里的持卡人姓名
+  // （data.attributes.user_name → client_payload.fallback_display_name），避免正常付款却拒单。
+  const ownName = clean(input.display_name ?? input.displayName ?? '', MAX_DISPLAY_NAME);
+  const fallbackName = clean(
+    input.fallback_display_name ?? input.fallbackDisplayName ?? input.user_name ?? '',
+    MAX_DISPLAY_NAME,
+  );
+  const displayName = ownName || fallbackName;
   if (!displayName) {
     const err = new Error('缺少登记人姓名/称呼（display_name）');
     err.code = 'INVALID_ORDER';

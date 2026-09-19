@@ -62,3 +62,19 @@ test('TC-PAY-06 已付款放行；缺省状态视为可信来源（人工派发�
   assert.equal(normalizeOrder({ display_name: 'Anna', status: 'PAID' }).displayName, 'Anna');
   assert.equal(normalizeOrder({ display_name: 'Anna' }).displayName, 'Anna');
 });
+
+test('TC-PAY-07 表单自填名优先；为空时回退到持卡人姓名（绕过落地页直接下单不拒单）', () => {
+  // 客户自填名存在 → 用它，忽略持卡人名
+  const own = normalizeOrder({ display_name: '星野', fallback_display_name: 'Zhang San' });
+  assert.equal(own.displayName, '星野');
+  // 自填名为空 → 回退到持卡人名，不再以「缺少姓名」拒单
+  const fallback = normalizeOrder({ display_name: '', fallback_display_name: 'Zhang San' });
+  assert.equal(fallback.displayName, 'Zhang San');
+  // user_name 也接受（Zap 里可直接映射 LS 的 User Name）
+  assert.equal(normalizeOrder({ user_name: 'Li Si' }).displayName, 'Li Si');
+  // 两者都空 → 仍然拒单
+  assert.throws(
+    () => normalizeOrder({ display_name: '  ', fallback_display_name: '' }),
+    (err) => err.code === 'INVALID_ORDER',
+  );
+});
