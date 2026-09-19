@@ -1,0 +1,29 @@
+{
+  "slug": "p39pwec7j2",
+  "star_id": "HIP-24608",
+  "owner_display_name": null,
+  "anonymous": true,
+  "dedication_message": "愿你此后的每个夜晚都有星光",
+  "registered_at": "2026-09-19T08:42:20.213Z",
+  "star": {
+    "id": "HIP-24608",
+    "hip": 24608,
+    "hd": 34029,
+    "proper_name": "Capella",
+    "bayer": "Alp",
+    "flam": "13",
+    "constellation": "Aur",
+    "ra": 79.172249,
+    "dec": 45.997991,
+    "magnitude": 0.08,
+    "spectral_type": null,
+    "distance_ly": 42.8
+  },
+  "artifacts": {
+    "certificate": "certificates/p39pwec7j2.pdf",
+    "certificate_sha256": "4f837b25b4d2319ea9c081aece73667d1eecfc88d2f9b71620a7f73129a52a52",
+    "og_image": "og/p39pwec7j2.png",
+    "og_sha256": "92ebed43c1eaf4b1795578823330788ff35c8fed277a520ebe34a2e365bb6b27",
+    "certificate_public": true
+  }
+}

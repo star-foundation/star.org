@@ -1,9 +1,20 @@
 {
-  "generated_at": "2026-09-19T08:38:21.334Z",
-  "count": 5,
-  "unique_stars": 5,
+  "generated_at": "2026-09-19T08:42:22.664Z",
+  "count": 6,
+  "unique_stars": 6,
   "duplicates": [],
   "entries": [
+    {
+      "slug": "p39pwec7j2",
+      "star_id": "HIP-24608",
+      "star_name": "Capella",
+      "constellation": "Aur",
+      "magnitude": 0.08,
+      "owner_display_name": null,
+      "anonymous": true,
+      "registered_at": "2026-09-19T08:42:20.213Z",
+      "dedication_message": "愿你此后的每个夜晚都有星光"
+    },
     {
       "slug": "kg0javv8nn",
       "star_id": "HIP-91262",
