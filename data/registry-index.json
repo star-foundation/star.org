@@ -1,9 +1,20 @@
 {
-  "generated_at": "2026-09-19T12:34:20.995Z",
-  "count": 2,
-  "unique_stars": 2,
+  "generated_at": "2026-09-19T12:52:28.744Z",
+  "count": 3,
+  "unique_stars": 3,
   "duplicates": [],
   "entries": [
+    {
+      "slug": "1sqyxmtg14",
+      "star_id": "HIP-69673",
+      "star_name": "Arcturus",
+      "constellation": "Boo",
+      "magnitude": -0.05,
+      "owner_display_name": "Jun",
+      "anonymous": false,
+      "registered_at": "2026-09-19T12:52:26.610Z",
+      "dedication_message": "Hello Star.org"
+    },
     {
       "slug": "pmzyvftrxf",
       "star_id": "HIP-30438",

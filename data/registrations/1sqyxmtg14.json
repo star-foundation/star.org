@@ -1,0 +1,29 @@
+{
+  "slug": "1sqyxmtg14",
+  "star_id": "HIP-69673",
+  "owner_display_name": "Jun",
+  "anonymous": false,
+  "dedication_message": "Hello Star.org",
+  "registered_at": "2026-09-19T12:52:26.610Z",
+  "star": {
+    "id": "HIP-69673",
+    "hip": 69673,
+    "hd": 124897,
+    "proper_name": "Arcturus",
+    "bayer": "Alp",
+    "flam": "16",
+    "constellation": "Boo",
+    "ra": 213.915456,
+    "dec": 19.18241,
+    "magnitude": -0.05,
+    "spectral_type": "K2III",
+    "distance_ly": 36.7
+  },
+  "artifacts": {
+    "certificate": "certificates/1sqyxmtg14.pdf",
+    "certificate_sha256": "8dc09ca85368ba227e60dca6fb1847ba62da9b74341f3a24321b56ef019835af",
+    "og_image": "og/1sqyxmtg14.png",
+    "og_sha256": "c0987c48dfc0bbac84ddec15747ba53f02268b36fd7645008dadbdcece4f6230",
+    "certificate_public": true
+  }
+}
