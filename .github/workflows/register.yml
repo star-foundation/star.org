@@ -83,7 +83,7 @@ jobs:
           fi
           # pipefail：默认管道只看最后一个命令的退出码，node 失败会被 tee 的成功掩盖，
           # 结果就是"分配失败但步骤显示成功"，运维只能在下个步骤看到莫名的 JSON 解析错误。
-          # 但售罄（退出码 3）是预期内的业务状态，不能让它把整条流水线标红。
+          # 但售罄（3）与未付款订单（5）都是预期内的业务状态，不能把整条流水线标红。
           set +e
           set -o pipefail
           node scripts/register.mjs | tee register-result.json
@@ -91,6 +91,10 @@ jobs:
           set -e
           if [ "$code" = "3" ]; then
             echo "::warning::候选库已售罄，本次未产生登记（已通知运维补货）"
+            exit 0
+          fi
+          if [ "$code" = "5" ]; then
+            echo "::warning::订单未支付成功，本次不登记（用户可能放弃支付或退款）"
             exit 0
           fi
           exit "$code"

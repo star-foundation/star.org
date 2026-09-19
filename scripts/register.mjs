@@ -135,12 +135,17 @@ async function main() {
     if (!args.quiet) process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
     if (result.status === 'sold_out') process.exit(3);
   } catch (error) {
-    await sendOperatorAlert({
-      subject: '[Star.org] 登记流程失败，需人工补单',
-      text: `错误：${error.message}\n来源：${order?.source ?? 'unknown'}\n时间：${new Date().toISOString()}\n堆栈：\n${error.stack}\n\n请用 Lemon Squeezy 后台订单号执行：node scripts/manual-order.mjs --order-id <订单号> --name "<称呼>" --email <邮箱>`,
-    }).catch(() => {});
+    // 未付款订单是正常噪音（用户下单后放弃支付），不值得半夜叫醒运维。
+    if (error.code !== 'UNPAID_ORDER') {
+      await sendOperatorAlert({
+        subject: '[Star.org] 登记流程失败，需人工补单',
+        text: `错误：${error.message}\n来源：${order?.source ?? 'unknown'}\n时间：${new Date().toISOString()}\n堆栈：\n${error.stack}\n\n请用 Lemon Squeezy 后台订单号执行：node scripts/manual-order.mjs --order-id <订单号> --name "<称呼>" --email <邮箱>`,
+      }).catch(() => {});
+    }
     process.stderr.write(`登记失败：${error.message}\n`);
-    process.exit(error.code === 'INVALID_ORDER' ? 4 : 1);
+    if (error.code === 'INVALID_ORDER') process.exit(4);
+    if (error.code === 'UNPAID_ORDER') process.exit(5);
+    process.exit(1);
   }
 }
 

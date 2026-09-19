@@ -141,6 +141,7 @@ Events 只勾 `order_created`，Signing secret 保存好（Zapier 侧可用于�
 | `email` | `data.attributes.user_email` | 只用于发证书邮件，绝不写入公开仓库 |
 | `dedication` | 结算页「献词」自定义字段 | 选填；超过 100 字自动截断 |
 | `anonymous` | 结算页「匿名展示」自定义字段（勾选为 true） | 勾选后公开记录与页面不显示称呼 |
+| `status` | `data.attributes.status` | **务必映射**：只有 `paid` 才登记。`order_created` 在订单创建时就触发，pending / failed / refunded 都会来，流水线以退出码 5 拒绝（不提交、不告警）。状态判断放在代码里而不是 Zapier 的 Filter 步骤，是为了让免费版的两步 Zap 也够用 |
 
 > 结算页自定义字段落在载荷的哪个位置，取决于 Lemon Squeezy 后台的字段配置方式；
 > 官方文档明确的是「通过结算链接传入的自定义数据」出现在 `meta.custom_data`。
@@ -171,6 +172,7 @@ Events 只勾 `order_created`，Signing secret 保存好（Zapier 侧可用于�
       "email": "<user_email>",
       "dedication": "<献词，可为空>",
       "anonymous": false,
+      "status": "<data.attributes.status>",
       "source": "lemon-squeezy"
     }
   }
@@ -199,6 +201,7 @@ gh api --method POST repos/star-foundation/star.org/dispatches \
 | 正常 | 产生一次 `登记 <slug>` 提交（证书 PDF + OG 图 + 记录），候选库少一颗 |
 | 同一订单号再派发一次 | 仍然是同一个登记编号，**不会占第二颗星** |
 | 缺 `display_name` | 以退出码 4 失败，**不产生任何提交** |
+| `status` 不是 paid | 退出码 5，标为 warning 并跳过提交（不告警：放弃支付是正常噪音） |
 | 候选库售罄 | 退出码 3，标为 warning 并跳过提交（同时发运维告警） |
 
 > 自测产生的记录记得清理：删除 `data/registrations/<slug>.json`、`certificates/<slug>.pdf`、

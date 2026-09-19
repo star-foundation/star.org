@@ -46,3 +46,19 @@ test('姓名必填且被清洗（去标签、限长）', () => {
 test('邮箱格式非法时拒绝下单', () => {
   assert.throws(() => normalizeOrder({ display_name: 'Anna', email: 'not-an-email' }), /邮箱格式不正确/);
 });
+
+test('TC-PAY-05 未支付成功的订单不占用恒星（pending / failed / refunded）', () => {
+  for (const status of ['pending', 'failed', 'refunded', 'void', 'cancelled']) {
+    assert.throws(
+      () => normalizeOrder({ display_name: 'Anna', status }),
+      (err) => err.code === 'UNPAID_ORDER',
+      `status=${status} 应被拒绝`,
+    );
+  }
+});
+
+test('TC-PAY-06 已付款放行；缺省状态视为可信来源（人工派发补单）', () => {
+  assert.equal(normalizeOrder({ display_name: 'Anna', status: 'paid' }).displayName, 'Anna');
+  assert.equal(normalizeOrder({ display_name: 'Anna', status: 'PAID' }).displayName, 'Anna');
+  assert.equal(normalizeOrder({ display_name: 'Anna' }).displayName, 'Anna');
+});

@@ -2,6 +2,9 @@ import { loadConfig } from './config.mjs';
 
 export const MAX_DISPLAY_NAME = 40;
 
+/** 视为"已付款"的订单状态（Lemon Squeezy 正常为 paid）。 */
+export const PAID_STATUSES = new Set(['paid', 'succeeded', 'completed']);
+
 /** 归一化订单信息。邮箱与订单号只在此处短暂存在，绝不写入公开文件。 */
 export function normalizeOrder(input = {}) {
   const cfg = loadConfig();
@@ -11,6 +14,17 @@ export function normalizeOrder(input = {}) {
   if (!displayName) {
     const err = new Error('缺少登记人姓名/称呼（display_name）');
     err.code = 'INVALID_ORDER';
+    throw err;
+  }
+
+  // Lemon Squeezy 的 order_created 在订单创建时就触发，状态可能是 pending / failed /
+  // refunded……只有真正付过款的才该占一颗星。这里做代码层校验，Zapier/Make 侧就不必
+  // 再挂一个 Filter 步骤（免费版只允许两步 Zap，能少一步就少一步依赖）。
+  // 字段缺省（人工派发补单、本地测试）时视为可信来源，不拦。
+  const status = String(input.status ?? input.order_status ?? '').trim().toLowerCase();
+  if (status && !PAID_STATUSES.has(status)) {
+    const err = new Error(`订单未支付成功（status=${status}），拒绝登记`);
+    err.code = 'UNPAID_ORDER';
     throw err;
   }
 
