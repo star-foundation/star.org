@@ -124,3 +124,26 @@ test('TC-LP-14 付款完成等待页 /thanks/：可回站、带订单号提示�
     sandbox.cleanup();
   }
 });
+
+test('TC-REG-06 公开登记表显示候选库进度：百分比与进度条随登记数变化', () => {
+  // poolSize=4 且预置 1 颗已分配 → 登记表已有 1 条；再登记 1 条后应为 2/4 = 50%
+  const sandbox = createSandbox({ availableStars: 3, poolSize: 4 });
+  try {
+    const reg = runScript('register.mjs', [], {
+      sandbox,
+      input: JSON.stringify({ order_id: 'PROG-1', display_name: '进度测试', status: 'paid' }),
+    });
+    assert.equal(reg.status, 0, reg.stderr);
+    const built = runScript('build-site.mjs', [], { sandbox, env: NO_CHROME });
+    assert.equal(built.status, 0, built.stderr);
+    const html = readFileSync(path.join(sandbox.siteOut, 'registry', 'index.html'), 'utf8');
+    assert.ok(html.includes('class="progress-track"'), '应有进度条');
+    assert.ok(html.includes('role="progressbar"'), '进度条应带无障碍语义');
+    assert.ok(html.includes('aria-valuenow="50"'), '2/4 应算出 50%，实际：' + (html.match(/aria-valuenow="[^"]*"/) || [])[0]);
+    assert.ok(html.includes('>50%<'), '应显示 50% 文字');
+    assert.ok(html.includes('2 / 4'), '应显示 已登记/总数');
+    assert.ok(/最近 7 天新增\s*<strong>2<\/strong>/.test(html), '应统计最近 7 天新增');
+  } finally {
+    sandbox.cleanup();
+  }
+});

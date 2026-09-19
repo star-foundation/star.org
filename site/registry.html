@@ -47,10 +47,26 @@
       </div>
       {{/unless}}
 
-      <div class="grid grid-3" style="margin-bottom:30px;">
+      <div class="grid grid-3" style="margin-bottom:22px;">
         <div class="card soft"><div class="num">{{registryCount}}</div><div class="stat">已登记记录</div></div>
         <div class="card soft"><div class="num">{{availableCount}}</div><div class="stat">候选库剩余可登记</div></div>
         <div class="card soft"><div class="num">{{poolTotal}}</div><div class="stat">候选库总恒星数</div></div>
+      </div>
+
+      <div class="progress-card">
+        <div class="progress-head">
+          <span>候选库登记进度</span>
+          <span class="mono">{{progressLabel}}　<strong>{{progressPercent}}%</strong></span>
+        </div>
+        <div class="progress-track" role="progressbar" aria-label="候选库登记进度"
+             aria-valuenow="{{progressPercent}}" aria-valuemin="0" aria-valuemax="100">
+          <div class="progress-fill" style="width: {{progressPercent}}%"></div>
+        </div>
+        <div class="progress-foot">
+          已登记 <strong>{{registryCount}}</strong> 颗，还剩 <strong>{{availableCount}}</strong> 颗可登记；
+          最近 7 天新增 <strong>{{recentCount7d}}</strong> 颗。
+          登记进度按"已登记 / 候选库总数"计算，补货后总数会随之增长。
+        </div>
       </div>
 
       <h2>怎么算核实成功</h2>

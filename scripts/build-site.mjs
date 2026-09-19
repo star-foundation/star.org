@@ -161,6 +161,14 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
   writeFileAtomic(path.join(outDir, 'thanks', 'index.html'), relativize(thanksHtml, 1));
 
   // 公开登记表
+  // 登记进度：候选库被登记掉的比例 + 最近 7 天新增（给公开登记表一个直观的进度感）
+  const progressTotal = pool.stars.length || 1;
+  const progressPercent = Math.round((index.count / progressTotal) * 1000) / 10;
+  const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+  const recentCount7d = index.entries.filter((entry) => {
+    const t = Date.parse(entry.registered_at || '');
+    return Number.isFinite(t) && t >= sevenDaysAgo;
+  }).length;
   const registryHtml = render(tpl('registry.html'), {
     ...common,
     entries: index.entries,
@@ -168,6 +176,9 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
     hasDuplicates: index.duplicates.length > 0,
     indexJsonUrl: `${cfg.site.baseUrl}/data/registry-index.json`,
     generatedAt: index.generated_at,
+    progressPercent,
+    progressLabel: `${index.count} / ${progressTotal}`,
+    recentCount7d,
   });
   ensureDir(path.join(outDir, 'registry'));
   writeFileAtomic(path.join(outDir, 'registry', 'index.html'), relativize(registryHtml, 1));
