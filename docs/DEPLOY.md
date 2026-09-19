@@ -191,7 +191,7 @@ Events 只勾 `order_created`，Signing secret 保存好（Zapier 侧可用于�
 1. Trigger 选 `Webhooks by Zapier → Catch Hook`，复制 URL 填到 Lemon Squeezy Webhook。
 2. Lemon Squeezy 开 Test Mode，用测试卡下一单。
 3. 回 Zapier 点 **Find new records**，看真实载荷，按 4.2 的表把字段映射好。
-4. 用 **Test action** 发一次，去 GitHub Actions 页面确认 `认领（支付成功后自动执行）` 跑起来了。
+4. 用 **Test action** 发一次，去 GitHub Actions 页面确认 `Claim registration (runs after successful payment)` 跑起来了。
 
 ### 4.4 Action：调用 GitHub repository_dispatch
 
@@ -252,7 +252,7 @@ gh api --method POST repos/star-foundation/star.org/dispatches \
   -f client_payload[email]=you@example.com
 ```
 
-派发后到 Actions 页面看 `认领（支付成功后自动执行）`：
+派发后到 Actions 页面看 `Claim registration (runs after successful payment)`：
 
 | 载荷 | 预期结果 |
 | --- | --- |

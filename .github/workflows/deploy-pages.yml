@@ -1,4 +1,4 @@
-name: 构建并发布站点（GitHub Pages）
+name: Build and deploy site (GitHub Pages)
 
 on:
   push:
@@ -19,7 +19,7 @@ on:
   # 上面的 on:push（否则无限循环），所以客户认领后站点不会自动重建、页面一直 404。
   # 因此必须用 workflow_run 在「认领」跑完后强制重建（下面 build job 再按是否成功过滤）。
   workflow_run:
-    workflows: [认领（支付成功后自动执行）]
+    workflows: [Claim registration (runs after successful payment)]
     types: [completed]
   workflow_dispatch:
 
@@ -42,21 +42,21 @@ jobs:
       # 镜像自带 Node 22（满足 package.json 的 engines: >=20），
       # 原先 setup-node 请求 Node 20 不在镜像缓存里，每次要下载一遍（实测 5s）。
       # 这里改为直接用镜像的 Node，并显式断言版本，避免悄悄跑在过旧的运行时上。
-      - name: 确认 Node 版本
+      - name: Verify Node version
         run: |
           node --version
           node -e "const major = Number(process.versions.node.split('.')[0]); if (major < 20) { console.error('Node 版本过低：' + process.versions.node); process.exit(1); }"
-      - name: 准备渲染环境（中文字体 + Chrome）
+      - name: Set up render environment (Chrome + bundled CJK fonts)
         uses: ./.github/actions/setup-render-env
-      - name: 生成静态站点
+      - name: Build static site
         env:
           SITE_BASE_URL: ${{ vars.SITE_BASE_URL || 'https://star.org' }}
           LEMON_SQUEEZY_CHECKOUT_URL: ${{ vars.LEMON_SQUEEZY_CHECKOUT_URL }}
           REGISTRY_REPO_URL: ${{ github.server_url }}/${{ github.repository }}
         run: |
-          if [ ! -x "${CHROME_PATH:-}" ]; then echo "::warning::Chrome 不可用，将跳过默认 OG 图渲染"; fi
+          if [ ! -x "${CHROME_PATH:-}" ]; then echo "::warning::Chrome unavailable; skipping the default OG image render"; fi
           node scripts/build-site.mjs
-      - name: 上线前自检（认领表完整性 + 合规文案）
+      - name: Pre-deploy self-check (registry integrity + compliance copy)
         run: |
           node scripts/verify-registry.mjs
           node scripts/check-compliance.mjs

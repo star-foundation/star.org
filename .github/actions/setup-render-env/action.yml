@@ -1,32 +1,39 @@
-name: 准备渲染环境（Chrome + 内置中文字体）
+name: Set up render environment (Chrome + bundled CJK fonts)
 description: >-
-  证书 PDF 与 OG 分享图靠无头 Chrome 渲染，中文靠仓库内置的字体子集。
-  两个前提决定了这里的做法：
-    1. ubuntu-latest 镜像**已预装 Google Chrome**（见 actions/runner-images 的
-       Ubuntu2404-Readme），每次再 apt 装一遍纯属浪费；
-    2. 中文字体**随仓库内置**（assets/fonts，约 12.5MB 的裁剪子集，见 DECISIONS D10）。
-      镜像里没有中文字体，原先每次 CI 都 apt 安装 fonts-noto-cjk（多语言全量版，
-      约 60MB）并缓存——那让"证书长什么样"依赖运行环境是否装过字体。
-      改为内置后渲染完全确定、离线可复现，这一步不再需要任何网络与安装。
-  三个 workflow 共用这一份逻辑，避免再次出现"某一份悄悄走偏"——register.yml
-  曾误用 snap 占位包 chromium-browser，导致第一笔真实订单会卡在生成证书。
+  Renders the certificate PDF and OG share image with headless Chrome, and
+  renders Chinese with a font subset bundled in this repository.
+  Two facts drive the approach here:
+    1. The ubuntu-latest runner image **already ships Google Chrome** (see
+       actions/runner-images, Ubuntu2404-Readme), so installing it on every run
+       is pure waste;
+    2. The CJK fonts are **bundled in the repository** (fonts/, a ~12.5MB
+       trimmed subset - see DECISIONS D10). The runner image has no CJK fonts,
+       and this workflow used to apt-install fonts-noto-cjk (the full
+       multilingual build, ~60MB) and cache it on every run, which made
+       "what the certificate looks like" depend on the runner environment.
+       Bundling makes rendering fully deterministic and reproducible offline,
+       so this step no longer needs any network access or installation.
+  All three workflows share this single piece of logic, so one copy can never
+  quietly drift again - register.yml once used the snap placeholder package
+  chromium-browser, which meant the first real order would stall while
+  generating its certificate.
 
 outputs:
   chrome-path:
-    description: 可用的 Chrome 可执行文件路径
+    description: Path to the usable Chrome executable
     value: ${{ steps.detect.outputs.path }}
 
 runs:
   using: composite
   steps:
-    - name: 定位 Chrome（优先复用镜像预装）
+    - name: Locate Chrome (reuse the runner image copy when possible)
       id: detect
       shell: bash
       run: |
         set -euo pipefail
         for candidate in "${CHROME_PATH:-}" /usr/bin/google-chrome /usr/bin/google-chrome-stable /opt/google/chrome/chrome; do
           if [ -n "$candidate" ] && [ -x "$candidate" ]; then
-            echo "复用镜像预装的 Chrome：$candidate"
+            echo "Reusing the Chrome preinstalled in the runner image: $candidate"
             "$candidate" --version
             echo "path=$candidate" >> "$GITHUB_OUTPUT"
             # 统一导出给后续步骤，避免每个 workflow 各写一份路径（写错就整条链路失败）
@@ -35,7 +42,7 @@ runs:
           fi
         done
 
-        echo "::warning::未找到预装 Chrome，回退到官方 apt 源安装（较慢）"
+        echo "::warning::No preinstalled Chrome found; falling back to installing from the official apt repository (slower)"
         # 注意：gpg 不能以 sudo 运行（无 TTY 时会报 cannot open /dev/tty），
         # 改为普通用户解钥、再用 sudo install 落盘。
         wget -q -O /tmp/google-chrome.pub https://dl-ssl.google.com/linux/linux_signing_key.pub
@@ -49,13 +56,13 @@ runs:
         echo "CHROME_PATH=/usr/bin/google-chrome" >> "$GITHUB_ENV"
         /usr/bin/google-chrome --version
 
-    - name: 校验渲染环境可用
+    - name: Validate the render environment
       shell: bash
       run: |
         set -euo pipefail
 
         if [ ! -x "${CHROME_PATH:-}" ]; then
-          echo "::error::CHROME_PATH=${CHROME_PATH:-<未设置>} 不可执行，证书与 OG 图将无法渲染"
+          echo "::error::CHROME_PATH=${CHROME_PATH:-<unset>} is not executable; certificates and OG images cannot be rendered"
           exit 1
         fi
         echo "Chrome：$CHROME_PATH"

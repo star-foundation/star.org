@@ -1,4 +1,4 @@
-name: 自检（测试用例 + 合规扫描）
+name: Verify (tests + compliance)
 
 on:
   push:
@@ -22,28 +22,28 @@ jobs:
       # 镜像自带 Node 22（满足 package.json 的 engines: >=20），
       # 原先 setup-node 请求 Node 20 不在镜像缓存里，每次要下载一遍（实测 5s）。
       # 这里改为直接用镜像的 Node，并显式断言版本，避免悄悄跑在过旧的运行时上。
-      - name: 确认 Node 版本
+      - name: Verify Node version
         run: |
           node --version
           node -e "const major = Number(process.versions.node.split('.')[0]); if (major < 20) { console.error('Node 版本过低：' + process.versions.node); process.exit(1); }"
-      - name: 准备渲染环境（中文字体 + Chrome）
+      - name: Set up render environment (Chrome + bundled CJK fonts)
         uses: ./.github/actions/setup-render-env
-      - name: 登记表自检（TC-REG-03 / TC-REG-04）
+      - name: Registry self-check (TC-REG-03 / TC-REG-04)
         run: node scripts/verify-registry.mjs
-      - name: 合规文案扫描（TC-COMP-01~04）
+      - name: Compliance copy scan (TC-COMP-01~04)
         run: node scripts/check-compliance.mjs
-      - name: 密钥与隐私扫描（公开仓库不得出现密钥或订单隐私）
+      - name: Secrets and privacy scan (no keys or order PII in the public repo)
         run: node scripts/check-secrets.mjs
-      - name: 测试用例（含 TC-ALLOC-03 防超卖并发测试 3 轮）
+      - name: Test suite (including 3 rounds of the TC-ALLOC-03 oversell concurrency test)
         run: |
           # Chrome 路径由 setup-render-env 统一导出；缺失时给出明确提示而不是让测试莫名失败
-          if [ ! -x "${CHROME_PATH:-}" ]; then echo "::error::Chrome 不可用：${CHROME_PATH:-<未设置>}"; exit 1; fi
+          if [ ! -x "${CHROME_PATH:-}" ]; then echo "::error::Chrome unavailable: ${CHROME_PATH:-<unset>}"; exit 1; fi
           npm test
-      - name: 候选库状态
+      - name: Star pool status
         run: |
           node -e "
           const pool = require('./data/stars_pool.json');
           const available = pool.stars.filter((s) => s.status === 'available').length;
           console.log('候选库总数', pool.stars.length, '可登记', available);
-          if (available < 50) console.log('::warning::候选库剩余不足 50 颗，请及时扩充 stars_pool.json');
+          if (available < 50) console.log('::warning::Fewer than 50 stars remain; please restock stars_pool.json soon');
           "

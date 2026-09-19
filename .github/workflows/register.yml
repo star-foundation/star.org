@@ -1,4 +1,4 @@
-name: 认领（支付成功后自动执行）
+name: Claim registration (runs after successful payment)
 
 # 触发方式：
 #   1. repository_dispatch —— Lemon Squeezy Webhook → Zapier/Make → GitHub API（正式链路）
@@ -9,19 +9,19 @@ on:
   workflow_dispatch:
     inputs:
       order_id:
-        description: '订单号（Lemon Squeezy 订单 ID，用于幂等与补单追溯）'
+        description: 'Order ID (Lemon Squeezy order ID; used for idempotency and manual re-issue tracing)'
         required: false
       display_name:
-        description: '认领人姓名/称呼（会展示在证书与永久页面）'
+        description: 'Claimer name (shown on the certificate and the permanent page)'
         required: true
       email:
-        description: '接收证书的邮箱'
+        description: 'Email address that receives the certificate'
         required: false
       dedication:
-        description: '献词（选填，超过 100 字自动截断）'
+        description: 'Dedication (optional; truncated beyond 100 characters)'
         required: false
       anonymous:
-        description: '匿名展示（true/false）'
+        description: 'Show anonymously (true/false)'
         required: false
         default: 'false'
 
@@ -38,7 +38,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - name: 取出仓库
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           # 只需要最新一份树；完整历史会随每次认领提交的证书与 OG 图（约 600KB/笔）
@@ -49,7 +49,7 @@ jobs:
       # 镜像自带 Node 22（满足 package.json 的 engines: >=20），
       # 原先 setup-node 请求 Node 20 不在镜像缓存里，每次要下载一遍（实测 5s）。
       # 这里改为直接用镜像的 Node，并显式断言版本，避免悄悄跑在过旧的运行时上。
-      - name: 确认 Node 版本
+      - name: Verify Node version
         run: |
           node --version
           node -e "const major = Number(process.versions.node.split('.')[0]); if (major < 20) { console.error('Node 版本过低：' + process.versions.node); process.exit(1); }"
@@ -57,10 +57,10 @@ jobs:
       # 证书 PDF 与 OG 图都靠无头 Chrome 渲染。这里原先装的是 chromium-browser，
       # 而 Ubuntu 24.04 上那只是 snap 占位包，渲染必然失败——第一笔真实订单会卡在
       # 生成证书这一步。改为与另外两个 workflow 共用同一份安装逻辑。
-      - name: 准备渲染环境（中文字体 + Chrome）
+      - name: Set up render environment (Chrome + bundled CJK fonts)
         uses: ./.github/actions/setup-render-env
 
-      - name: 分配恒星 · 生成证书与 OG 图 · 发送邮件
+      - name: Allocate star, render certificate and OG image, send email
         env:
           # Webhook 载荷（Zapier/Make 通过 client_payload 传入）
           STARORG_ORDER_JSON: ${{ toJSON(github.event.client_payload) }}
@@ -95,41 +95,41 @@ jobs:
           code=$?
           set -e
           if [ "$code" = "3" ]; then
-            echo "::warning::候选库已售罄，本次未产生认领（已通知运维补货）"
+            echo "::warning::Star pool is sold out; no claim was created (the operator has been notified to restock)"
             exit 0
           fi
           if [ "$code" = "5" ]; then
-            echo "::warning::订单未支付成功，本次不认领（用户可能放弃支付或退款）"
+            echo "::warning::Order was not paid successfully; no claim was created (the customer may have abandoned payment or asked for a refund)"
             exit 0
           fi
           exit "$code"
 
-      - name: 提交认领记录（每次认领产生一次独立 commit）
+      - name: Commit the claim record (one independent commit per claim)
         run: |
           if [ ! -s register-result.json ]; then
-            echo "::error::未产生认领结果（载荷不合法或分配失败），本次不提交任何内容，请查看上一步日志"
+            echo "::error::No claim result was produced (invalid payload or allocation failure). Nothing will be committed; see the previous step log"
             exit 1
           fi
           SLUG=$(node -e "const r=require('./register-result.json'); console.log(r.slug||'')")
-          if [ -z "$SLUG" ]; then echo "未产生认领（可能候选库售罄），跳过提交"; exit 0; fi
+          if [ -z "$SLUG" ]; then echo "No claim produced (the pool may be sold out); skipping commit"; exit 0; fi
           git config user.name "star-org-bot"
           git config user.email "bot@star.org"
           git add data/stars_pool.json data/registrations data/registry-index.json certificates og
           if git diff --cached --quiet; then
-            echo "没有变化，跳过提交"
+            echo "No changes; skipping commit"
           else
             git commit -m "认领 $SLUG"
             # 提交期间可能有别的提交进到 main（人工修数据、另一次认领），
             # 直接 push 会被拒；先 rebase 再推，避免认领记录白白丢掉。
             for attempt in 1 2 3; do
               if git push; then break; fi
-              echo "第 $attempt 次 push 失败，同步远端后重试"
+              echo "Push attempt $attempt failed; syncing with the remote and retrying"
               git pull --rebase --autostash origin main
-              [ "$attempt" = "3" ] && { echo "::error::连续 3 次推送失败，认领记录未提交，请人工补单"; exit 1; }
+              [ "$attempt" = "3" ] && { echo "::error::Push failed 3 times in a row; the claim record was not committed. Please re-issue manually"; exit 1; }
             done
           fi
 
-      - name: 失败时留档（便于人工补单）
+      - name: Archive on failure (for manual re-issue)
         if: failure()
         uses: actions/upload-artifact@v4
         with:
