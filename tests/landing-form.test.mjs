@@ -240,3 +240,67 @@ test('TC-STAR-02 SIMBAD 链接在缺少 HIP 编号时依次回退到 HD、坐标
   // HIP 优先于 HD
   assert.ok(simbadUrl({ hip: 1, hd: 2 }).includes('HIP+1'));
 });
+
+test('TC-LP-16 落地页「最近一次登记」展示真实星体、登记人与献词', () => {
+  const sandbox = createSandbox({ availableStars: 3, poolSize: 5 });
+  try {
+    const reg = runScript('register.mjs', [], {
+      sandbox,
+      input: JSON.stringify({
+        order_id: 'LATEST-1', display_name: '张三', dedication: '愿你抬头就能看见', status: 'paid',
+      }),
+    });
+    assert.equal(reg.status, 0, reg.stderr);
+    const built = runScript('build-site.mjs', [], { sandbox, env: NO_CHROME });
+    assert.equal(built.status, 0, built.stderr);
+    const html = readFileSync(path.join(sandbox.siteOut, 'index.html'), 'utf8');
+    assert.ok(html.includes('最近一次登记'), '应显示「最近一次登记」标题');
+    assert.ok(!html.includes('（示例数据）'), '有真实登记时不应再称示例数据');
+    assert.ok(html.includes('最新记录 ' + reg.json.slug), '应标注最新登记编号');
+    assert.ok(html.includes('张三'), '应展示登记人');
+    assert.ok(html.includes('愿你抬头就能看见'), '应展示献词');
+    const starId = String(reg.json.star_id).replace('HIP-', '');
+    assert.ok(html.includes('HIP-' + starId), '应展示真实恒星标识');
+    assert.ok(html.includes('/s/' + reg.json.slug + '/'), '应链接到该登记的永久页面');
+    assert.ok(html.includes('https://simbad.cds.unistra.fr/simbad/sim-id?Ident=HIP+' + starId), '应带 SIMBAD 核实链接');
+    assert.ok(!html.includes('织女星'), '不应再出现虚构的织女星');
+  } finally {
+    sandbox.cleanup();
+  }
+});
+
+test('TC-LP-17 最新登记为匿名时，落地页只显示「匿名登记人」', () => {
+  const sandbox = createSandbox({ availableStars: 3, poolSize: 5 });
+  try {
+    const reg = runScript('register.mjs', [], {
+      sandbox,
+      input: JSON.stringify({
+        order_id: 'LATEST-ANON', display_name: '李四', dedication: '致自己', anonymous: true, status: 'paid',
+      }),
+    });
+    assert.equal(reg.status, 0, reg.stderr);
+    const built = runScript('build-site.mjs', [], { sandbox, env: NO_CHROME });
+    assert.equal(built.status, 0, built.stderr);
+    const html = readFileSync(path.join(sandbox.siteOut, 'index.html'), 'utf8');
+    assert.ok(html.includes('匿名登记人'), '匿名登记应显示「匿名登记人」');
+    assert.ok(!html.includes('李四'), '匿名登记不得泄漏姓名到落地页');
+    assert.ok(html.includes('致自己'), '献词是公开内容，匿名时仍应展示');
+  } finally {
+    sandbox.cleanup();
+  }
+});
+
+test('TC-LP-18 没有任何登记时回退到内置示例并明确标注「示例数据」', () => {
+  const sandbox = createSandbox({ availableStars: 5, poolSize: 5 });
+  try {
+    const built = runScript('build-site.mjs', [], { sandbox, env: NO_CHROME });
+    assert.equal(built.status, 0, built.stderr);
+    const html = readFileSync(path.join(sandbox.siteOut, 'index.html'), 'utf8');
+    assert.ok(html.includes('你会拿到什么'), '无登记时应回退到示例标题');
+    assert.ok(html.includes('（示例数据）'), '回退时必须标明是示例数据');
+    assert.ok(html.includes('织女星'), '回退示例仍用织女星');
+    assert.ok(!html.includes('最近一次登记'), '无登记时不应谎称有最新登记');
+  } finally {
+    sandbox.cleanup();
+  }
+});

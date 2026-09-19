@@ -52,8 +52,48 @@ export function relativize(html, depth) {
   );
 }
 
-function sampleView(cfg) {
+/**
+ * 落地页「你会拿到什么」展示的内容。
+ *
+ * 优先展示**最近一条真实登记**（含登记人与献词）——既是社会证明，也让访客在购买前
+ * 看到真实交付物，而不是一个虚构样例。没有登记记录时回退到内置示例并明确标注「示例数据」。
+ */
+function sampleView(cfg, records = []) {
+  const latest = records[0] ?? null;
+  if (latest) {
+    const view = buildStarView({
+      star: latest.star,
+      record: latest,
+      slug: latest.slug,
+      baseUrl: cfg.site.baseUrl,
+      registryUrl: `${cfg.site.baseUrl}/registry/`,
+      certificateUrl: certificateUrl(latest.slug),
+      ogImageUrl: ogImageUrl(latest.slug),
+      certificatePublic: latest.artifacts?.certificate_public !== false,
+    });
+    return {
+      isReal: true,
+      starId: view.starId,
+      starTitle: view.starTitle,
+      starSubtitle: view.starSubtitle,
+      raText: view.raText,
+      decText: view.decText,
+      magnitudeText: view.magnitudeText,
+      distanceText: view.distanceText,
+      spectralText: view.spectralText,
+      // 匿名登记不展示姓名（与登记表、永久页一致）
+      displayName: view.anonymous ? '匿名登记人' : view.displayName,
+      anonymous: view.anonymous,
+      dedication: view.dedication,
+      registeredDateZh: view.registeredDateZh,
+      slug: view.slug,
+      permalink: view.permalink,
+      simbadUrl: view.simbadUrl,
+      simbadIdent: view.simbadIdent,
+    };
+  }
   return {
+    isReal: false,
     starId: 'HIP-91262',
     starTitle: '织女星',
     starSubtitle: '天琴座 α · Vega · HD 172167 · HIP-91262',
@@ -63,9 +103,13 @@ function sampleView(cfg) {
     distanceText: '25.0 光年',
     spectralText: 'A0V',
     displayName: 'For Anna',
+    anonymous: false,
     dedication: '愿你在每一个抬头看天的夜晚，都能找到属于自己的那一颗。',
     registeredDateZh: '2026年9月20日',
+    slug: 'sample',
     permalink: `${cfg.site.baseUrl}/s/sample`,
+    simbadUrl: `https://simbad.cds.unistra.fr/simbad/sim-id?Ident=HIP+91262`,
+    simbadIdent: 'HIP 91262',
   };
 }
 
@@ -75,7 +119,9 @@ async function buildDefaultOg(cfg, outDir) {
   try {
     renderPng(
       renderOgHtml({
-        ...sampleView(cfg),
+        // 默认 OG 图保持固定的示例内容：社交平台会缓存 OG 图，跟着最新登记变动
+        // 会让卡片反复失效。真实的最新登记展示在落地页正文里。
+        ...sampleView(cfg, []),
         slug: 'star-org',
         starFieldSvg: '',
         tagline: cfg.site.tagline,
@@ -150,7 +196,7 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
   // 落地页
   const landing = render(tpl('index.html'), {
     ...common,
-    sample: sampleView(cfg),
+    sample: sampleView(cfg, records),
     registryPreview: index.entries.slice(0, 5),
   });
   writeFileAtomic(path.join(outDir, 'index.html'), relativize(landing, 0));

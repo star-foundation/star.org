@@ -93,11 +93,20 @@
 
   <section id="sample">
     <div class="wrap">
+      {{#if sample.isReal}}
+      <h2>最近一次登记</h2>
+      <p class="section-lede">
+        这是最新完成的一笔真实登记（第 {{registryCount}} 颗），任何人都可以点进去核实；
+        它也是你付款后会拿到的页面的真实样子。
+      </p>
+      {{/if}}
+      {{#unless sample.isReal}}
       <h2>你会拿到什么</h2>
       <p class="section-lede">下面是一份永久链接页面的样式示例（示例数据），购买前就可以先看清楚最终交付物长什么样。</p>
+      {{/unless}}
       <div class="sample">
         <div class="sample-head">
-          <div class="kicker">恒星登记 · 永久链接页面示例</div>
+          <div class="kicker">{{#if sample.isReal}}恒星登记 · 最新记录 {{sample.slug}}{{/if}}{{#unless sample.isReal}}恒星登记 · 永久链接页面示例{{/unless}}</div>
           <h3>{{sample.starTitle}}</h3>
           <div class="sub">{{sample.starSubtitle}}</div>
         </div>
@@ -109,7 +118,15 @@
           <div><dt>登记人</dt><dd>{{sample.displayName}}</dd></div>
           <div><dt>登记日期</dt><dd>{{sample.registeredDateZh}}</dd></div>
         </div>
+        {{#if sample.dedication}}
         <div class="sample-quote">「{{sample.dedication}}」</div>
+        {{/if}}
+        {{#if sample.isReal}}
+        <p class="muted" style="padding:0 24px 20px;font-size:13.5px;">
+          <a href="{{sample.permalink}}">查看这条登记的完整页面 →</a>
+          {{#if sample.simbadUrl}}· <a href="{{sample.simbadUrl}}" target="_blank" rel="noopener noreferrer">在 SIMBAD 核实 {{sample.simbadIdent}} ↗</a>{{/if}}
+        </p>
+        {{/if}}
       </div>
       <p style="margin-top:20px;">
         {{#if latestUrl}}<a class="btn btn-ghost" href="{{latestUrl}}">查看一条真实登记记录</a>{{/if}}

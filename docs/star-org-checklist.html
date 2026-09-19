@@ -247,7 +247,7 @@
   <header>
     <h1>⭐ Star.org 开发进度 CheckList</h1>
     <p class="subtitle">依据《技术需求说明书 v0.2》《产品需求文档 v1.0》《测试用例说明书 v1.0》整理 · 勾选状态自动保存在本机浏览器</p>
-    <p class="meta-line">进度已同步至代码仓库当前实现：72 个自动化测试全部通过，端到端验收、登记表自检与合规扫描均通过；站点已绑定 www.star.org 并开启购买入口；下单前登记表单（姓名/献词/匿名）已上线，LS→Zapier→GitHub 全链路已用真实订单验证。</p>
+    <p class="meta-line">进度已同步至代码仓库当前实现：75 个自动化测试全部通过，端到端验收、登记表自检与合规扫描均通过；站点已绑定 www.star.org 并开启购买入口；下单前登记表单（姓名/献词/匿名）已上线，LS→Zapier→GitHub 全链路已用真实订单验证。</p>
   </header>
 
   <div class="progress-card">
@@ -441,7 +441,7 @@ const DATA = [
     days: "已完成",
     desc: "代码实现之外的验证证据：测试、端到端、合规、数据核对",
     items: [
-      { t: "72 个自动化测试全部通过（npm test）", tag: "", done: true,
+      { t: "75 个自动化测试全部通过（npm test）", tag: "", done: true,
         note: "覆盖 TC-ALLOC / TC-PDF / TC-PAGE / TC-REG / TC-MAIL / TC-COMP / TC-PAY / TC-LP / TC-ERR" },
       { t: "防超卖并发测试连续 3 轮通过", tag: "", done: true,
         note: "6 个真实子进程抢 1 颗星：恰好 1 笔成功、5 笔判定售罄、零重复记录" },
@@ -465,6 +465,8 @@ const DATA = [
         note: "根因：register.yml 用默认 GITHUB_TOKEN 推提交，GitHub 防循环机制下这种提交不触发 on:push，所以客户登记后永久链接页/证书一直 404。已在 deploy-pages.yml 加 workflow_run 监听「登记」工作流、成功完成后强制重建，并用真实派发验证：登记跑完自动出现 event=workflow_run 的部署并把新登记发布上线" },
       { t: "下单前登记表单（姓名 / 献词 / 匿名），解决 LS 无自定义字段的产品缺口", tag: "p0", done: true,
         note: "【真实链路联调又暴露并修掉一个缺陷】Lemon Squeezy 的 custom data 值都是字符串，登记页传来的匿名开关是 \"false\" 字符串，而 normalizeOrder 用 Boolean() 判断——字符串 \"false\" 是真值，导致没勾匿名的订单被当成匿名、错误隐藏客户名字。现新增 parseBool() 识别 true/false 与 \"1\"/\"0\"/\"yes\"/\"是\" 等写法（TC-PAY-08 覆盖 11 种取值）。Lemon Squeezy 结算页不收集自定义字段（该需求在其反馈板挂了四年未实现），导致客户自填的登记名/献词/匿名没有来源、证书只能退化成持卡人姓名，且违反 PRD 5.4 的匿名选择权。已在落地页加入登记表单，提交时把三个值作为 ?checkout[custom][...] 拼进结算链接（LS 官方支持的传入路径）。URL 构建抽成纯函数 site/assets/js/checkout-url.mjs 并单测；端到端验证：派发带 meta.custom_data 的载荷后，公开记录 owner_display_name=null（匿名生效）、献词正确保留、持卡人姓名未泄漏，线上匿名页显示「匿名登记人」且献词可见。另加登记名回退：客户自填名优先，为空（例如绕过落地页直接打开结算链接）时回退到持卡人姓名，避免已付款订单被拒" },
+      { t: "落地页展示最近一次真实登记（含登记人与献词）", tag: "p0", done: true,
+        note: "原来这块是硬编码的虚构样例（织女星 / For Anna / 虚构献词）——访客在购买前看到的是编的。现在改为读取登记索引里最近一条记录、复用永久链接页的 buildStarView() 渲染同一套字段：恒星信息、登记人、献词、登记编号、日期，并链接到该登记永久页与 SIMBAD 核实链接。匿名登记一律显示「匿名登记人」绝不泄漏姓名（献词是公开内容仍展示）；无任何登记时回退到内置示例并明确标注「（示例数据）」，不得谎称存在最新登记。默认 OG 图不跟随最新登记变化（社交平台会缓存 OG 图，频繁变动会让卡片反复失效）。TC-LP-16/17/18 覆盖真实、匿名、空库三种情况" },
       { t: "永久链接页与证书增加 SIMBAD 第三方核实外链", tag: "p0", done: true,
         note: "公开登记表能证明「没被重复登记」，但证明不了「这颗星真实存在」——证书上的天文数据凭什么可信？现在永久链接页的星体数据区增加一行「天文数据库」，并在核实步骤第一条给出 SIMBAD（CDS 斯特拉斯堡天文数据中心）查询入口，链接形如 sim-id?Ident=HIP+32349；证书 PDF 的核实段落第一条同样写明。链接由 scripts/lib/view.mjs 的 simbadUrl() 统一生成，永久页与证书共用同一 view 对象所以必然一致；回退顺序 HIP → HD → 赤经赤纬坐标（候选库 800 颗星均带 HIP/HD）。外链带 target=_blank 与 rel=noopener noreferrer。TC-STAR-01/02 覆盖页面渲染、证书模板引用与三级回退" },
       { t: "公开登记表显示登记数量与候选库进度", tag: "p0", done: true,
