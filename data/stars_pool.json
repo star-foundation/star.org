@@ -4,15 +4,15 @@
   "source_url": "https://github.com/astronexus/HYG-Database",
   "license": "CC BY-SA 4.0（公开天文数据）",
   "generated_at": "2026-09-18T10:10:17.012Z",
-  "updated_at": "2026-09-19T01:22:19.188Z",
+  "updated_at": "2026-09-19T00:56:22.477Z",
   "filter": {
     "max_magnitude": 6.5,
     "requires_hip": true,
     "requires_distance": true
   },
   "count": 800,
-  "available": 797,
-  "assigned": 3,
+  "available": 798,
+  "assigned": 2,
   "stars": [
     {
       "id": "HIP-32349",
@@ -61,9 +61,9 @@
       "magnitude": -0.05,
       "spectral_type": "K2III",
       "distance_ly": 36.7,
-      "status": "assigned",
-      "assigned_slug": "s0xwtqk13e",
-      "assigned_at": "2026-09-19T01:22:19.187Z"
+      "status": "available",
+      "assigned_slug": null,
+      "assigned_at": null
     },
     {
       "id": "HIP-71683",
