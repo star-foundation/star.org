@@ -103,7 +103,11 @@ test('TC-LP-01~04 / TC-PAGE-01~05 / TC-REG-01~05 站点构建与公开登记表'
     // 落地页（TC-LP-01 / TC-LP-02）
     const landing = readFileSync(path.join(out, 'index.html'), 'utf8');
     assert.ok(landing.includes('每一次登记，都可以被公开验证'), '落地页需含一句话价值主张');
-    assert.ok(landing.includes('https://star-org.lemonsqueezy.com/checkout/buy/test'), '购买按钮需跳转结算页');
+    // 三个申请入口统一指向登记页，姓名/献词在登记页填完，登记页再带 checkout[custom] 跳结算
+    assert.ok(landing.includes('register/'), '购买入口需指向登记页 /register/');
+    const register = readFileSync(path.join(out, 'register', 'index.html'), 'utf8');
+    assert.ok(register.includes('https://star-org.lemonsqueezy.com/checkout/buy/test'), '登记页表单需携带结算链接');
+    assert.ok(register.includes('name="display_name"') && register.includes('name="dedication"'), '登记页需含姓名与献词表单');
     assert.ok(landing.includes('/registry/'), '需提供公开登记表入口');
     assert.ok(landing.includes('IAU'), 'FAQ 需澄清 IAU 关系');
     assert.ok(landing.includes('退款'), 'FAQ 需含退款政策');
