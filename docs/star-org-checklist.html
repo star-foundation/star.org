@@ -349,8 +349,8 @@ const DATA = [
     items: [
       { t: "GitHub Actions workflow：repository_dispatch 触发配置", tag: "p0", done: true,
         note: ".github/workflows/register.yml（同时支持 workflow_dispatch 人工补单）" },
-      { t: "分配逻辑：从 available 记录中选取并置为 assigned", tag: "p0", done: true,
-        note: "scripts/allocate.mjs，按亮度优先分配；TC-ALLOC-01/02 已测" },
+      { t: "分配逻辑：从未被认领的记录中随机选取并置为 assigned", tag: "p0", done: true,
+        note: "scripts/allocate.mjs，均匀随机分配（订单号 HMAC 派生种子，可复现）；TC-ALLOC-01/02/06/07 已测" },
       { t: "concurrency 分组配置，确保排队执行", tag: "p0", done: true,
         note: "concurrency: star-registration + mkdir 原子锁双保险；TC-ALLOC-03 三轮并发测试通过" },
       { t: "slug 唯一性生成逻辑", tag: "", done: true,

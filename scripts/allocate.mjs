@@ -20,8 +20,8 @@ import { readFileSync, existsSync } from 'node:fs';
 import crypto from 'node:crypto';
 import { PATHS, assertConfig } from './lib/config.mjs';
 import { normalizeOrder, buildRegistrationRecord } from './lib/order.mjs';
-import { readPool, writePool, sortByPriority, withAllocationLock } from './lib/pool.mjs';
-import { deterministicSlug, randomSlug, isValidSlug } from './lib/slug.mjs';
+import { readPool, writePool, pickRandomAvailable, withAllocationLock } from './lib/pool.mjs';
+import { deterministicSlug, deterministicDigest, randomSlug, isValidSlug } from './lib/slug.mjs';
 import { ensureDir, writeJsonAtomic, sha256File } from './lib/fsx.mjs';
 import { registrationPath, findRegistration } from './lib/registry.mjs';
 
@@ -67,12 +67,16 @@ export function allocateWithinLock(order, { poolFile = PATHS.pool, registrations
     return { status: 'replay', slug, star: existing.star, record: existing, replay: true };
   }
 
-  const available = sortByPriority(pool.stars.filter((s) => s.status === 'available'));
+  const available = pool.stars.filter((s) => s.status === 'available');
   if (available.length === 0) {
     return { status: 'sold_out' };
   }
 
-  const star = available[0];
+  // 均匀随机抽取一颗，不再按亮度优先（见 docs/DECISIONS.md D8）。
+  // 有订单号时用 HMAC 摘要作为种子，同一订单重跑抽到同一颗星；人工补单则真随机。
+  const star = pickRandomAvailable(available, {
+    digest: deterministicDigest(order.orderId, secret),
+  });
   const registeredAt = new Date().toISOString();
   const record = buildRegistrationRecord({ slug, star, order, registeredAt });
 

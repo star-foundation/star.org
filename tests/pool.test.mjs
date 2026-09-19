@@ -21,7 +21,7 @@ test('TC-ALLOC 候选库结构：800 颗肉眼可见恒星，字段完整', () =
   }
 });
 
-test('分配优先级：候选库按视星等从亮到暗排序（PRD 5.2）', () => {
+test('候选库按视星等从亮到暗排列（仅用于浏览展示，不再决定分配顺序）', () => {
   for (let i = 1; i < pool.stars.length; i += 1) {
     assert.ok(pool.stars[i].magnitude >= pool.stars[i - 1].magnitude, '候选库未按亮度排序');
   }

@@ -1,3 +1,4 @@
+import crypto from 'node:crypto';
 import { existsSync, mkdirSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { PATHS } from './config.mjs';
@@ -23,12 +24,25 @@ export function availableStars(pool) {
   return pool.stars.filter((s) => s.status === 'available');
 }
 
-/** 按视星等从亮到暗排序，作为分配优先级（更亮的星先分配给早期用户） */
-export function sortByPriority(stars) {
-  return [...stars].sort((a, b) => {
-    if (a.magnitude !== b.magnitude) return a.magnitude - b.magnitude;
-    return String(a.id).localeCompare(String(b.id));
-  });
+/**
+ * 从未被认领的恒星中均匀随机抽取一颗。
+ *
+ * 随机分配取代了早先的「按视星等从亮到暗优先」：候选库文件仍然按亮度排序，
+ * 但那只用于浏览与展示，不再决定谁拿到哪颗星（见 docs/DECISIONS.md D8）。
+ *
+ * 随机性来源分两种：
+ *   - 传入 digest（由订单号 HMAC 派生）时按该摘要确定性取模，
+ *     同一订单重跑得到同一颗星，便于复现、测试与人工补单核对；
+ *   - 无订单号（人工补单）或缺少密钥时退化为真随机。
+ *
+ * 取 48 bit 再取模，模数 ≤ 800 时的偏差量级约 1e-12，可忽略。
+ */
+export function pickRandomAvailable(stars, { digest = null } = {}) {
+  if (!Array.isArray(stars) || stars.length === 0) return null;
+  const index = digest
+    ? digest.readUIntBE(0, 6) % stars.length
+    : crypto.randomInt(stars.length);
+  return stars[index];
 }
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));

@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { createSandbox, runScript, readJson } from './helpers.mjs';
+import { pickRandomAvailable } from '../scripts/lib/pool.mjs';
+import { deterministicDigest } from '../scripts/lib/slug.mjs';
 
 test('TC-ALLOC-01 正常分配一颗可用恒星并写回 assigned', () => {
   const sandbox = createSandbox({ availableStars: 3, poolSize: 5 });
@@ -86,6 +88,65 @@ test('TC-ERR-04 同一订单重复触发不会分配第二颗星（幂等）', (
     assert.equal(pool.stars.filter((s) => s.status === 'assigned' && s.assigned_slug === first.json.slug).length, 1);
   } finally {
     sandbox.cleanup();
+  }
+});
+
+test('TC-ALLOC-06 分配为均匀随机，不再按亮度优先', () => {
+  const sandbox = createSandbox({ availableStars: 8, poolSize: 8 });
+  try {
+    // 候选库按亮度排列，因此"按亮度优先"会让抽取顺序与候选库顺序完全一致
+    const catalogOrder = readJson(sandbox.poolFile).stars.map((star) => star.id);
+    const picks = [];
+    for (let index = 0; index < catalogOrder.length; index += 1) {
+      const result = runScript('allocate.mjs', [], {
+        sandbox,
+        input: JSON.stringify({ order_id: `LS-RANDOM-${index}`, display_name: `User ${index}` }),
+      });
+      assert.equal(result.json.status, 'allocated', result.stderr);
+      picks.push(result.json.star_id);
+    }
+    assert.equal(new Set(picks).size, picks.length, `出现重复分配：${picks.join(', ')}`);
+    assert.notDeepEqual(picks, catalogOrder, '抽取顺序与候选库亮度顺序一致，疑似仍在按亮度分配');
+  } finally {
+    sandbox.cleanup();
+  }
+});
+
+test('TC-ALLOC-07 同一订单号在相同候选库状态下抽到同一颗星（派生种子确定性）', () => {
+  const first = createSandbox({ availableStars: 4, poolSize: 6 });
+  const second = createSandbox({ availableStars: 4, poolSize: 6 });
+  try {
+    const payload = JSON.stringify({ order_id: 'LS-DETERMINISTIC-1', display_name: 'Anna' });
+    const a = runScript('allocate.mjs', [], { sandbox: first, input: payload });
+    const b = runScript('allocate.mjs', [], { sandbox: second, input: payload });
+    assert.equal(a.json.status, 'allocated', a.stderr);
+    assert.equal(b.json.status, 'allocated', b.stderr);
+    assert.equal(a.json.slug, b.json.slug);
+    assert.equal(a.json.star_id, b.json.star_id, '同一订单号在相同候选库状态下抽到了不同的星');
+  } finally {
+    first.cleanup();
+    second.cleanup();
+  }
+});
+
+test('TC-ALLOC-08 抽取在候选库上分布均匀（派生种子不引入可见偏差）', () => {
+  const stars = Array.from({ length: 800 }, (_, index) => ({ id: `S-${index}` }));
+  const indexById = new Map(stars.map((star, index) => [star.id, index]));
+  const counts = new Array(stars.length).fill(0);
+  const rounds = 80_000;
+  for (let index = 0; index < rounds; index += 1) {
+    const digest = deterministicDigest(`LS-UNIFORM-${index}`, 'test-secret');
+    counts[indexById.get(pickRandomAvailable(stars, { digest }).id)] += 1;
+  }
+  // 分十档核对：48 bit 取模的偏差量级约 1e-12，正常应落在期望值 ±3% 内，
+  // 这里放宽到 ±15%，只用来抓住"取模写错/低位截断"这类明显偏差。
+  const perDecile = rounds / 10;
+  for (let decile = 0; decile < 10; decile += 1) {
+    const bucket = counts.slice(decile * 80, (decile + 1) * 80).reduce((sum, n) => sum + n, 0);
+    assert.ok(
+      Math.abs(bucket - perDecile) < perDecile * 0.15,
+      `第 ${decile} 档计数 ${bucket}，偏离期望 ${perDecile} 过多`,
+    );
   }
 });
 

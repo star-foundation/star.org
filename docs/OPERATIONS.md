@@ -34,7 +34,7 @@ fs.writeFileSync('data/stars_pool.json',JSON.stringify(pool,null,2));
 npm run verify && npm run build:site
 ```
 
-扩充后候选库按亮度排序，新用户仍然优先拿到较亮的星。
+扩充后候选库仍按亮度排序（仅用于浏览展示），但分配是均匀随机，与亮度无关，新用户不会因此优先拿到较亮的星（见 `DECISIONS.md` D8）。
 
 ## 3. 候选库售罄（TC-ALLOC-04 / TC-ERR-01）
 

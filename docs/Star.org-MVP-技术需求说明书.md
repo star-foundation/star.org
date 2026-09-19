@@ -130,7 +130,10 @@ Star.org 是一个星星认领产品：用户付费"认领"一颗真实存在的
 ### 4.2 分配与查重引擎
 
 **需求：**
-- 由 GitHub Actions workflow 执行：读取 `stars_pool.json`，选取一条 `status = available` 的记录，写回为 `assigned`，生成唯一 slug
+- 由 GitHub Actions workflow 执行：读取 `stars_pool.json`，从**所有** `status = available` 的记录中**均匀随机**选取一条，写回为 `assigned`，生成唯一 slug
+  - 随机性由订单号经 HMAC-SHA256 派生后取模得到下标（`deterministicDigest` + `pickRandomAvailable`）：同一订单重跑抽到同一颗星，缺订单号或密钥时退化为 `crypto.randomInt`
+  - 候选库文件本身仍按视星等降序排列，但该顺序**不参与**分配决策，仅用于浏览与展示
+  - **注意：** 随机分配不改变"可公开验证唯一性"这一核心承诺——仍可验证一颗星只被认领过一次，但不再能解释"为什么是这一颗"
 - **并发安全：** 为处理认领的 workflow 设置 `concurrency` 分组，保证同一时间只有一个认领流程在执行，天然避免两个订单抢到同一颗星
 - 若未来订单量上升到 concurrency 排队产生明显延迟，可升级为 GitHub Contents API 的乐观锁机制（基于文件 SHA 版本号做冲突检测），MVP 阶段无需实现
 
