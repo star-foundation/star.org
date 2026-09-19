@@ -10,6 +10,12 @@ on:
       - 'scripts/**'
       - 'site.config.json'
       - '.github/workflows/deploy-pages.yml'
+  # 登记由 register.yml 用 GITHUB_TOKEN 提交，GitHub 防循环机制下这种提交不会触发
+  # 上面的 on:push（否则无限循环），所以客户登记后站点不会自动重建、页面一直 404。
+  # 因此必须用 workflow_run 在「登记」跑完后强制重建（下面 build job 再按是否成功过滤）。
+  workflow_run:
+    workflows: [登记（支付成功后自动执行）]
+    types: [completed]
   workflow_dispatch:
 
 permissions:
@@ -24,6 +30,8 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    # rebuild after successful registration, or on push/dispatch
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
