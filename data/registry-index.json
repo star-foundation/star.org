@@ -1,30 +1,7 @@
 {
-  "generated_at": "2026-09-19T06:41:30.863Z",
-  "count": 2,
-  "unique_stars": 2,
+  "generated_at": "2026-09-18T10:52:30.907Z",
+  "count": 0,
+  "unique_stars": 0,
   "duplicates": [],
-  "entries": [
-    {
-      "slug": "dg805w7q3c",
-      "star_id": "HIP-30438",
-      "star_name": "Canopus",
-      "constellation": "Car",
-      "magnitude": -0.62,
-      "owner_display_name": "tongxiaojun",
-      "anonymous": false,
-      "registered_at": "2026-09-19T06:41:27.967Z",
-      "dedication_message": null
-    },
-    {
-      "slug": "p39pwec7j2",
-      "star_id": "HIP-32349",
-      "star_name": "Sirius",
-      "constellation": "CMa",
-      "magnitude": -1.44,
-      "owner_display_name": "李明月",
-      "anonymous": false,
-      "registered_at": "2026-09-19T06:39:39.245Z",
-      "dedication_message": null
-    }
-  ]
+  "entries": []
 }
