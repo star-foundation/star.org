@@ -1,9 +1,20 @@
 {
-  "generated_at": "2026-09-19T14:02:50.892Z",
-  "count": 4,
-  "unique_stars": 4,
+  "generated_at": "2026-09-19T14:36:09.279Z",
+  "count": 5,
+  "unique_stars": 5,
   "duplicates": [],
   "entries": [
+    {
+      "slug": "3xgdhyxf7z",
+      "star_id": "HIP-80331",
+      "star_name": "Athebyne",
+      "constellation": "Dra",
+      "magnitude": 2.73,
+      "owner_display_name": "TXJ",
+      "anonymous": false,
+      "registered_at": "2026-09-19T14:36:06.823Z",
+      "dedication_message": "Hello TXJ"
+    },
     {
       "slug": "6d1qmtgv35",
       "star_id": "HIP-60718",

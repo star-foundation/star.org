@@ -1,0 +1,29 @@
+{
+  "slug": "3xgdhyxf7z",
+  "star_id": "HIP-80331",
+  "owner_display_name": "TXJ",
+  "anonymous": false,
+  "dedication_message": "Hello TXJ",
+  "registered_at": "2026-09-19T14:36:06.823Z",
+  "star": {
+    "id": "HIP-80331",
+    "hip": 80331,
+    "hd": 148387,
+    "proper_name": "Athebyne",
+    "bayer": "Eta",
+    "flam": "14",
+    "constellation": "Dra",
+    "ra": 245.997904,
+    "dec": 61.514213,
+    "magnitude": 2.73,
+    "spectral_type": "G8III",
+    "distance_ly": 92.1
+  },
+  "artifacts": {
+    "certificate": "certificates/3xgdhyxf7z.pdf",
+    "certificate_sha256": "66f8e7a813955868ac981b7ecb4a5671f35c6f54c99b035dc3e512c2aee0d359",
+    "og_image": "og/3xgdhyxf7z.png",
+    "og_sha256": "7d5be0e52952ccf57f8fa32f6202fd7f7c12de32162719165d626975455ed6be",
+    "certificate_public": true
+  }
+}
