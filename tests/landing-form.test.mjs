@@ -102,3 +102,25 @@ test('TC-LP-13 全站导航统一：每页都有「登记一颗星」→ 登记�
     sandbox.cleanup();
   }
 });
+
+test('TC-LP-14 付款完成等待页 /thanks/：可回站、带订单号提示、noindex、不进 sitemap', () => {
+  const sandbox = createSandbox({ availableStars: 3, poolSize: 3 });
+  try {
+    const result = runScript('build-site.mjs', [], {
+      sandbox,
+      env: { ...NO_CHROME, LEMON_SQUEEZY_CHECKOUT_URL: CHECKOUT_URL },
+    });
+    assert.equal(result.status, 0, result.stderr);
+    const thanks = readFileSync(path.join(sandbox.siteOut, 'thanks', 'index.html'), 'utf8');
+    assert.ok(thanks.includes('付款已收到'), '应确认付款已收到');
+    assert.ok(thanks.includes('data-order-hint'), '应能展示 Lemon Squeezy 传来的订单号');
+    assert.ok(thanks.includes('noindex'), '购买后过渡页应 noindex');
+    assert.ok(thanks.includes('>登记一颗星<'), '导航应与其他页统一');
+    assert.ok(thanks.includes('公开登记表'), '应提供回站入口');
+    assert.ok(!thanks.includes('{{'), '不得残留占位符');
+    const sitemap = readFileSync(path.join(sandbox.siteOut, 'sitemap.xml'), 'utf8');
+    assert.ok(!sitemap.includes('/thanks/'), '过渡页不应进 sitemap');
+  } finally {
+    sandbox.cleanup();
+  }
+});

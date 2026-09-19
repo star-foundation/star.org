@@ -104,6 +104,29 @@ npm run check:launch        # 一次看清还缺哪些配置
 npm run build:site          # 本地确认购买入口已变为「已开启」
 ```
 
+### 付款完成后怎么让客户回到 Star.org
+
+付款成功后客户会停在 Lemon Squeezy 的确认弹窗与收据页，若不配置，他们就**没有任何
+路径回到站点**看证书与永久链接。Lemon Squeezy 的「确认弹窗」可以自定义标题、文案、
+**按钮文字**与**按钮链接**，按钮链接还支持订单变量。
+
+配置位置：**Lemon Squeezy → Products → 你的商品 → Settings → Confirmation modal**
+
+| 字段 | 建议值 |
+| --- | --- |
+| Title | `付款已收到` |
+| Message | `证书通常在 1-3 分钟内生成并发送到你的邮箱，也可以随时回到 Star.org 查看。` |
+| Button text | `回到 Star.org 查看进度` |
+| Button link | `https://www.star.org/thanks/?order=[order_identifier]` |
+
+`[order_identifier]` 是官方支持的变量（订单 UUID），会被替换成真实订单号；
+`/thanks/` 页面（本仓库 `site/thanks.html`）会把它显示出来，方便客户找客服时提供。
+其余可用变量：`[order_id]`、`[email]`、`[name]`、`[total]`、`[license_key]`。
+
+> 想直接跳转而不让客户看到收据页，可在商品的 Links 里使用带变量的跳转 URL；
+> 但**不建议**——客户往往需要收据，保留确认弹窗加一个回站按钮体验更好。
+> `/thanks/` 已设 `noindex` 且不进 sitemap（购买后过渡页不应出现在搜索结果里）。
+
 ## 4. Zapier / Make 配置（唯一的"胶水"环节）
 
 ### 4.1 Lemon Squeezy 侧

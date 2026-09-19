@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>付款已收到 · {{siteName}}</title>
+<meta name="robots" content="noindex">
+<meta name="description" content="付款已收到，证书通常 1-3 分钟内生成并发送到你的邮箱。">
+<link rel="canonical" href="{{baseUrl}}/thanks/">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+</head>
+<body>
+<header class="site">
+  <div class="wrap nav">
+    <div class="brand"><a href="/">{{siteName}}</a></div>
+    <nav class="nav-links">
+      <a href="/registry/">公开登记表</a>
+      <a href="/#faq">常见问题</a>
+      {{#if checkoutReady}}<a class="btn btn-primary btn-sm" href="/register/">登记一颗星</a>{{/if}}
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="plain" style="padding-top:64px;">
+    <div class="wrap narrow center">
+      <div class="eyebrow">付款已收到</div>
+      <h1 style="font-size:clamp(26px,4vw,38px);">谢谢，你的恒星正在路上</h1>
+      <p class="lede" style="margin-left:auto;margin-right:auto;">
+        证书与永久链接通常在 <b>1-3 分钟</b>内生成（最长不超过 5 分钟），
+        并发送到你在结算页填写的邮箱。这个页面可以安全关闭。
+      </p>
+
+      <ol class="steps" style="text-align:left;max-width:520px;margin:26px auto 0;">
+        <li><b>系统分配恒星</b> —— 按亮度顺序分配一颗真实恒星，并生成载有真实天文数据的 PDF 证书。</li>
+        <li><b>证书发到你的邮箱</b> —— 邮件里有证书下载链接和永久链接。</li>
+        <li><b>永久链接可随时分享</b> —— 页面与登记表都可被公开核实，且不依赖你保留邮件。</li>
+      </ol>
+
+      <div class="hero-actions" style="justify-content:center;margin-top:26px;">
+        <a class="btn btn-primary" href="/registry/">查看公开登记表</a>
+        <a class="btn btn-ghost" href="/">返回首页</a>
+      </div>
+
+      <p data-order-hint class="muted" style="margin-top:22px;font-size:14px;" hidden></p>
+      <p class="muted" style="margin-top:14px;font-size:14px;">
+        超过 5 分钟仍未收到？请来信 <a href="mailto:{{supportEmail}}">{{supportEmail}}</a>，
+        并附上结算时使用的邮箱，我们会人工补发。
+      </p>
+    </div>
+  </section>
+</main>
+
+<footer class="site">
+  <div class="wrap foot-grid">
+    <div class="disclaimer">
+      {{siteName}} 提供纪念性质的公开可验证恒星登记服务，不构成国际天文学联合会（IAU）官方命名，
+      亦不代表任何天体命名权。证书所载天文数据来自公开星表。
+      <br>联系：<a href="mailto:{{supportEmail}}">{{supportEmail}}</a>
+    </div>
+    <div>
+      <a href="/registry/">公开登记表</a> ·
+      <a href="/#faq">常见问题</a>
+      {{#if registryRepoUrl}}· <a href="{{registryRepoUrl}}" rel="noopener">公开仓库</a>{{/if}}
+      <div class="muted" style="margin-top:8px;">© {{year}} {{siteName}}</div>
+    </div>
+  </div>
+</footer>
+<script src="/assets/js/site.js" defer></script>
+</body>
+</html>

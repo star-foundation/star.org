@@ -154,6 +154,12 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
   ensureDir(path.join(outDir, 'register'));
   writeFileAtomic(path.join(outDir, 'register', 'index.html'), relativize(registerHtml, 1));
 
+  // 付款完成后的等待页（Lemon Squeezy 确认弹窗的按钮链接指向这里）。
+  // 不放进 sitemap：它是购买后的过渡页，页面本身已标 noindex。
+  const thanksHtml = render(tpl('thanks.html'), common);
+  ensureDir(path.join(outDir, 'thanks'));
+  writeFileAtomic(path.join(outDir, 'thanks', 'index.html'), relativize(thanksHtml, 1));
+
   // 公开登记表
   const registryHtml = render(tpl('registry.html'), {
     ...common,
