@@ -178,6 +178,7 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
     generatedAt: index.generated_at,
     progressPercent,
     progressLabel: `${index.count} / ${progressTotal}`,
+    progressStarted: index.count > 0,
     recentCount7d,
   });
   ensureDir(path.join(outDir, 'registry'));

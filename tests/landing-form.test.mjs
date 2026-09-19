@@ -147,3 +147,17 @@ test('TC-REG-06 公开登记表显示候选库进度：百分比与进度条随�
     sandbox.cleanup();
   }
 });
+
+test('TC-REG-07 候选库无登记时进度条为空轨道（不显示"已开始"最小宽度）', () => {
+  const sandbox = createSandbox({ availableStars: 4, poolSize: 4 });
+  try {
+    const built = runScript('build-site.mjs', [], { sandbox, env: NO_CHROME });
+    assert.equal(built.status, 0, built.stderr);
+    const html = readFileSync(path.join(sandbox.siteOut, 'registry', 'index.html'), 'utf8');
+    assert.ok(html.includes('aria-valuenow="0"'), '0 条时应为 0%');
+    assert.ok(!html.includes('is-started'), '0 条时不应出现最小可见宽度类');
+    assert.ok(/最近 7 天新增\s*<strong>0<\/strong>/.test(html), '近期新增应为 0');
+  } finally {
+    sandbox.cleanup();
+  }
+});

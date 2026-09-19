@@ -338,3 +338,7 @@ footer.site .disclaimer { max-width: 620px; line-height: 1.8; }
   line-height: 1.7;
 }
 .progress-foot strong { color: #16309a; }
+
+/* 早期阶段（如 1/800）真实宽度不足 1 像素，给一条最小可见宽度，
+   否则进度条看起来像没渲染。只在已有登记时生效，0 条仍是空轨道。 */
+.progress-fill.is-started { min-width: 4px; }

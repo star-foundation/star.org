@@ -60,7 +60,7 @@
         </div>
         <div class="progress-track" role="progressbar" aria-label="候选库登记进度"
              aria-valuenow="{{progressPercent}}" aria-valuemin="0" aria-valuemax="100">
-          <div class="progress-fill" style="width: {{progressPercent}}%"></div>
+          <div class="progress-fill{{#if progressStarted}} is-started{{/if}}" style="width: {{progressPercent}}%"></div>
         </div>
         <div class="progress-foot">
           已登记 <strong>{{registryCount}}</strong> 颗，还剩 <strong>{{availableCount}}</strong> 颗可登记；
