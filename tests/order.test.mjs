@@ -78,3 +78,21 @@ test('TC-PAY-07 表单自填名优先；为空时回退到持卡人姓名（绕�
     (err) => err.code === 'INVALID_ORDER',
   );
 });
+
+test('TC-PAY-08 匿名标志按字符串语义解析：Zapier/LS 传来 "false" 不得当成匿名', () => {
+  // Lemon Squeezy 的 custom data 值都是字符串，Boolean("false") 会得到 true
+  for (const [raw, expected] of [
+    ['false', false], ['FALSE', false], ['False', false],
+    ['true', true], ['TRUE', true],
+    ['0', false], ['1', true], ['', false],
+    [false, false], [true, true], [undefined, false],
+  ]) {
+    assert.equal(
+      normalizeOrder({ display_name: 'A', anonymous: raw }).anonymous,
+      expected,
+      'anonymous=' + JSON.stringify(raw) + ' 应解析为 ' + expected,
+    );
+  }
+  // 缺省与未勾选都要展示名字
+  assert.equal(normalizeOrder({ display_name: 'A' }).anonymous, false);
+});

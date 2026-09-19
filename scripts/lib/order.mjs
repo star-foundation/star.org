@@ -5,6 +5,17 @@ export const MAX_DISPLAY_NAME = 40;
 /** 视为"已付款"的订单状态（Lemon Squeezy 正常为 paid）。 */
 export const PAID_STATUSES = new Set(['paid', 'succeeded', 'completed']);
 
+/**
+ * 解析布尔字段。Zapier / Lemon Squeezy 的 custom data 值都是字符串，
+ * 直接 Boolean("false") 会得到 true —— 客户没勾匿名也会被当成匿名。
+ */
+export function parseBool(value) {
+  if (typeof value === 'boolean') return value;
+  if (value === null || value === undefined) return false;
+  const t = String(value).trim().toLowerCase();
+  return ['true', '1', 'yes', 'y', 'on', '是'].includes(t);
+}
+
 /** 归一化订单信息。邮箱与订单号只在此处短暂存在，绝不写入公开文件。 */
 export function normalizeOrder(input = {}) {
   const cfg = loadConfig();
@@ -57,7 +68,7 @@ export function normalizeOrder(input = {}) {
     email: email || null,
     dedication: dedication || null,
     dedicationTruncated: truncated,
-    anonymous: Boolean(input.anonymous),
+    anonymous: parseBool(input.anonymous),
     source: input.source || 'lemon-squeezy',
     receivedAt: new Date().toISOString(),
   };
