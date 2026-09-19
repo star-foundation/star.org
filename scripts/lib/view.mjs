@@ -50,5 +50,29 @@ export function buildStarView({ star, record, slug, baseUrl, registryUrl, certif
     ogImageUrl,
     registryUrl,
     certificatePublic: Boolean(certificatePublic),
+    // SIMBAD 外链：斯特拉斯堡天文数据中心的天体数据库，用来让登记人自己核实
+    // "这颗星真实存在、而且这些天文数据不是我们编的"。HIP 编号在场内 800 颗星上全都有，
+    // 所以统一用 Ident=HIP+<hip> 查询；万一将来出现没有 HIP 的星，退化为按坐标查询。
+    simbadIdent: hipIdent(star),
+    simbadUrl: simbadUrl(star),
   };
+}
+
+/** SIMBAD 用的标识（优先 HIP，其次 HD，最后按坐标）。 */
+function hipIdent(star) {
+  if (star.hip) return `HIP ${star.hip}`;
+  if (star.hd) return `HD ${star.hd}`;
+  return `${star.ra} ${star.dec}`;
+}
+
+/**
+ * 构造 SIMBAD 查询链接。
+ * 官方查询入口：/simbad/sim-id?Ident=<标识>，也可用 /simbad/sim-coo?Coord=<赤经>+<赤纬>。
+ * 用 query 参数形式（+ 表示空格）在浏览器里可读性更好。
+ */
+export function simbadUrl(star) {
+  const base = 'https://simbad.cds.unistra.fr/simbad/sim-id';
+  if (star.hip) return `${base}?Ident=HIP+${star.hip}`;
+  if (star.hd) return `${base}?Ident=HD+${star.hd}`;
+  return `https://simbad.cds.unistra.fr/simbad/sim-coo?Coord=${star.ra}+${star.dec}`;
 }

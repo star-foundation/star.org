@@ -178,6 +178,7 @@ Star.org 是一个星星登记产品：用户付费"登记"一颗真实存在的
 **需求：**
 - Actions workflow 中安装 Puppeteer（或等效无头浏览器工具），将 HTML 模板渲染为 PDF
 - 证书内容：登记人姓名、献词、恒星标识符、坐标、星等、距离、登记日期、永久链接、验证方式说明
+- 验证方式说明的**第一条**给出 SIMBAD 天文数据库查询入口（按 HIP 编号），用于第三方核实"这颗星真实存在"
 - 生成的 PDF 作为 Actions 产物之一，commit 进仓库的 `/certificates/{slug}.pdf`，通过 GitHub Pages 直接提供下载链接（无需单独的对象存储服务）
 
 ### 4.6 永久链接页面
@@ -186,6 +187,12 @@ Star.org 是一个星星登记产品：用户付费"登记"一颗真实存在的
 - 路径：`star.org/s/{slug}`
 - Jekyll 根据 `/data/registrations/` 目录下的 JSON 文件，在构建时自动为每条记录生成一个独立静态页面
 - 展示：恒星公开数据、登记人姓名（可选择匿名展示）、献词、登记日期
+- **SIMBAD 外链（第三方核实入口）**：星体数据区独立一行「天文数据库」，指向
+  `https://simbad.cds.unistra.fr/simbad/sim-id?Ident=HIP+<hip>`；核实步骤第一条也用同一链接。
+  链接由 `scripts/lib/view.mjs` 的 `simbadUrl()` 统一生成，回退顺序 HIP → HD → 赤经赤纬坐标
+  （坐标查询用 `/simbad/sim-coo?Coord=<ra>+<dec>`）。永久页与证书共用同一个 view 对象，
+  因此两处的链接必然一致
+- 外链一律 `target="_blank"` + `rel="noopener noreferrer"`
 - **OG 分享图：** 由 Actions 在生成证书的同一流程中，用脚本静态渲染一张 PNG（而非依赖实时渲染服务），commit 进仓库作为页面的 `og:image`，保证在 X 分享时正常显示卡片
 - 页面天然支持基本 SEO（每颗星一个独立可索引页面）
 

@@ -45,6 +45,7 @@
 
         <dl class="data-grid">
           <div><dt>恒星标识</dt><dd class="mono">{{starId}}</dd></div>
+          <div><dt>天文数据库</dt><dd><a href="{{simbadUrl}}" target="_blank" rel="noopener noreferrer">在 SIMBAD 查看 {{simbadIdent}} ↗</a></dd></div>
           <div><dt>赤经</dt><dd class="mono">{{raText}}</dd></div>
           <div><dt>赤纬</dt><dd class="mono">{{decText}}</dd></div>
           <div><dt>视星等</dt><dd>{{magnitudeText}}</dd></div>
@@ -73,6 +74,8 @@
         <div class="verify-box">
           <strong>自行核实这条记录</strong>
           <ol>
+            <li>先在 <a href="{{simbadUrl}}" target="_blank" rel="noopener noreferrer">SIMBAD 天文数据库</a>
+              查询 <span class="mono">{{simbadIdent}}</span>，确认这颗恒星真实存在、且证书上的赤经/赤纬/视星等与之相符。</li>
             <li>打开<a href="/registry/">公开登记表</a>，搜索恒星标识 <span class="mono">{{starId}}</span>。</li>
             <li>应当只出现一条记录，登记编号为 <span class="mono">{{slug}}</span>；若出现两条，说明登记表异常，请来信告知。</li>
             <li>{{#if registryDirUrl}}也可以直接打开公开仓库的 <span class="mono">data/registrations/{{slug}}.json</span> 查看原始记录。{{/if}}</li>

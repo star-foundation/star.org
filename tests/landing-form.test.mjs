@@ -191,3 +191,52 @@ test('TC-LP-15 等待页 /thanks/ 显示两块进度：证书生成中（不确�
     sandbox.cleanup();
   }
 });
+
+test('TC-STAR-01 永久链接页与证书都给出 SIMBAD 外链（可核实恒星真实存在）', () => {
+  const sandbox = createSandbox({ availableStars: 3, poolSize: 4 });
+  try {
+    const reg = runScript('register.mjs', [], {
+      sandbox,
+      input: JSON.stringify({ order_id: 'SIMBAD-1', display_name: '证星人', status: 'paid' }),
+    });
+    assert.equal(reg.status, 0, reg.stderr);
+    const slug = reg.json.slug;
+    const starId = reg.json.star_id;                     // 形如 HIP-32349
+    const hip = String(starId).replace(/^HIP-/, '');
+
+    // 永久链接页
+    const built = runScript('build-site.mjs', [], { sandbox, env: NO_CHROME });
+    assert.equal(built.status, 0, built.stderr);
+    const page = readFileSync(path.join(sandbox.siteOut, 's', slug, 'index.html'), 'utf8');
+    const expected = 'https://simbad.cds.unistra.fr/simbad/sim-id?Ident=HIP+' + hip;
+    assert.ok(page.includes(expected), '永久页应含 SIMBAD 链接：' + expected);
+    assert.ok(page.includes('SIMBAD'), '永久页应出现 SIMBAD 字样');
+    assert.ok(page.includes('rel="noopener noreferrer"'), '外链应带安全的 rel 属性');
+    assert.ok(page.includes('target="_blank"'), '外链应新开标签');
+    assert.ok(page.includes('HIP ' + hip), '应显示 SIMBAD 用的标识 HIP ' + hip);
+
+    // 证书模板：证书是打印件，也要带上 SIMBAD 核实路径（模板占位符 + 视图数据两头都验）
+    const certTpl = readFileSync(path.join(process.cwd(), 'templates', 'certificate.html'), 'utf8');
+    assert.ok(certTpl.includes('{{simbadUrl}}'), '证书模板应引用 simbadUrl');
+    assert.ok(certTpl.includes('{{simbadIdent}}'), '证书模板应引用 simbadIdent');
+    assert.ok(certTpl.includes('SIMBAD'), '证书应写明 SIMBAD 核实步骤');
+
+    // 证书 PDF 应已生成（渲染链路没被新字段破坏）
+    const certPdf = path.join(sandbox.dataDir, '..', 'certificates', slug + '.pdf');
+    assert.ok(readFileSync(certPdf).length > 1000, '证书 PDF 应已生成且非空');
+  } finally {
+    sandbox.cleanup();
+  }
+});
+
+test('TC-STAR-02 SIMBAD 链接在缺少 HIP 编号时依次回退到 HD、坐标', async () => {
+  const { simbadUrl } = await import('../scripts/lib/view.mjs');
+  assert.equal(simbadUrl({ hip: 32349 }), 'https://simbad.cds.unistra.fr/simbad/sim-id?Ident=HIP+32349');
+  assert.equal(simbadUrl({ hd: 48915 }), 'https://simbad.cds.unistra.fr/simbad/sim-id?Ident=HD+48915');
+  assert.equal(
+    simbadUrl({ ra: 101.287214, dec: -16.716116 }),
+    'https://simbad.cds.unistra.fr/simbad/sim-coo?Coord=101.287214+-16.716116',
+  );
+  // HIP 优先于 HD
+  assert.ok(simbadUrl({ hip: 1, hd: 2 }).includes('HIP+1'));
+});
