@@ -1,9 +1,20 @@
 {
-  "generated_at": "2026-09-19T23:58:18.944Z",
-  "count": 8,
-  "unique_stars": 8,
+  "generated_at": "2026-09-19T23:59:49.441Z",
+  "count": 9,
+  "unique_stars": 9,
   "duplicates": [],
   "entries": [
+    {
+      "slug": "qwqt36aygj",
+      "star_id": "HIP-72370",
+      "star_name": null,
+      "constellation": "Aps",
+      "magnitude": 3.83,
+      "owner_display_name": "meme",
+      "anonymous": false,
+      "registered_at": "2026-09-19T23:59:43.482Z",
+      "dedication_message": "MeMe Star!"
+    },
     {
       "slug": "w8yrrx3yn6",
       "star_id": "HIP-39953",

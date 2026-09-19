@@ -1,0 +1,30 @@
+{
+  "slug": "qwqt36aygj",
+  "star_id": "HIP-72370",
+  "owner_display_name": "meme",
+  "anonymous": false,
+  "locale": null,
+  "dedication_message": "MeMe Star!",
+  "registered_at": "2026-09-19T23:59:43.482Z",
+  "star": {
+    "id": "HIP-72370",
+    "hip": 72370,
+    "hd": 129078,
+    "proper_name": null,
+    "bayer": "Alp",
+    "flam": null,
+    "constellation": "Aps",
+    "ra": 221.965512,
+    "dec": -79.044751,
+    "magnitude": 3.83,
+    "spectral_type": "K5III",
+    "distance_ly": 446.8
+  },
+  "artifacts": {
+    "certificate": "certificates/qwqt36aygj.pdf",
+    "certificate_sha256": "107504acdf0d5aff8ffbdf05ceb10006eb0499103ddf81c12b8ebfc28b5d6d31",
+    "og_image": "og/qwqt36aygj.png",
+    "og_sha256": "d3f372ed851957668fa09a93a129a03c523d3073ed9b1fcaa77faa799126de29",
+    "certificate_public": true
+  }
+}
