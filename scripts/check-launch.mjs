@@ -40,6 +40,13 @@ function line(icon, title, detail) {
   if (detail) console.log(`      ${detail}`);
 }
 
+// 本地运行时看不到仓库里配置的 Secrets，密钥类检查会一律报缺失。
+// 与其让人误以为没配，不如把这件事说清楚。
+const inActions = Boolean(process.env.GITHUB_ACTIONS);
+const secretHint = inActions
+  ? null
+  : '（本地运行时读不到仓库 Secrets，这条只在 CI 里有效；本地可用环境变量模拟）';
+
 console.log('Star.org 上线就绪自检');
 console.log('');
 
@@ -67,6 +74,8 @@ console.log('数据与幂等');
 if (process.env.STARORG_SLUG_SECRET) {
   ok.push('STARORG_SLUG_SECRET 已配置');
   line('✓', 'STARORG_SLUG_SECRET 已配置', '同一订单号可复现同一登记编号，补单幂等成立');
+} else if (!inActions) {
+  line('·', 'STARORG_SLUG_SECRET 未在本地环境中设置', secretHint);
 } else {
   blockers.push('未配置 STARORG_SLUG_SECRET');
   line('⛔', '未配置 STARORG_SLUG_SECRET',
