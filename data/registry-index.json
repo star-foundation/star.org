@@ -1,19 +1,7 @@
 {
-  "generated_at": "2026-09-19T09:16:10.573Z",
-  "count": 1,
-  "unique_stars": 1,
+  "generated_at": "2026-09-18T10:52:30.907Z",
+  "count": 0,
+  "unique_stars": 0,
   "duplicates": [],
-  "entries": [
-    {
-      "slug": "ey37zx5ayx",
-      "star_id": "HIP-32349",
-      "star_name": "Sirius",
-      "constellation": "CMa",
-      "magnitude": -1.44,
-      "owner_display_name": "tongxiaojun",
-      "anonymous": false,
-      "registered_at": "2026-09-19T09:16:07.072Z",
-      "dedication_message": "Hello Star.org !"
-    }
-  ]
+  "entries": []
 }
