@@ -23,7 +23,7 @@
     <nav class="nav-links">
       <a href="/registry/">公开登记表</a>
       <a href="#faq">常见问题</a>
-      {{#if checkoutReady}}<a class="btn btn-primary btn-sm" href="{{checkoutUrl}}">立即登记</a>{{/if}}
+      {{#if checkoutReady}}<a class="btn btn-primary btn-sm" href="/register/">登记一颗星</a>{{/if}}
     </nav>
   </div>
 </header>
@@ -39,7 +39,7 @@
       </p>
       <div class="hero-actions">
         {{#if checkoutReady}}
-        <a class="btn btn-primary" href="{{checkoutUrl}}">登记一颗星 · {{priceDisplay}}</a>
+        <a class="btn btn-primary" href="/register/">登记一颗星</a>
         <a class="btn btn-ghost" href="/registry/">先看看公开登记表</a>
         {{/if}}
         {{#unless checkoutReady}}
@@ -146,25 +146,10 @@
         仅支持信用卡等常规法币结算方式。
       </p>
       {{#if checkoutReady}}
-      <form class="register-form" data-registration-form data-checkout-url="{{checkoutUrl}}" autocomplete="off">
-        <label class="field">
-          <span class="field-label">登记人姓名 / 称呼 <em>必填</em></span>
-          <input name="display_name" type="text" maxlength="40" required
-                 placeholder="将印在证书上，如：李四 / Anna / 星野">
-        </label>
-        <label class="field">
-          <span class="field-label">献词（可选，最多 100 字）</span>
-          <textarea name="dedication" rows="3" maxlength="100"
-                    placeholder="愿你抬头就能看见的那颗星……"></textarea>
-          <span class="field-hint"><b data-dedication-count>0</b>/100</span>
-        </label>
-        <label class="field checkbox">
-          <input name="anonymous" type="checkbox">
-          <span>匿名展示 —— 公开页面与证书不显示我的名字</span>
-        </label>
-        <button class="btn btn-primary" type="submit">去支付 · {{priceDisplay}}</button>
-        <p class="muted field-note">提交后跳转到 Lemon Squeezy 安全结算页完成支付；姓名与献词会用于生成证书。</p>
-      </form>
+      <a class="btn btn-primary" href="/register/">登记一颗星</a>
+      <p class="muted" style="margin-top:14px;font-size:14px;">
+        下一步填写登记人姓名与献词（可选），再前往结算。
+      </p>
       {{/if}}
       {{#unless checkoutReady}}
       <span class="btn btn-primary is-disabled">{{entryLabel}}</span>

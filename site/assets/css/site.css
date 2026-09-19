@@ -259,3 +259,40 @@ footer.site .disclaimer { max-width: 620px; line-height: 1.8; }
 .register-form .field.checkbox input { width: 16px; height: 16px; accent-color: #16309a; }
 .register-form .btn { align-self: center; margin-top: 4px; }
 .register-form .field-note { font-size: 12.5px; text-align: center; margin-top: 2px; }
+/* 登记页的「接下来会发生什么」 */
+.steps {
+  counter-reset: step;
+  list-style: none;
+  padding: 0;
+  margin: 0 0 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.steps li {
+  counter-increment: step;
+  position: relative;
+  padding: 12px 14px 12px 46px;
+  border: 1px solid #e6e8f2;
+  border-radius: 12px;
+  background: #fbfcff;
+  font-size: 14.5px;
+  color: #2a3a5f;
+}
+.steps li::before {
+  content: counter(step);
+  position: absolute;
+  left: 14px;
+  top: 12px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #16309a;
+  color: #fff;
+  font-size: 12.5px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.steps li b { color: #16309a; }

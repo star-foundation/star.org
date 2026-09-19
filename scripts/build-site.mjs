@@ -149,6 +149,11 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
   });
   writeFileAtomic(path.join(outDir, 'index.html'), relativize(landing, 0));
 
+  // 登记页（三个申请入口统一指向这里；表单在这里填写姓名/献词/匿名）
+  const registerHtml = render(tpl('register.html'), common);
+  ensureDir(path.join(outDir, 'register'));
+  writeFileAtomic(path.join(outDir, 'register', 'index.html'), relativize(registerHtml, 1));
+
   // 公开登记表
   const registryHtml = render(tpl('registry.html'), {
     ...common,
@@ -227,6 +232,7 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
   );
   const urls = [
     `${cfg.site.baseUrl}/`,
+    `${cfg.site.baseUrl}/register/`,
     `${cfg.site.baseUrl}/registry/`,
     ...records.map((record) => registrationUrl(record.slug)),
   ];
