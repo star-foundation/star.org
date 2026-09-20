@@ -21,7 +21,7 @@
   },
   "artifacts": {
     "certificate": "certificates/1sqyxmtg14.pdf",
-    "certificate_sha256": "024435b8d21e7f2f0c06553dee495ecc3bf275ac9f1f323a39c65a38195f3d5c",
+    "certificate_sha256": "aaf6cdf40db4ef5236abc0bfc83e79157bda193c826e00dedb6601fdfeb0ba1f",
     "og_image": "og/1sqyxmtg14.png",
     "og_sha256": "baae170b8f86e58d4a466466b272d38552c93264b09af32fc9289f3228322b14",
     "certificate_public": true

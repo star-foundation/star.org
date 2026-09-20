@@ -21,7 +21,7 @@
   },
   "artifacts": {
     "certificate": "certificates/6d1qmtgv35.pdf",
-    "certificate_sha256": "a03735f171dcce06fc241782598adbe3ec19d840d86294a4548d394b717b37be",
+    "certificate_sha256": "9fc3929ab09482b6053bc658aae2ef91ad81ade9b40d99c6a352dbd2721aa820",
     "og_image": "og/6d1qmtgv35.png",
     "og_sha256": "57b988918d242147024120709346f5e0635898334d3c999959c68bec1eabd04d",
     "certificate_public": true

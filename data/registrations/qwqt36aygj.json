@@ -3,7 +3,7 @@
   "star_id": "HIP-72370",
   "owner_display_name": "meme",
   "anonymous": false,
-  "locale": null,
+  "locale": "en",
   "dedication_message": "MeMe Star!",
   "registered_at": "2026-09-19T23:59:43.482Z",
   "star": {
@@ -22,9 +22,9 @@
   },
   "artifacts": {
     "certificate": "certificates/qwqt36aygj.pdf",
-    "certificate_sha256": "107504acdf0d5aff8ffbdf05ceb10006eb0499103ddf81c12b8ebfc28b5d6d31",
+    "certificate_sha256": "9976aed07f3bb8b04df04d448b74d79c13d069775d564bc5d6c15f1bd42d959a",
     "og_image": "og/qwqt36aygj.png",
-    "og_sha256": "d3f372ed851957668fa09a93a129a03c523d3073ed9b1fcaa77faa799126de29",
+    "og_sha256": "4b9aee79edb44054264a39f8f0ff3f99784d349b0b21293436c9c1b129037261",
     "certificate_public": true
   }
 }

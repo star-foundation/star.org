@@ -3,7 +3,7 @@
   "star_id": "HIP-34444",
   "owner_display_name": "Anna",
   "anonymous": false,
-  "locale": null,
+  "locale": "en",
   "dedication_message": "Hello Anna Star!",
   "registered_at": "2026-09-20T00:23:01.060Z",
   "star": {
@@ -22,9 +22,9 @@
   },
   "artifacts": {
     "certificate": "certificates/fmnpkdcnpa.pdf",
-    "certificate_sha256": "c45216245fac64bd62a5c35ecb3725b7a8c5d4ec9ee4dc49b3cc5207383d8963",
+    "certificate_sha256": "2e7e96b83b8bd74fbb6021923fd92dea338e74459412050ed253485f5948dd7c",
     "og_image": "og/fmnpkdcnpa.png",
-    "og_sha256": "f84f4e0e8c4500fffb72c3590fc17a31b5ee2b706f40c4de2f8ad1d9596b36d0",
+    "og_sha256": "e5f7b583dee3e4d7095d70a9a1fc1ca9bda58cd8a1f371bc98859d37e9385950",
     "certificate_public": true
   }
 }
