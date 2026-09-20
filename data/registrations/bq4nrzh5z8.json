@@ -1,0 +1,30 @@
+{
+  "slug": "bq4nrzh5z8",
+  "star_id": "HIP-111169",
+  "owner_display_name": "Claimer name",
+  "anonymous": false,
+  "locale": null,
+  "dedication_message": "Claimer name",
+  "registered_at": "2026-09-20T13:21:59.013Z",
+  "star": {
+    "id": "HIP-111169",
+    "hip": 111169,
+    "hd": 213558,
+    "proper_name": null,
+    "bayer": "Alp",
+    "flam": "7",
+    "constellation": "Lac",
+    "ra": 337.822732,
+    "dec": 50.282491,
+    "magnitude": 3.76,
+    "spectral_type": "A1V",
+    "distance_ly": 102.6
+  },
+  "artifacts": {
+    "certificate": "certificates/bq4nrzh5z8.pdf",
+    "certificate_sha256": "60d42d692835f5c1c6feeb17b5d0fd3fe3b8ef0841b47cce7cbb133ae6e33830",
+    "og_image": "og/bq4nrzh5z8.png",
+    "og_sha256": "442a17ab934de4f1770645fa7aae0b8ddabdf3fb65fcb2458b11b88bb15371e3",
+    "certificate_public": true
+  }
+}

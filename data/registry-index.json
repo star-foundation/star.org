@@ -1,9 +1,20 @@
 {
-  "generated_at": "2026-09-20T07:53:52.707Z",
-  "count": 13,
-  "unique_stars": 13,
+  "generated_at": "2026-09-20T13:22:02.175Z",
+  "count": 14,
+  "unique_stars": 14,
   "duplicates": [],
   "entries": [
+    {
+      "slug": "bq4nrzh5z8",
+      "star_id": "HIP-111169",
+      "star_name": null,
+      "constellation": "Lac",
+      "magnitude": 3.76,
+      "owner_display_name": "Claimer name",
+      "anonymous": false,
+      "registered_at": "2026-09-20T13:21:59.013Z",
+      "dedication_message": "Claimer name"
+    },
     {
       "slug": "ttge9f1yg3",
       "star_id": "HIP-50583",
