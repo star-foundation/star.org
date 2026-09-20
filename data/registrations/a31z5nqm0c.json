@@ -1,0 +1,30 @@
+{
+  "slug": "a31z5nqm0c",
+  "star_id": "HIP-59196",
+  "owner_display_name": "Google",
+  "anonymous": false,
+  "locale": null,
+  "dedication_message": "Hello Google Star!",
+  "registered_at": "2026-09-20T03:03:06.958Z",
+  "star": {
+    "id": "HIP-59196",
+    "hip": 59196,
+    "hd": 105435,
+    "proper_name": null,
+    "bayer": "Del",
+    "flam": null,
+    "constellation": "Cen",
+    "ra": 182.089649,
+    "dec": -50.722425,
+    "magnitude": 2.58,
+    "spectral_type": "B2I",
+    "distance_ly": 415
+  },
+  "artifacts": {
+    "certificate": "certificates/a31z5nqm0c.pdf",
+    "certificate_sha256": "fdc00611e478ebc4c107196bf9da60e64dc453de8ed64d6d232ed9dabee109cc",
+    "og_image": "og/a31z5nqm0c.png",
+    "og_sha256": "d2f6471ba54f480ab6d6f3a5c7c991d8b0d9cc8ce5d8f98260500ebd0564c4c3",
+    "certificate_public": true
+  }
+}

@@ -1,9 +1,20 @@
 {
-  "generated_at": "2026-09-20T00:23:10.412Z",
-  "count": 10,
-  "unique_stars": 10,
+  "generated_at": "2026-09-20T03:03:10.224Z",
+  "count": 11,
+  "unique_stars": 11,
   "duplicates": [],
   "entries": [
+    {
+      "slug": "a31z5nqm0c",
+      "star_id": "HIP-59196",
+      "star_name": null,
+      "constellation": "Cen",
+      "magnitude": 2.58,
+      "owner_display_name": "Google",
+      "anonymous": false,
+      "registered_at": "2026-09-20T03:03:06.958Z",
+      "dedication_message": "Hello Google Star!"
+    },
     {
       "slug": "fmnpkdcnpa",
       "star_id": "HIP-34444",
