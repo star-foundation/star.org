@@ -62,10 +62,36 @@ function renderPage(name, scope) {
     const detail = missing.map((m) => `${m.key}（缺 ${m.locales.join('、')}）`).join('；');
     throw new Error(`${name} 引用了不存在的文案键：${detail}`);
   }
-  return render(template, {
+  // 站点隐藏另一种语言时（site.config.json → language.showToggle = false），页面里
+  // 不内嵌该语言的目录、也不渲染切换按钮：默认语言页面里不会出现另一种语言的任何文本。
+  const altScript = scope.showLanguageToggle === false
+    ? ''
+    : buildAltCatalogScript(scope.altLocale, scope.tAltFlat ?? {}, keys);
+  const html = render(template, {
     ...scope,
-    i18nAltScript: buildAltCatalogScript(scope.altLocale, scope.tAltFlat ?? {}, keys),
+    i18nAltScript: altScript,
   });
+  // 隐藏另一种语言时，连数据值与标题里的另一种语言写法也一并剥掉，
+  // 保证默认语言页面里不出现该语言的任何文本
+  return scope.showLanguageToggle === false ? stripAltLocaleArtifacts(html) : html;
+}
+
+/**
+ * 隐藏另一种语言时，把模板里承载该语言的属性一并剥掉。
+ *
+ * 模板有两类这样的属性：
+ *   - `<html data-alt-lang data-alt-title>`：切换后的语言名与页面标题
+ *   - `data-i18n-alt="…"`：数据值的另一种语言写法（星名、星等、距离、日期）
+ *     —— 这些值不是静态文案，走不了目录，由构建期按两种语言各算一遍内联在属性里。
+ *
+ * 没有切换按钮时它们既用不上，又会让默认语言页面里出现另一种语言的文本
+ * （实测英文页会因此残留中文星名与中文日期），所以整体移除。
+ */
+function stripAltLocaleArtifacts(html) {
+  return html
+    .replace(/\sdata-alt-lang="[^"]*"/g, '')
+    .replace(/\sdata-alt-title="[^"]*"/g, '')
+    .replace(/\sdata-i18n-alt="[^"]*"/g, '');
 }
 
 function copyDir(from, to) {
@@ -205,6 +231,14 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
   // ---- 文案层（阶段 1 起：文案唯一来源是 site/i18n/*.json）----
   const locale = resolveDefaultLocale();
   const altLocale = otherLocale(locale);
+  // ---- 语言可见性（site.config.json → language）----
+  //
+  // 站点默认只保留英文：showToggle=false 时，英文页面既不渲染切换按钮、也不内嵌中文目录，
+  // 页面里不会出现任何中文文本。中文版本仍然生成，但降级为「隐藏入口」——
+  // 只有知道 hiddenEntryPath 的人才能进入（该入口 noindex、不进 sitemap、不被任何页面链接）。
+  const showLanguageToggle = cfg.language?.showToggle ?? true;
+  const hiddenEntryPath = showLanguageToggle ? '' : String(cfg.language?.hiddenEntryPath || '').trim();
+  const hiddenEntrySegment = hiddenEntryPath.replace(/^\/+|\/+$/g, '');
   const baseVars = {
     siteName: cfg.site.name,
     supportEmail: cfg.site.supportEmail,
@@ -258,13 +292,15 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
     t,
     locale,
     altLocale,
+    showLanguageToggle,
+    noindex: false,
     htmlLang: htmlLang(locale),
     ogLocale: ogLocale(locale),
     altLangName: tAlt.common.lang.name,
     selfLangName: t.common.lang.name,
     altTitle: `${cfg.site.name} · ${tAlt.brand.tagline}`,
-    // 给前端脚本用的双语目录（付款等待页的动态文案靠它）
-    i18nJsScript: buildJsCatalogScript(locale, altLocale),
+    // 给前端脚本用的目录（付款等待页的动态文案靠它）；隐藏另一种语言时只内嵌默认语言
+    i18nJsScript: buildJsCatalogScript(locale, altLocale, { includeAlt: showLanguageToggle }),
     registryCount: index.count,
     availableCount: available,
     poolTotal,
@@ -281,32 +317,55 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
   // 落地页
   // 示例区的文案里带 {{count}} / {{slug}} / {{ident}}，这些值只有拿到 sample 之后才知道，
   // 所以落地页用自己那一份目录（在基础变量上补这三个值），不从 common.t 复用。
-  const sample = sampleView(cfg, records, locale);
-  const sampleVars = {
-    ...vars,
-    count: index.count,
-    slug: sample.slug,
-    ident: sample.simbadIdent,
+  // 抽成函数是因为隐藏语言入口页要用同一套结构再渲染一遍（只是换成另一种语言）。
+  const landingScope = (pageLocale, pageAltLocale) => {
+    const pageSample = sampleView(cfg, records, pageLocale);
+    const pageSampleVars = {
+      ...vars,
+      count: index.count,
+      slug: pageSample.slug,
+      ident: pageSample.simbadIdent,
+    };
+    const pageKey = pageSample.isReal ? 'Real' : 'Sample';
+    const pageT = interpolateCatalog(loadCatalogs()[pageLocale], pageSampleVars);
+    const pageTAlt = interpolateCatalog(loadCatalogs()[pageAltLocale], pageSampleVars);
+    return {
+      ...common,
+      locale: pageLocale,
+      altLocale: pageAltLocale,
+      htmlLang: htmlLang(pageLocale),
+      ogLocale: ogLocale(pageLocale),
+      selfLangName: loadCatalogs()[pageLocale].common.lang.name,
+      altLangName: loadCatalogs()[pageAltLocale].common.lang.name,
+      altTitle: `${cfg.site.name} · ${loadCatalogs()[pageAltLocale].brand.tagline}`,
+      t: pageT,
+      tAltFlat: flattenCatalog(pageTAlt),
+      sample: pageSample,
+      sampleAlt: sampleView(cfg, records, pageAltLocale),
+      registryPreview: index.entries.slice(0, 5),
+      sampleLedeKey: `landing.sample.lede${pageKey}`,
+      sampleLede: pageT.landing.sample[`lede${pageKey}`],
+      sampleKickerKey: `landing.sample.kicker${pageKey}`,
+      sampleKicker: pageT.landing.sample[`kicker${pageKey}`],
+      sampleSimbadKey: 'landing.sample.verifySimbad',
+      sampleSimbadText: pageT.landing.sample.verifySimbad,
+    };
   };
-  const sampleKey = sample.isReal ? 'Real' : 'Sample';
-  const landingT = interpolateCatalog(loadCatalogs()[locale], sampleVars);
-  const landingTAlt = interpolateCatalog(loadCatalogs()[altLocale], sampleVars);
-  const sampleAlt = sampleView(cfg, records, altLocale);
-  const landing = renderPage('index.html', {
-    ...common,
-    t: landingT,
-    tAltFlat: flattenCatalog(landingTAlt),
-    sample,
-    sampleAlt,
-    registryPreview: index.entries.slice(0, 5),
-    sampleLedeKey: `landing.sample.lede${sampleKey}`,
-    sampleLede: landingT.landing.sample[`lede${sampleKey}`],
-    sampleKickerKey: `landing.sample.kicker${sampleKey}`,
-    sampleKicker: landingT.landing.sample[`kicker${sampleKey}`],
-    sampleSimbadKey: 'landing.sample.verifySimbad',
-    sampleSimbadText: landingT.landing.sample.verifySimbad,
-  });
+  const landing = renderPage('index.html', landingScope(locale, altLocale));
   writeFileAtomic(path.join(outDir, 'index.html'), relativize(landing, 0));
+
+  // 隐藏语言入口（site.config.json → language.hiddenEntryPath，如 /zh/）：
+  // 另一种语言的默认语言页面，noindex、不进 sitemap、不被任何公开页面链接，
+  // 只有知道地址的人才能进入。switcher 同样不渲染——它本身就是"隐藏"的那一侧。
+  if (hiddenEntrySegment) {
+    const hidden = renderPage('index.html', {
+      ...landingScope(altLocale, locale),
+      showLanguageToggle: false,
+      noindex: true,
+    });
+    ensureDir(path.join(outDir, hiddenEntrySegment));
+    writeFileAtomic(path.join(outDir, hiddenEntrySegment, 'index.html'), relativize(hidden, 1));
+  }
 
   // 认领页（三个申请入口统一指向这里；表单在这里填写姓名/献词/匿名）
   const registerHtml = renderPage('register.html', {
@@ -407,17 +466,19 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
     const zhView = buildViewFor('zh');
     // 永久链接 URL 策略（DECISIONS D9）：/s/<slug>/ 为英文 canonical，
     // 另产出 /zh/s/<slug>/ 作为中文默认入口，两者用 hreflang 互链、canonical 都指向前者。
+    // 隐藏中文时不再声明 zh-CN 的 alternate——向搜索引擎暴露被隐藏语言的入口，
+    // 与「默认只保留英文」相矛盾；中文页仍在，只是改为 noindex 且不被链接。
     const canonicalUrl = registrationUrl(slug);
-    const zhUrl = `${cfg.site.baseUrl}/zh/s/${slug}/`;
+    const zhUrl = `${cfg.site.baseUrl}/${hiddenEntrySegment || 'zh'}/s/${slug}/`;
     const hreflangLinks = [
       `<link rel="alternate" hreflang="en" href="${canonicalUrl}">`,
-      `<link rel="alternate" hreflang="zh-CN" href="${zhUrl}">`,
+      ...(showLanguageToggle ? [`<link rel="alternate" hreflang="zh-CN" href="${zhUrl}">`] : []),
       `<link rel="alternate" hreflang="x-default" href="${canonicalUrl}">`,
     ].join('\n');
 
     // pageView = 这一页默认语言的数据值（星名/星等/日期都要对应语言）；
     // altData = 另一种语言的数据值，放在 data-i18n-alt 里供客户端切换。
-    const renderStarPage = (pageLocale, pageAltLocale, pageView, altData) => {
+    const renderStarPage = (pageLocale, pageAltLocale, pageView, altData, { noindex = false } = {}) => {
       const tFor = (loc) => pageCatalogFor(loc, starVars);
       return renderPage('permanent.html', {
         ...common,
@@ -434,6 +495,7 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
         tAltFlat: flattenCatalog(tFor(pageAltLocale)),
         canonicalUrl,
         hreflangLinks,
+        noindex,
         shareText: encodeURIComponent(tFor(pageLocale).star.shareText),
         shareUrl: encodeURIComponent(canonicalUrl),
       });
@@ -442,10 +504,10 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
     ensureDir(path.join(outDir, 's', slug));
     writeFileAtomic(path.join(outDir, 's', slug, 'index.html'),
       relativize(renderStarPage('en', 'zh', enView, zhView), 2));
-    // 中文默认入口：数据值与文案都取中文
-    ensureDir(path.join(outDir, 'zh', 's', slug));
-    writeFileAtomic(path.join(outDir, 'zh', 's', slug, 'index.html'),
-      relativize(renderStarPage('zh', 'en', zhView, enView), 3));
+    // 中文默认入口：数据值与文案都取中文。隐藏中文时这一页 noindex。
+    ensureDir(path.join(outDir, hiddenEntrySegment || 'zh', 's', slug));
+    writeFileAtomic(path.join(outDir, hiddenEntrySegment || 'zh', 's', slug, 'index.html'),
+      relativize(renderStarPage('zh', 'en', zhView, enView, { noindex: !showLanguageToggle }), 3));
     pages += 2;
   }
 
@@ -497,8 +559,11 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
     `${cfg.site.baseUrl}/register/`,
     `${cfg.site.baseUrl}/registry/`,
     ...records.map((record) => registrationUrl(record.slug)),
-    // 中文默认入口也要能被搜索引擎收录（与英文页用 hreflang 互链）
-    ...records.map((record) => `${cfg.site.baseUrl}/zh/s/${record.slug}/`),
+    // 中文默认入口也要能被搜索引擎收录（与英文页用 hreflang 互链）；
+    // 隐藏中文时反过来——被隐藏的语言不该出现在 sitemap 里。
+    ...(showLanguageToggle
+      ? records.map((record) => `${cfg.site.baseUrl}/${hiddenEntrySegment || 'zh'}/s/${record.slug}/`)
+      : []),
   ];
   writeFileAtomic(
     path.join(outDir, 'sitemap.xml'),

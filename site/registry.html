@@ -23,7 +23,7 @@
       <a href="/" data-i18n="registry.navHome">{{t.registry.navHome}}</a>
       <a href="/#faq" data-i18n="common.nav.faq">{{t.common.nav.faq}}</a>
       {{#if checkoutReady}}<a class="btn btn-primary btn-sm" href="/register/" data-i18n="common.nav.claim">{{t.common.nav.claim}}</a>{{/if}}
-      <button class="lang-toggle" type="button" data-lang-toggle data-self-name="{{selfLangName}}" data-alt-name="{{altLangName}}" aria-label="{{t.common.lang.switchAria}}">{{altLangName}}</button>
+      {{#if showLanguageToggle}}<button class="lang-toggle" type="button" data-lang-toggle data-self-name="{{selfLangName}}" data-alt-name="{{altLangName}}" aria-label="{{t.common.lang.switchAria}}">{{altLangName}}</button>{{/if}}
     </nav>
   </div>
 </header>

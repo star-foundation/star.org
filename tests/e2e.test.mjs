@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { createSandbox, runScript, readJson, chromeAvailable } from './helpers.mjs';
+import { createSandbox, runScript, readJson, chromeAvailable, copy } from './helpers.mjs';
 
 const hasChrome = chromeAvailable();
 const skip = hasChrome ? false : '未检测到 Chrome/Chromium，跳过需要渲染的端到端用例';
@@ -102,7 +102,7 @@ test('TC-LP-01~04 / TC-PAGE-01~05 / TC-REG-01~05 站点构建与公开认领表'
     const out = sandbox.siteOut;
     // 落地页（TC-LP-01 / TC-LP-02）
     const landing = readFileSync(path.join(out, 'index.html'), 'utf8');
-    assert.ok(landing.includes('每一次认领，都可以被公开验证'), '落地页需含一句话价值主张');
+    assert.ok(landing.includes(copy('brand.tagline')), '落地页需含一句话价值主张');
     // 三个申请入口统一指向认领页，姓名/献词在认领页填完，认领页再带 checkout[custom] 跳结算
     assert.ok(landing.includes('register/'), '购买入口需指向认领页 /register/');
     const register = readFileSync(path.join(out, 'register', 'index.html'), 'utf8');
@@ -110,16 +110,17 @@ test('TC-LP-01~04 / TC-PAGE-01~05 / TC-REG-01~05 站点构建与公开认领表'
     assert.ok(register.includes('name="display_name"') && register.includes('name="dedication"'), '认领页需含姓名与献词表单');
     assert.ok(landing.includes('/registry/'), '需提供公开认领表入口');
     assert.ok(landing.includes('IAU'), 'FAQ 需澄清 IAU 关系');
-    assert.ok(landing.includes('退款'), 'FAQ 需含退款政策');
+    assert.ok(landing.includes(copy('landing.faq.q4')), 'FAQ 需含退款政策');
     assert.ok(!landing.includes('{{'), '落地页不得残留占位符');
 
     // 公开认领表（TC-REG-01 / TC-REG-04）
     const registry = readFileSync(path.join(out, 'registry', 'index.html'), 'utf8');
-    assert.ok(registry.includes('公开认领表'));
+    assert.ok(registry.includes(copy('common.nav.registry')));
     assert.ok(!/登录后可见|请先登录/.test(registry), '认领表不得设置访问门槛');
     assert.ok(registry.includes(first.json.star_id), '认领表应列出已认领恒星');
     assert.ok(registry.includes(second.json.star_id));
-    assert.ok(registry.includes('没有任何一颗恒星被认领两次'), '需给出查重结论');
+    // 目录值带构建期占位符（{{generatedAt}}），取占位符之前的部分断言
+    assert.ok(registry.includes(copy('registry.dupOk').split('{{')[0].replace(/[\s(（]+$/, '')), '需给出查重结论');
 
     const index = readJson(path.join(out, 'data', 'registry-index.json'));
     assert.equal(index.duplicates.length, 0, '不得出现重复分配');
@@ -140,7 +141,7 @@ test('TC-LP-01~04 / TC-PAGE-01~05 / TC-REG-01~05 站点构建与公开认领表'
     // 匿名展示（TC-PAY-04 / TC-PAGE-05）
     const anonPage = readFileSync(path.join(out, 's', second.json.slug, 'index.html'), 'utf8');
     assert.ok(!anonPage.includes('不应出现在公开页面的名字'), '匿名认领不得公开姓名');
-    assert.ok(anonPage.includes('匿名认领人'));
+    assert.ok(anonPage.includes(copy('star.anonymousOwner')));
     const anonRecord = readJson(path.join(out, 'data', 'registrations', `${second.json.slug}.json`));
     assert.equal(anonRecord.owner_display_name, null, '匿名认领的公开记录不得写入姓名');
 

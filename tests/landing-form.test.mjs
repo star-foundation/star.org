@@ -19,6 +19,10 @@ function build(sandbox, env = {}) {
   };
 }
 
+// 目录值里可能带构建期占位符（如 register.submit 的 {{price}}），
+// 取占位符之前的部分做断言：产物里那一段已被替换成实际价格。
+const copyStem = (key) => copy(key).split('{{')[0].replace(/[\s·(（]+$/, '');
+
 test('TC-LP-09 认领表单在独立的 /register/ 页面，含姓名/献词/匿名', () => {
   const sandbox = createSandbox({ availableStars: 3, poolSize: 3 });
   try {
@@ -29,7 +33,7 @@ test('TC-LP-09 认领表单在独立的 /register/ 页面，含姓名/献词/匿
     assert.ok(register.includes('name="dedication"'), '应有献词输入框');
     assert.ok(register.includes('name="anonymous"'), '应有匿名选项');
     assert.ok(register.includes('/assets/js/checkout-url.mjs'), '应加载 checkout-url 纯函数模块');
-    assert.ok(register.includes('去支付'), '认领页应有支付按钮');
+    assert.ok(register.includes(copyStem('register.submit')), '认领页应有支付按钮');
   } finally {
     sandbox.cleanup();
   }
@@ -57,7 +61,7 @@ test('TC-LP-11 未配置结算链接：认领页显示通道接入中且无表�
   try {
     const { landing, register } = build(sandbox);
     assert.ok(!register.includes('data-registration-form'), '未配置时认领页不应出现表单');
-    assert.ok(register.includes('购买通道接入中'), '认领页应说明通道接入中');
+    assert.ok(register.includes(copy('state.checkoutPending')), '认领页应说明通道接入中');
     assert.ok(!landing.includes('data-registration-form'), '未配置时落地页也不应有表单');
   } finally {
     sandbox.cleanup();
@@ -115,11 +119,11 @@ test('TC-LP-14 付款完成等待页 /thanks/：可回站、带订单号提示�
     });
     assert.equal(result.status, 0, result.stderr);
     const thanks = readFileSync(path.join(sandbox.siteOut, 'thanks', 'index.html'), 'utf8');
-    assert.ok(thanks.includes('付款已收到'), '应确认付款已收到');
+    assert.ok(thanks.includes(copy('thanks.eyebrow')), '应确认付款已收到');
     assert.ok(thanks.includes('data-order-hint'), '应能展示 Lemon Squeezy 传来的订单号');
     assert.ok(thanks.includes('noindex'), '购买后过渡页应 noindex');
     assert.ok(thanks.includes('>' + claimLabel() + '<'), '导航应与其他页统一');
-    assert.ok(thanks.includes('公开认领表'), '应提供回站入口');
+    assert.ok(thanks.includes(copy('thanks.ctaRegistry')), '应提供回站入口');
     assert.ok(!thanks.includes('{{'), '不得残留占位符');
     const sitemap = readFileSync(path.join(sandbox.siteOut, 'sitemap.xml'), 'utf8');
     assert.ok(!sitemap.includes('/thanks/'), '过渡页不应进 sitemap');
@@ -185,7 +189,7 @@ test('TC-LP-15 等待页 /thanks/ 显示两块进度：证书生成中（不确�
     // 证书生成中：不确定进度条 + 阶段文案 + 端点提示
     assert.ok(html.includes('is-indeterminate'), '应有不确定进度条表示证书生成中');
     assert.ok(html.includes('data-thanks-stage'), '应有阶段文案（正在分配恒星…）');
-    assert.ok(html.includes('正在分配恒星'), '初始阶段文案应为"正在分配恒星"');
+    assert.ok(html.includes(copy('js.stage1')), '初始阶段文案应为分配恒星阶段');
     // 候选库真实计数：poolSize=4 且预置 1 条 + 新认领 1 条 = 2
     assert.ok(html.includes('data-pool-count'), '应有候选库计数元素');
     assert.ok(html.includes('data-pool-label>2 / 4'), '候选库计数应为 2 / 4，实际：' + (html.match(/data-pool-label>[^<]*/) || [])[0]);
@@ -274,16 +278,20 @@ test('TC-LP-16 落地页「最近一次认领」展示真实星体、认领人�
     const built = runScript('build-site.mjs', [], { sandbox, env: NO_CHROME });
     assert.equal(built.status, 0, built.stderr);
     const html = readFileSync(path.join(sandbox.siteOut, 'index.html'), 'utf8');
-    assert.ok(html.includes('最近一次认领'), '应显示「最近一次认领」标题');
-    assert.ok(!html.includes('（示例数据）'), '有真实认领时不应再称示例数据');
-    assert.ok(html.includes('最新记录 ' + reg.json.slug), '应标注最新认领编号');
+    // 断言按目录键取值，不写死中文：站点默认语言是英文，且隐藏另一种语言后
+    // 页面里不再内嵌中文目录——写死中文的断言会变成"在测内嵌目录存在"，而不是在测页面内容。
+    assert.ok(html.includes(copy('landing.sample.titleReal')), '应显示「' + copy('landing.sample.titleReal') + '」标题');
+    assert.ok(!html.includes(copy('landing.sample.titleSample')), '有真实认领时不应再回退到示例标题');
+    assert.ok(!html.includes(copy('landing.sample.kickerSample')), '有真实认领时不应再出现示例标注');
+    const latestKicker = copy('landing.sample.kickerReal').replace('{{slug}}', reg.json.slug);
+    assert.ok(html.includes(latestKicker), '应标注最新认领编号');
     assert.ok(html.includes('张三'), '应展示认领人');
     assert.ok(html.includes('愿你抬头就能看见'), '应展示献词');
     const starId = String(reg.json.star_id).replace('HIP-', '');
     assert.ok(html.includes('HIP-' + starId), '应展示真实恒星标识');
     assert.ok(html.includes('/s/' + reg.json.slug + '/'), '应链接到该认领的永久页面');
     assert.ok(html.includes('https://simbad.cds.unistra.fr/simbad/sim-id?Ident=HIP+' + starId), '应带 SIMBAD 核实链接');
-    assert.ok(!html.includes('织女星'), '不应再出现虚构的织女星');
+    assert.ok(!html.includes('Vega'), '不应再出现内置示例的恒星');
   } finally {
     sandbox.cleanup();
   }
@@ -316,10 +324,10 @@ test('TC-LP-18 没有任何认领时回退到内置示例并明确标注「示�
     const built = runScript('build-site.mjs', [], { sandbox, env: NO_CHROME });
     assert.equal(built.status, 0, built.stderr);
     const html = readFileSync(path.join(sandbox.siteOut, 'index.html'), 'utf8');
-    assert.ok(html.includes('你会拿到什么'), '无认领时应回退到示例标题');
-    assert.ok(html.includes('（示例数据）'), '回退时必须标明是示例数据');
-    assert.ok(html.includes('织女星'), '回退示例仍用织女星');
-    assert.ok(!html.includes('最近一次认领'), '无认领时不应谎称有最新认领');
+    assert.ok(html.includes(copy('landing.sample.titleSample')), '无认领时应回退到示例标题');
+    assert.ok(html.includes(copy('landing.sample.ledeSample')), '回退时必须标明是示例数据');
+    assert.ok(html.includes('Vega'), '回退示例仍用内置示例恒星');
+    assert.ok(!html.includes(copy('landing.sample.titleReal')), '无认领时不应谎称有最新认领');
   } finally {
     sandbox.cleanup();
   }

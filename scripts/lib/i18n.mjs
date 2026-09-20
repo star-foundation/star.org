@@ -247,8 +247,12 @@ export function flattenCatalog(nested) {
  *
  * js.* 的值可能带运行时占位符（如 js.orderHint 的 {{order}}），构建期不做替换：
  * interpolate 只解析已知变量，未知的 {{order}} 原样保留，正好留给运行时填。
+ *
+ * includeAlt=false（站点隐藏另一种语言时）只内嵌默认语言：页面里不会出现另一种语言的
+ * 任何文本，默认语言页面的体积也不会被另一份目录撑大。site.js 的 jsText() 已按
+ * `payload.alt || {}` 取值，缺少 alt 时自然回退到默认语言，无需额外改动。
  */
-export function buildJsCatalogScript(defaultLocale, altLocale) {
+export function buildJsCatalogScript(defaultLocale, altLocale, { includeAlt = true } = {}) {
   const catalogs = flatCatalogs();
   const pick = (locale) => {
     const subset = {};
@@ -264,9 +268,13 @@ export function buildJsCatalogScript(defaultLocale, altLocale) {
   const runtimePick = (locale) => Object.fromEntries(
     Object.entries(pick(locale)).map(([key, value]) => [key, toRuntime(value)]),
   );
-  const json = JSON.stringify({ default: runtimePick(defaultLocale), alt: runtimePick(altLocale) })
-    .replace(/</g, '\\u003c');
-  return `<script type="application/json" id="i18n-js" data-default-locale="${defaultLocale}" data-alt-locale="${altLocale}">${json}</script>`;
+  const payload = { default: runtimePick(defaultLocale) };
+  if (includeAlt) payload.alt = runtimePick(altLocale);
+  const json = JSON.stringify(payload).replace(/</g, '\\u003c');
+  const localeAttrs = includeAlt
+    ? ` data-default-locale="${defaultLocale}" data-alt-locale="${altLocale}"`
+    : ` data-default-locale="${defaultLocale}"`;
+  return `<script type="application/json" id="i18n-js"${localeAttrs}>${json}</script>`;
 }
 
 /**

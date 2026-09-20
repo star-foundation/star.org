@@ -5,8 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{{t.notfound.metaTitle}} · {{siteName}}</title>
 <script>
-// 这个文件会被 GitHub Pages 用来兜底任意不存在的路径，页面自身的 URL 层级不可预知。
-// 先把站点根固定下来，下面的相对路径在「自定义域名根路径」与「项目子路径」下才能都解析正确。
+// GitHub Pages serves this file for any unknown path, so the page's own URL depth is unknown.
+// Pin the site root first: only then do the relative paths below resolve correctly both on a
+// custom-domain root and under a project subpath.
 (function () {
   var project = '{{projectBase}}';
   var root = location.pathname.indexOf(project) === 0 ? project : '/';
@@ -24,7 +25,7 @@
       <a href="/registry/" data-i18n="common.nav.registry">{{t.common.nav.registry}}</a>
       <a href="/#faq" data-i18n="common.nav.faq">{{t.common.nav.faq}}</a>
       {{#if checkoutReady}}<a class="btn btn-primary btn-sm" href="/register/" data-i18n="common.nav.claim">{{t.common.nav.claim}}</a>{{/if}}
-      <button class="lang-toggle" type="button" data-lang-toggle data-self-name="{{selfLangName}}" data-alt-name="{{altLangName}}" aria-label="{{t.common.lang.switchAria}}">{{altLangName}}</button>
+      {{#if showLanguageToggle}}<button class="lang-toggle" type="button" data-lang-toggle data-self-name="{{selfLangName}}" data-alt-name="{{altLangName}}" aria-label="{{t.common.lang.switchAria}}">{{altLangName}}</button>{{/if}}
     </nav>
   </div>
 </header>

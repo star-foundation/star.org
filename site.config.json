@@ -17,6 +17,10 @@
     "certificatesPublic": true,
     "anonymousNameInCertificate": true
   },
+  "language": {
+    "showToggle": false,
+    "hiddenEntryPath": "/zh/"
+  },
   "email": {
     "fromName": "Star.org",
     "fromAddress": "certificate@star.org",

@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import { createSandbox, runScript, claimLabel } from './helpers.mjs';
+import { createSandbox, runScript, claimLabel, copy } from './helpers.mjs';
 
 /**
  * 购买入口三态（对应《测试用例说明书》TC-LP-02 / TC-ALLOC-04）：
@@ -27,9 +27,9 @@ test('TC-LP-08 未配置结算链接：显示「购买通道接入中」，不�
   const sandbox = createSandbox({ availableStars: 3, poolSize: 3 });
   try {
     const html = buildLanding(sandbox);
-    assert.ok(html.includes('购买通道接入中'), '未配置结算链接时应显示通道接入中');
-    assert.ok(html.includes('支付通道正在接入'), '应说明支付通道正在接入');
-    assert.ok(!html.includes('候选库正在补充中'), '库存充足时不得显示售罄文案');
+    assert.ok(html.includes(copy('state.checkoutPending')), '未配置结算链接时应显示通道接入中');
+    assert.ok(html.includes(copy('state.checkoutPendingMessage')), '应说明支付通道正在接入');
+    assert.ok(!html.includes(copy('state.soldOutMessage')), '库存充足时不得显示售罄文案');
     assert.ok(!html.includes(CHECKOUT_URL), '未配置时不应出现任何结算链接');
   } finally {
     sandbox.cleanup();
@@ -43,8 +43,8 @@ test('TC-LP-02 配置结算链接后：购买按钮指向认领页（不再直�
     assert.ok(html.includes('register/'), '购买入口应指向认领页 /register/');
     assert.ok(html.includes(claimLabel()), '按钮文案应统一为「' + claimLabel() + '」');
     assert.ok(html.includes('US$29'), '页面应展示价格');
-    assert.ok(!html.includes('购买通道接入中'), '已开启时不应出现接入中文案');
-    assert.ok(!html.includes('候选库已售罄'), '有库存时不应出现售罄文案');
+    assert.ok(!html.includes(copy('state.checkoutPending')), '已开启时不应出现接入中文案');
+    assert.ok(!html.includes(copy('state.soldOut')), '有库存时不应出现售罄文案');
   } finally {
     sandbox.cleanup();
   }
@@ -54,9 +54,9 @@ test('TC-ALLOC-04 候选库售罄：入口下线、给出补货说明，且不�
   const sandbox = createSandbox({ availableStars: 0, poolSize: 2 });
   try {
     const html = buildLanding(sandbox, { LEMON_SQUEEZY_CHECKOUT_URL: CHECKOUT_URL });
-    assert.ok(html.includes('候选库已售罄'), '售罄时应显示售罄标签');
-    assert.ok(html.includes('候选库正在补充中'), '售罄时应显示补货说明');
-    assert.ok(html.includes('补货后入口会自动恢复'), '应说明入口会自动恢复');
+    assert.ok(html.includes(copy('state.soldOut')), '售罄时应显示售罄标签');
+    assert.ok(html.includes(copy('state.soldOutMessage')), '售罄时应显示补货说明');
+    assert.ok(html.includes(copy('state.soldOutNote')), '应说明入口会自动恢复');
     assert.ok(!html.includes(`href="${CHECKOUT_URL}"`), '售罄时不得放出结算链接');
   } finally {
     sandbox.cleanup();
