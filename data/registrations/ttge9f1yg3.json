@@ -1,0 +1,30 @@
+{
+  "slug": "ttge9f1yg3",
+  "star_id": "HIP-50583",
+  "owner_display_name": "OpenAi",
+  "anonymous": false,
+  "locale": null,
+  "dedication_message": "OpenAI Star",
+  "registered_at": "2026-09-20T07:53:41.530Z",
+  "star": {
+    "id": "HIP-50583",
+    "hip": 50583,
+    "hd": 89484,
+    "proper_name": "Algieba",
+    "bayer": "Gam-1",
+    "flam": "41",
+    "constellation": "Leo",
+    "ra": 154.993096,
+    "dec": 19.841489,
+    "magnitude": 2.01,
+    "spectral_type": "K0III",
+    "distance_ly": 130.1
+  },
+  "artifacts": {
+    "certificate": "certificates/ttge9f1yg3.pdf",
+    "certificate_sha256": "1e3b69ac30e8a8ad21a8165df5d0e706cc9efb219587b32ea787dfe83eedc7e0",
+    "og_image": "og/ttge9f1yg3.png",
+    "og_sha256": "be1f792d5cd95f27b9528fc347542ccaa9ad6a52f0cd04d571c933d01b27c16a",
+    "certificate_public": true
+  }
+}

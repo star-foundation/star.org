@@ -1,9 +1,20 @@
 {
-  "generated_at": "2026-09-20T07:52:29.451Z",
-  "count": 12,
-  "unique_stars": 12,
+  "generated_at": "2026-09-20T07:53:52.707Z",
+  "count": 13,
+  "unique_stars": 13,
   "duplicates": [],
   "entries": [
+    {
+      "slug": "ttge9f1yg3",
+      "star_id": "HIP-50583",
+      "star_name": "Algieba",
+      "constellation": "Leo",
+      "magnitude": 2.01,
+      "owner_display_name": "OpenAi",
+      "anonymous": false,
+      "registered_at": "2026-09-20T07:53:41.530Z",
+      "dedication_message": "OpenAI Star"
+    },
     {
       "slug": "vww6j0320q",
       "star_id": "HIP-22109",
