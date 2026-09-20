@@ -1,0 +1,30 @@
+{
+  "slug": "fmnpkdcnpa",
+  "star_id": "HIP-34444",
+  "owner_display_name": "Anna",
+  "anonymous": false,
+  "locale": null,
+  "dedication_message": "Hello Anna Star!",
+  "registered_at": "2026-09-20T00:23:01.060Z",
+  "star": {
+    "id": "HIP-34444",
+    "hip": 34444,
+    "hd": 54605,
+    "proper_name": "Wezen",
+    "bayer": "Del",
+    "flam": "25",
+    "constellation": "CMa",
+    "ra": 107.097852,
+    "dec": -26.3932,
+    "magnitude": 1.83,
+    "spectral_type": "F8I",
+    "distance_ly": 1606.7
+  },
+  "artifacts": {
+    "certificate": "certificates/fmnpkdcnpa.pdf",
+    "certificate_sha256": "c45216245fac64bd62a5c35ecb3725b7a8c5d4ec9ee4dc49b3cc5207383d8963",
+    "og_image": "og/fmnpkdcnpa.png",
+    "og_sha256": "f84f4e0e8c4500fffb72c3590fc17a31b5ee2b706f40c4de2f8ad1d9596b36d0",
+    "certificate_public": true
+  }
+}

@@ -1,9 +1,20 @@
 {
-  "generated_at": "2026-09-19T23:59:49.441Z",
-  "count": 9,
-  "unique_stars": 9,
+  "generated_at": "2026-09-20T00:23:10.412Z",
+  "count": 10,
+  "unique_stars": 10,
   "duplicates": [],
   "entries": [
+    {
+      "slug": "fmnpkdcnpa",
+      "star_id": "HIP-34444",
+      "star_name": "Wezen",
+      "constellation": "CMa",
+      "magnitude": 1.83,
+      "owner_display_name": "Anna",
+      "anonymous": false,
+      "registered_at": "2026-09-20T00:23:01.060Z",
+      "dedication_message": "Hello Anna Star!"
+    },
     {
       "slug": "qwqt36aygj",
       "star_id": "HIP-72370",
