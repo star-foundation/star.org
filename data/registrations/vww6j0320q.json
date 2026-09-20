@@ -1,0 +1,30 @@
+{
+  "slug": "vww6j0320q",
+  "star_id": "HIP-22109",
+  "owner_display_name": "Google",
+  "anonymous": false,
+  "locale": null,
+  "dedication_message": "Google Star",
+  "registered_at": "2026-09-20T07:52:26.701Z",
+  "star": {
+    "id": "HIP-22109",
+    "hip": 22109,
+    "hd": 30211,
+    "proper_name": null,
+    "bayer": "Mu",
+    "flam": "57",
+    "constellation": "Eri",
+    "ra": 71.375629,
+    "dec": -3.254657,
+    "magnitude": 4.01,
+    "spectral_type": "B5I",
+    "distance_ly": 521.9
+  },
+  "artifacts": {
+    "certificate": "certificates/vww6j0320q.pdf",
+    "certificate_sha256": "34d51e77d37044a0586db8718a34c88ccc2a601a3fdee6641a903546c25e0861",
+    "og_image": "og/vww6j0320q.png",
+    "og_sha256": "ffc53b43e724a199e736e8ebb1bebd377e0549bc2bc857b1c73e6c04c65f876f",
+    "certificate_public": true
+  }
+}

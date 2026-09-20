@@ -1,9 +1,20 @@
 {
-  "generated_at": "2026-09-20T03:03:10.224Z",
-  "count": 11,
-  "unique_stars": 11,
+  "generated_at": "2026-09-20T07:52:29.451Z",
+  "count": 12,
+  "unique_stars": 12,
   "duplicates": [],
   "entries": [
+    {
+      "slug": "vww6j0320q",
+      "star_id": "HIP-22109",
+      "star_name": null,
+      "constellation": "Eri",
+      "magnitude": 4.01,
+      "owner_display_name": "Google",
+      "anonymous": false,
+      "registered_at": "2026-09-20T07:52:26.701Z",
+      "dedication_message": "Google Star"
+    },
     {
       "slug": "a31z5nqm0c",
       "star_id": "HIP-59196",
