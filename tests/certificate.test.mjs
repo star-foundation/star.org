@@ -26,6 +26,9 @@ function viewFor(recordOverrides = {}, starName = 'Vega') {
     registryUrl: 'https://star.org/registry/',
     certificateUrl: `https://star.org/certificates/${record.slug}.pdf`,
     ogImageUrl: `https://star.org/og/${record.slug}.png`,
+    // 这个文件里的断言测的是中文文案，显式指定语言；
+    // 不写的话就会跟着站点默认语言走，改默认语言时测试会莫名其妙地红。
+    locale: 'zh',
   });
 }
 

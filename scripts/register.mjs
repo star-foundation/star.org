@@ -16,6 +16,7 @@ import { readOrderInput, allocate, attachArtifacts } from './allocate.mjs';
 import { findRegistration, buildRegistryIndex, registrationPath } from './lib/registry.mjs';
 import { writeJsonAtomic } from './lib/fsx.mjs';
 import { buildStarView } from './lib/view.mjs';
+import { resolveDefaultLocale } from './lib/i18n.mjs';
 import { renderCertificate, renderOg, artifactsExist } from './lib/artifacts.mjs';
 import { renderEmail } from './lib/render.mjs';
 import { sendEmail, sendOperatorAlert } from './lib/email.mjs';
@@ -70,8 +71,10 @@ export async function runRegistration(order, args = {}) {
     certificateUrl: certificateUrl(slug),
     ogImageUrl: ogImageUrl(slug),
     certificatePublic: record.artifacts?.certificate_public !== false,
-    // 交付物语言：优先用下单时记录的语言，缺失时由 renderCertificateHtml 回退默认
-    locale: record.locale || order.locale || undefined,
+    // 交付物语言：下单时记录的语言 → 本次订单的语言 → 站点默认语言。
+    // 这里必须显式解析出结果：传 undefined 会落到 buildStarView 的默认参数上，
+    // 曾经因此静默生成中文证书（站点已是英文默认）。
+    locale: record.locale || order.locale || resolveDefaultLocale(),
   });
 
   let certificate = null;

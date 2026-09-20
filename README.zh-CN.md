@@ -86,6 +86,7 @@ npm run check            # CI 强制的全部检查：自检 + 合规 + 密钥 +
 npm test                 # 全部测试用例（82 个，含防超卖并发测试 3 轮）
 npm run test:concurrency # 只跑并发防超卖测试
 node scripts/fetch-fonts.mjs --check   # 校验内置字体与清单一致
+node scripts/rerender-artifacts.mjs --dry-run   # 按站点当前默认语言重渲染既有证书与 OG 图
 node scripts/manual-order.mjs --order-id 123456 --name "For Anna" --email a@b.com   # 人工补单
 node scripts/reconcile.mjs                                                          # 对账孤立订单
 ```

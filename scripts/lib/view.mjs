@@ -2,7 +2,7 @@ import {
   starTitle, starSubtitle, formatRa, formatDec, formatMagnitude, formatDistance,
   spectralLabel, spectralColor, skyChartSvg, constellationName, bayerLabel, starFieldSvg,
 } from './astro.mjs';
-import { formatDate } from './i18n.mjs';
+import { formatDate, resolveDefaultLocale } from './i18n.mjs';
 
 export function formatDateZh(iso) {
   const date = new Date(iso);
@@ -22,7 +22,12 @@ export function formatDateIso(iso) {
  */
 export function buildStarView({
   star, record, slug, baseUrl, registryUrl, certificateUrl, ogImageUrl,
-  certificatePublic = true, locale = 'zh',
+  certificatePublic = true,
+  // 默认跟随站点默认语言，而不是写死中文。
+  // 曾经写成 'zh'，于是调用方漏传 locale 时（老记录没有 locale 字段、register.mjs
+  // 传的是 undefined）会静默渲染出中文证书——而站点已经是英文默认，
+  // 交付物与站点语言不一致。默认值必须与站点一致，漏传才不会再无声出错。
+  locale = resolveDefaultLocale(),
 }) {
   const anonymous = Boolean(record?.anonymous);
   const displayName = anonymous ? null : record?.owner_display_name ?? null;

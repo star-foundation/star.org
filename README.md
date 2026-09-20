@@ -90,6 +90,7 @@ npm run check            # everything CI enforces: verify + compliance + secrets
 npm test                 # full test suite (82 tests, including 3 rounds of the oversell concurrency test)
 npm run test:concurrency # only the oversell concurrency test
 node scripts/fetch-fonts.mjs --check   # verify bundled fonts match their manifest
+node scripts/rerender-artifacts.mjs --dry-run    # re-render existing certificates/OG images in the site's current default language
 node scripts/manual-order.mjs --order-id 123456 --name "For Anna" --email a@b.com   # manual re-issue
 node scripts/reconcile.mjs                                                          # reconcile orphaned orders
 ```

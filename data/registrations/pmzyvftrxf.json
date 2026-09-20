@@ -21,9 +21,10 @@
   },
   "artifacts": {
     "certificate": "certificates/pmzyvftrxf.pdf",
-    "certificate_sha256": "b397b3ec74cdd6dc565e03f91944150c4e115c6c19e7e31362913c34712c12e0",
+    "certificate_sha256": "cba7cad1fe4e1dd6e4ebc96a1e1a78d5b4c15ab5998a6e8c560b66e65c15f58f",
     "og_image": "og/pmzyvftrxf.png",
-    "og_sha256": "09a19d86b4b50e27591a32a67820c6dd4dc4b555278b0a1b15cd23f790cf7ecf",
+    "og_sha256": "61b11a3c26a2492c624f162237b37023e613c5ce9377318b28118a7e2aa968bf",
     "certificate_public": true
-  }
+  },
+  "locale": "en"
 }

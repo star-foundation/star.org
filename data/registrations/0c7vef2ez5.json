@@ -3,7 +3,7 @@
   "star_id": "HIP-105502",
   "owner_display_name": "COCO",
   "anonymous": false,
-  "locale": null,
+  "locale": "en",
   "dedication_message": "Hello CoCo Star!",
   "registered_at": "2026-09-19T22:35:09.059Z",
   "star": {
@@ -22,9 +22,9 @@
   },
   "artifacts": {
     "certificate": "certificates/0c7vef2ez5.pdf",
-    "certificate_sha256": "ae44cf5fd86e38aa6e4c444de1a07d5d45b7f6e032c19438ff52b3635e9f1d1e",
+    "certificate_sha256": "6bf6f0d23b905bc8de48df34a067fd538ec461a0f94342781a10940f59db6813",
     "og_image": "og/0c7vef2ez5.png",
-    "og_sha256": "89b2fb5cc3c56928c1061af578119380b239d4b6d01e86c058a9efb9bc2c041e",
+    "og_sha256": "976860fa48ab8e4945d008ceac9fbf994071e28c9a3ad16a4c741fc2e1d2e61d",
     "certificate_public": true
   }
 }

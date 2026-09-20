@@ -3,7 +3,7 @@
   "star_id": "HIP-8903",
   "owner_display_name": "Hello",
   "anonymous": false,
-  "locale": null,
+  "locale": "en",
   "dedication_message": "Hello Hello Star.org",
   "registered_at": "2026-09-19T23:44:34.074Z",
   "star": {
@@ -22,9 +22,9 @@
   },
   "artifacts": {
     "certificate": "certificates/hst5hej7k9.pdf",
-    "certificate_sha256": "bb8136669617bea3adf623757addda5861a8da7f52f810acbc07cb9653dc2fe6",
+    "certificate_sha256": "8915a66debf3aa3ea098518fe482d21efdba4eb0aad968326690c6c64dcb9d13",
     "og_image": "og/hst5hej7k9.png",
-    "og_sha256": "041245bd81f57a624fb65233953ad6501e27175343ac62d0b166d5203d2475fa",
+    "og_sha256": "e6c40bcda4e39a67cc02d5dafd09f862ba92dc727c56f274f20c440c3f03567d",
     "certificate_public": true
   }
 }

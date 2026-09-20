@@ -21,9 +21,10 @@
   },
   "artifacts": {
     "certificate": "certificates/6rny8htcgb.pdf",
-    "certificate_sha256": "37d23f9fe41b0c6fa3240eb636b4453648135d25dc18df2dbbe7441ae7fbd5bd",
+    "certificate_sha256": "068a14ea57393835e903238527012cf2187c6d6161ced6876805a1a38e9fe0c2",
     "og_image": "og/6rny8htcgb.png",
-    "og_sha256": "837353c8c635a2086d81960c8fb8e5adf933dc1e0ef9e78dc8f9324e94287b69",
+    "og_sha256": "d0fcfcae0a44bb5d1f76e344a03303c401bbe4c0ca433fae0d415ef5f5b4d790",
     "certificate_public": true
-  }
+  },
+  "locale": "en"
 }
