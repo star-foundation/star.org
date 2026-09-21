@@ -7,7 +7,7 @@ permanent link. Every claim is written to a public registry, so **anyone can ver
 themselves that a star has been claimed only once**.
 
 This repository is a runnable implementation of the fully GitHub-hosted plan in the
-*Star.org MVP Technical Requirements v0.2*: no self-hosted server, no separate database,
+*Star.org MVP Technical Requirements v0.4*: no self-hosted server, no separate database,
 no Vercel or Supabase. Everything is compressed into the GitHub ecosystem — GitHub Pages
 plus GitHub Actions — with only two external dependencies: Lemon Squeezy (payments) and an
 email provider (both have free tiers).
@@ -24,7 +24,7 @@ carry both languages, and star pages also get a Chinese-default entry at `/zh/s/
 |---|---|---|
 | Star pool | `data/stars_pool.json` — 800 real stars from the HYG catalogue (magnitude −1.44 to 4.4) | Tech 4.1 |
 | Allocation and duplicate checking | `scripts/allocate.mjs` — uniform random pick, mkdir atomic lock, pool re-read under lock, deterministic idempotent slug | Tech 4.2 / TC-ALLOC-01~08 |
-| Landing page | `site/index.html` — value proposition, trust section, live sample, purchase entry, FAQ | PRD 4.1 / TC-LP-01~05 |
+| Landing page | `site/index.html` — value proposition, philosophy section, trust section, live sample, purchase entry, FAQ | PRD 4.1 / TC-LP-01~05 |
 | PDF certificate | `templates/certificate.html` rendered by headless Chrome → `certificates/{slug}.pdf` | Tech 4.5 / TC-PDF-01~05 |
 | Permanent link page | `/s/{slug}/` per claim, with an OG card and share buttons | Tech 4.6 / TC-PAGE-01~05 |
 | OG share image | `scripts/lib/artifacts.mjs` renders a 1200×630 PNG → `og/{slug}.png` | Tech 4.6 |
@@ -34,6 +34,8 @@ carry both languages, and star pages also get a Chinese-default entry at `/zh/s/
 | Bundled CJK fonts | `fonts/` — a ~12.5MB trimmed subset, so rendering does not depend on the runner | `DECISIONS.md` D10 |
 | Failure handling | Sold-out alerts, failure alerts, manual re-issue, order reconciliation | PRD 6 / TC-ERR-01~04 |
 | Compliance controls | `scripts/check-compliance.mjs` scans banned wording and payment channels; CI enforces it | Tech 5 / TC-COMP-01~04 |
+| Philosophy page | `/philosophy/` — all five core ideas plus whitepaper (PDF) downloads; also linked from the landing hero and the nav | TC-PHIL-01~05 |
+| Philosophy whitepaper | `docs/whitepaper/*.tex` (TeX source) → `site/assets/whitepaper/*.pdf` (Chinese + English, committed) | TC-PHIL-03 |
 
 ## 2. Architecture
 
@@ -66,6 +68,8 @@ data/registry-index.json      public registry index (for the pages and external 
 certificates/{slug}.pdf       certificates
 og/{slug}.png                 OG share images
 site/                         site sources (landing / registry / permanent / 404 / assets)
+site/assets/whitepaper/        Philosophy whitepaper PDFs (zh + en; build output, committed)
+docs/whitepaper/              Whitepaper TeX sources + build.sh (output goes to site/assets/whitepaper/)
 site/i18n/{en,zh}.json        all UI copy (single source of truth)
 fonts/                        bundled CJK font subset + manifest + OFL license
 templates/                    certificate, OG image and email templates
@@ -80,6 +84,7 @@ docs/                         product / technical / test docs, deploy and ops gu
 
 ```bash
 npm run build:pool       # rebuild the pool from the HYG catalogue (--input <csv> --limit 800 --max-mag 6.5)
+npm run build:whitepaper # compile the philosophy whitepaper (zh + en) with xelatex → site/assets/whitepaper/
 npm run allocate         # allocation only (order JSON on stdin)
 npm run register         # full pipeline: allocate → certificate → OG image → record → email
 npm run build:site       # build the static site into _site/
@@ -87,7 +92,7 @@ npm run serve            # preview _site/ locally
 npm run demo             # one-command local demo (see section 5)
 npm run verify           # registry self-check (duplicates / private fields / artifact hashes)
 npm run check            # everything CI enforces: verify + compliance + secrets + launch readiness
-npm test                 # full test suite (82 tests, including 3 rounds of the oversell concurrency test)
+npm test                 # full test suite (93 tests, including 3 rounds of the oversell concurrency test)
 npm run test:concurrency # only the oversell concurrency test
 node scripts/fetch-fonts.mjs --check   # verify bundled fonts match their manifest
 node scripts/rerender-artifacts.mjs --dry-run    # re-render existing certificates/OG images in the site's current default language
@@ -154,7 +159,7 @@ Afterwards use `git status` to find and delete those demo files — do not commi
 ### 5.4 Tests and self-checks
 
 ```bash
-npm test                # 82 tests, roughly 1-2 minutes (includes 3 rounds of the oversell concurrency test)
+npm test                # 93 tests, roughly 1-2 minutes (includes 3 rounds of the oversell concurrency test)
 npm run check           # registry self-check + compliance scan + secrets scan + launch readiness
 ```
 
@@ -169,6 +174,27 @@ npm run check           # registry self-check + compliance scan + secrets scan +
 - Optional: copy `.env.example` to `.env` and fill in the checkout URL and email keys. The
   scripts read process environment variables, so load it with
   `export $(grep -v '^#' .env | xargs)`.
+
+### 5.7 Core philosophy and whitepaper
+
+The intellectual source of the site lives in two same-source documents, and is now reflected in both the website and a PDF:
+
+- `docs/Star.org-Core-Philosophy.md` (English) / `docs/Star.org-核心理念.md` (Chinese) — the full argument for the five core ideas;
+- `docs/whitepaper/*.tex` → `site/assets/whitepaper/*.pdf` — the same content typeset as an A4 whitepaper, in Chinese and English.
+
+The whitepaper is deliberately given the most prominent positions on the site, in three places:
+
+1. **Landing page hero** — a core-philosophy entry button;
+2. **Navigation bar** — `Philosophy` / `核心理念`;
+3. **The `/philosophy/` page** — the whitepaper download card sits **above** the five ideas, in the first screen of body content.
+
+It is compiled with `xelatex` using the repository's bundled Noto Sans/Serif SC subsets (`fonts/`), so no CJK font needs to be installed locally (the same approach as certificate rendering — see `DECISIONS.md` D10). CI does not guarantee a TeX installation, so **the PDFs are committed as deliverables** and `npm run build:site` merely copies them into `_site/`:
+
+```bash
+npm run build:whitepaper   # requires xelatex locally; regenerate after editing the .tex sources
+```
+
+The whitepaper PDFs deliberately use phrasing such as "makes nothing into a financial product." They belong to `docs/` and to the typeset artifact, whereas the compliance scan targets the site's public copy (html/txt/json/css/js/xml/svg under `site/**`); `docs/` and `.tex` files were never in scope, because those files must be able to discuss those very words.
 
 ## 6. Deployment
 

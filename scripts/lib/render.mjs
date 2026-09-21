@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { PATHS, loadConfig } from './config.mjs';
 import { render } from './template.mjs';
-import { t, resolveDefaultLocale, loadCatalogs, interpolateCatalog } from './i18n.mjs';
+import { t, resolveDefaultLocale, loadCatalogs, interpolateCatalog, htmlLang } from './i18n.mjs';
 
 export function loadTemplate(name) {
   return readFileSync(path.join(PATHS.templates, name), 'utf8');
@@ -87,6 +87,8 @@ export function renderEmail(view) {
     brandName: cfg.site.name,
     supportEmail: cfg.site.supportEmail,
     registryDirUrl: cfg.site.registryDirUrl,
+    // 邮件 HTML 的 lang 属性要跟随买家语言，不能写死 zh-CN
+    htmlLang: htmlLang(locale),
     subject,
     t: artifactCatalog(locale, {
       starId: view.starId,

@@ -159,6 +159,19 @@ export function spectralLabel(spectralType, locale = 'zh') {
   return map[cls] || (locale === 'en' ? 'unknown spectral type' : '未知光谱型');
 }
 
+/**
+ * 光谱型的展示值，如 "A0V（白色星）" / "A0V (white star)"。
+ *
+ * 括号形态随语言变：中文全角、英文半角并前置一个空格。
+ * 为什么要有这个函数：括号原先写死在 site/permanent.html 与 templates/email.* 里，
+ * 结果英文页面与英文邮件上都出现了中文全角括号（"A0V（white star）"）。
+ */
+export function formatSpectralValue(spectralType, locale = 'zh') {
+  if (!spectralType) return '—';
+  const label = spectralLabel(spectralType, locale);
+  return locale === 'en' ? `${spectralType} (${label})` : `${spectralType}（${label}）`;
+}
+
 export function starTitle(star, locale = 'zh') {
   if (star.proper_name) return starName(star.proper_name, locale);
   return star.id;

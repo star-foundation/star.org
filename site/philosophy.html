@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="{{htmlLang}}" data-lang="{{locale}}" data-alt-lang="{{altLocale}}" data-alt-title="{{altTitle}}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{t.philosophy.metaTitle}} · {{siteName}}</title>
+<meta name="description" content="{{t.philosophy.metaDescription}}">
+<link rel="canonical" href="{{baseUrl}}/philosophy/">
+{{#if noindex}}<meta name="robots" content="noindex, nofollow">{{/if}}
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="{{siteName}}">
+<meta property="og:title" content="{{t.philosophy.metaTitle}} · {{siteName}}">
+<meta property="og:description" content="{{t.philosophy.metaOgDescription}}">
+<meta property="og:url" content="{{baseUrl}}/philosophy/">
+<meta property="og:image" content="{{defaultOgImage}}">
+<meta property="og:locale" content="{{ogLocale}}">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+</head>
+<body>
+<header class="site">
+  <div class="wrap nav">
+    <div class="brand"><a href="/">{{siteName}}</a></div>
+    <nav class="nav-links">
+      <a href="/philosophy/" data-i18n="common.nav.philosophy">{{t.common.nav.philosophy}}</a>
+      <a href="/registry/" data-i18n="common.nav.registry">{{t.common.nav.registry}}</a>
+      <a href="/#faq" data-i18n="common.nav.faq">{{t.common.nav.faq}}</a>
+      {{#if checkoutReady}}<a class="btn btn-primary btn-sm" href="/register/" data-i18n="common.nav.claim">{{t.common.nav.claim}}</a>{{/if}}
+      {{#if showLanguageToggle}}<button class="lang-toggle" type="button" data-lang-toggle data-self-name="{{selfLangName}}" data-alt-name="{{altLangName}}" aria-label="{{t.common.lang.switchAria}}">{{altLangName}}</button>{{/if}}
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero plain">
+    <div class="wrap">
+      <div class="eyebrow" data-i18n="philosophy.eyebrow">{{t.philosophy.eyebrow}}</div>
+      <h1 data-i18n="philosophy.title">{{t.philosophy.title}}</h1>
+      <p class="lede" data-i18n="philosophy.lede">
+        {{t.philosophy.lede}}
+      </p>
+    </div>
+  </section>
+
+  <!-- Whitepaper download: deliberately placed in the first screen of body content -->
+  <section id="whitepaper">
+    <div class="wrap">
+      <div class="wp-card">
+        <div class="wp-card-text">
+          <h2 data-i18n="philosophy.whitepaperTitle">{{t.philosophy.whitepaperTitle}}</h2>
+          <p class="section-lede" data-i18n="philosophy.whitepaperLede">{{t.philosophy.whitepaperLede}}</p>
+          <p class="wp-note" data-i18n="philosophy.whitepaperNote">{{t.philosophy.whitepaperNote}}</p>
+        </div>
+        <div class="wp-card-actions">
+          <a class="btn btn-primary" href="{{wpPrimary.url}}" download>
+            <span data-i18n="{{wpPrimary.key}}">{{wpPrimary.label}}</span>
+          </a>
+          <a class="btn btn-ghost" href="{{wpSecondary.url}}" download>
+            <span data-i18n="{{wpSecondary.key}}">{{wpSecondary.label}}</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="ideas">
+    <div class="wrap">
+      <div class="ideas">
+        <article class="idea">
+          <h2 data-i18n="philosophy.s1Title">{{t.philosophy.s1Title}}</h2>
+          <p data-i18n="philosophy.s1Body">{{t.philosophy.s1Body!}}</p>
+          <p class="idea-note" data-i18n="philosophy.s1Note">{{t.philosophy.s1Note!}}</p>
+        </article>
+        <article class="idea">
+          <h2 data-i18n="philosophy.s2Title">{{t.philosophy.s2Title}}</h2>
+          <p data-i18n="philosophy.s2Body">{{t.philosophy.s2Body!}}</p>
+          <p class="idea-note" data-i18n="philosophy.s2Note">{{t.philosophy.s2Note!}}</p>
+        </article>
+        <article class="idea">
+          <h2 data-i18n="philosophy.s3Title">{{t.philosophy.s3Title}}</h2>
+          <p data-i18n="philosophy.s3Body">{{t.philosophy.s3Body!}}</p>
+          <p class="idea-note" data-i18n="philosophy.s3Note">{{t.philosophy.s3Note!}}</p>
+        </article>
+        <article class="idea">
+          <h2 data-i18n="philosophy.s4Title">{{t.philosophy.s4Title}}</h2>
+          <p data-i18n="philosophy.s4Body">{{t.philosophy.s4Body!}}</p>
+          <p class="idea-note" data-i18n="philosophy.s4Note">{{t.philosophy.s4Note!}}</p>
+        </article>
+        <article class="idea">
+          <h2 data-i18n="philosophy.s5Title">{{t.philosophy.s5Title}}</h2>
+          <p data-i18n="philosophy.s5Body">{{t.philosophy.s5Body!}}</p>
+          <p class="idea-note" data-i18n="philosophy.s5Note">{{t.philosophy.s5Note!}}</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="chain">
+    <div class="wrap narrow center">
+      <h2 data-i18n="philosophy.chainTitle">{{t.philosophy.chainTitle}}</h2>
+      <p class="section-lede" style="margin-left:auto;margin-right:auto;" data-i18n="philosophy.chainLede">{{t.philosophy.chainLede}}</p>
+      <div class="chain">
+        <span class="chain-node" data-i18n="landing.philosophy.i1Title">{{t.landing.philosophy.i1Title}}</span>
+        <span class="chain-arrow">→</span>
+        <span class="chain-node" data-i18n="landing.philosophy.i2Title">{{t.landing.philosophy.i2Title}}</span>
+        <span class="chain-arrow">→</span>
+        <span class="chain-node" data-i18n="landing.philosophy.i3Title">{{t.landing.philosophy.i3Title}}</span>
+        <span class="chain-arrow">→</span>
+        <span class="chain-node" data-i18n="landing.philosophy.i4Title">{{t.landing.philosophy.i4Title}}</span>
+        <span class="chain-arrow">→</span>
+        <span class="chain-node" data-i18n="landing.philosophy.i5Title">{{t.landing.philosophy.i5Title}}</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="buy">
+    <div class="wrap narrow center">
+      <h2 data-i18n="philosophy.ctaTitle">{{t.philosophy.ctaTitle}}</h2>
+      <p class="section-lede" style="margin-left:auto;margin-right:auto;" data-i18n="philosophy.ctaLede">{{t.philosophy.ctaLede}}</p>
+      <div class="hero-actions" style="justify-content:center;">
+        {{#if checkoutReady}}
+        <a class="btn btn-primary" href="/register/" data-i18n="philosophy.ctaClaim">{{t.philosophy.ctaClaim}}</a>
+        {{/if}}
+        {{#unless checkoutReady}}
+        <span class="btn btn-primary is-disabled" data-i18n="{{entryLabelKey}}">{{entryLabel}}</span>
+        {{/unless}}
+        <a class="btn btn-ghost" href="/registry/" data-i18n="philosophy.ctaRegistry">{{t.philosophy.ctaRegistry}}</a>
+        <a class="btn btn-ghost" href="/" data-i18n="philosophy.ctaHome">{{t.philosophy.ctaHome}}</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site">
+  <div class="wrap foot-grid">
+    <div class="disclaimer">
+      <span data-i18n="philosophy.footerDisclaimer">{{t.philosophy.footerDisclaimer}}</span>
+      <br><span data-i18n="common.footer.contact">{{t.common.footer.contact}}</span><a href="mailto:{{supportEmail}}">{{supportEmail}}</a>
+    </div>
+    <div>
+      <a href="/philosophy/" data-i18n="common.nav.philosophy">{{t.common.nav.philosophy}}</a> ·
+      <a href="/registry/" data-i18n="common.nav.registry">{{t.common.nav.registry}}</a> ·
+      <a href="/#faq" data-i18n="common.nav.faq">{{t.common.nav.faq}}</a>
+      {{#if registryRepoUrl}}· <a href="{{registryRepoUrl}}" rel="noopener" data-i18n="common.nav.repo">{{t.common.nav.repo}}</a>{{/if}}
+      <div class="muted" style="margin-top:8px;">© {{year}} {{siteName}}</div>
+    </div>
+  </div>
+</footer>
+{{i18nAltScript!}}
+<script src="/assets/js/site.js" defer></script>
+</body>
+</html>

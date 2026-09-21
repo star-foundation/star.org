@@ -4,20 +4,20 @@
 
 {{t.email.introPlain}}
 
-{{t.email.rowStar}}：{{starTitle}}（{{starId}}）
-{{t.email.rowConstellation}}：{{starSubtitle}}
-{{t.email.rowCoords}}：{{t.email.coordsValue}}
-{{t.star.magnitude}}：{{magnitudeText}}（{{spectralText}}）
-{{t.star.distance}}：{{distanceText}}
-{{t.star.date}}：{{registeredDate}}
+{{t.email.rowStar}}{{t.email.kvSep}}{{starTitle}}{{t.email.parenOpen}}{{starId}}{{t.email.parenClose}}
+{{t.email.rowConstellation}}{{t.email.kvSep}}{{starSubtitle}}
+{{t.email.rowCoords}}{{t.email.kvSep}}{{t.email.coordsValue}}
+{{t.star.magnitude}}{{t.email.kvSep}}{{magnitudeText}}{{t.email.parenOpen}}{{spectralText}}{{t.email.parenClose}}
+{{t.star.distance}}{{t.email.kvSep}}{{distanceText}}
+{{t.star.date}}{{t.email.kvSep}}{{registeredDate}}
 {{#if dedication}}
-{{t.star.dedication}}：{{dedication}}
+{{t.star.dedication}}{{t.email.kvSep}}{{dedication}}
 {{/if}}
 {{t.email.permalinkLabel}}{{permalink}}
 {{#if certificatePublic}}{{t.email.certFileLabel}}{{certificateUrl}}
 {{/if}}{{t.email.claimNumberLabel}}{{slug}}
 
-{{t.cert.verifyTitle}}：
+{{t.cert.verifyTitle}}{{t.email.kvSep}}
 {{t.email.verifyBody}}
 
 {{t.registry.footerDisclaimer}}

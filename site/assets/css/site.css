@@ -375,3 +375,102 @@ footer.site .disclaimer { max-width: 620px; line-height: 1.8; }
   cursor: pointer;
 }
 .lang-toggle:hover { color: var(--ink); border-color: var(--ink-soft); }
+
+/* =====================================================================
+   核心理念（落地页 #philosophy 区块 / /philosophy/ 页面）
+   ===================================================================== */
+
+/* 五条理念的列表：两列自适应，窄屏自动折成单列 */
+.ideas {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  margin: 26px 0 0;
+}
+.idea {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius, 14px);
+  padding: 20px 22px;
+}
+.idea h3 {
+  font-family: var(--serif);
+  font-size: 17px;
+  margin: 0 0 10px;
+  font-weight: 600;
+}
+.idea p { margin: 0; font-size: 14.5px; line-height: 1.75; color: var(--ink-soft); }
+/* 每条的补充说明：与正文拉开一点层次 */
+.idea .idea-note,
+.idea p.idea-note {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--line);
+  font-size: 13.5px;
+  color: var(--ink-faint);
+}
+/* 理念页的 h2 用在每张卡片里，比正文 h2 小一号 */
+#ideas .idea h2 { font-size: clamp(18px, 2.2vw, 21px); }
+
+/* 落地页里的白皮书条：浅底、左侧金色竖线 */
+.wp-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 26px;
+  padding: 18px 22px;
+  border-radius: var(--radius, 14px);
+  background: var(--surface-soft);
+  border-left: 3px solid var(--gold);
+}
+.wp-inline-text { font-size: 13.5px; color: var(--ink-faint); }
+.wp-inline-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+
+/* 理念页顶部的白皮书卡片 */
+.wp-card {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 26px 28px;
+  border-radius: var(--radius, 14px);
+  background: linear-gradient(140deg, #1b2440, #10162a);
+  color: #f2efe8;
+}
+.wp-card-text { flex: 1 1 380px; }
+.wp-card h2 { color: #f2efe8; margin-bottom: 10px; }
+.wp-card .section-lede { color: #b9c1d2; margin-bottom: 10px; }
+.wp-card .wp-note { margin: 0; font-size: 13px; color: #98a1b5; }
+.wp-card-actions { display: flex; flex-direction: column; gap: 12px; flex: 0 0 auto; }
+.wp-card-actions .btn { white-space: nowrap; }
+
+/* 五条理念的串联链：横向节点，窄屏换行 */
+.chain {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 12px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 8px;
+}
+.chain-node {
+  display: inline-block;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 13.5px;
+}
+.chain-arrow { color: var(--ink-faint); }
+
+/* 白皮书卡片是深色底：默认的 btn-ghost 用 --accent 上色（浅色主题下是深蓝），
+   深底 + 深字会几乎看不见，所以卡片里的次要按钮改用浅色描边与浅色文字。 */
+.wp-card .btn-ghost {
+  color: #f2efe8;
+  border-color: rgba(242, 239, 232, 0.45);
+  background: transparent;
+}
+.wp-card .btn-ghost:hover { color: #fff; border-color: #fff; }

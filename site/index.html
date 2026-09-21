@@ -23,6 +23,7 @@
   <div class="wrap nav">
     <div class="brand"><a href="/">{{siteName}}</a></div>
     <nav class="nav-links">
+      <a href="/philosophy/" data-i18n="common.nav.philosophy">{{t.common.nav.philosophy}}</a>
       <a href="/registry/" data-i18n="common.nav.registry">{{t.common.nav.registry}}</a>
       <a href="#faq" data-i18n="common.nav.faq">{{t.common.nav.faq}}</a>
       {{#if checkoutReady}}<a class="btn btn-primary btn-sm" href="/register/" data-i18n="common.nav.claim">{{t.common.nav.claim}}</a>{{/if}}
@@ -48,11 +49,49 @@
         <span class="btn btn-primary is-disabled" data-i18n="{{entryLabelKey}}">{{entryLabel}}</span>
         <a class="btn btn-ghost" href="/registry/" data-i18n="landing.ctaRegistry">{{t.landing.ctaRegistry}}</a>
         {{/unless}}
+        <a class="btn btn-ghost" href="/philosophy/" data-i18n="landing.ctaPhilosophy">{{t.landing.ctaPhilosophy}}</a>
       </div>
       <div class="price-note">{{priceDisplay}} · {{priceNote}}</div>
       {{#unless checkoutReady}}
       <div class="notice"><span data-i18n="{{entryMessageKey}}">{{entryMessage}}</span>{{#if soldOut}}<span data-i18n="state.soldOutNote">{{t.state.soldOutNote}}</span>{{/if}}</div>
       {{/unless}}
+    </div>
+  </section>
+
+  <section id="philosophy">
+    <div class="wrap">
+      <div class="eyebrow" data-i18n="landing.philosophy.eyebrow">{{t.landing.philosophy.eyebrow}}</div>
+      <h2 data-i18n="landing.philosophy.title">{{t.landing.philosophy.title}}</h2>
+      <p class="section-lede" data-i18n="landing.philosophy.lede">{{t.landing.philosophy.lede}}</p>
+      <div class="ideas">
+        <article class="idea">
+          <h3 data-i18n="landing.philosophy.i1Title">{{t.landing.philosophy.i1Title}}</h3>
+          <p data-i18n="landing.philosophy.i1Body">{{t.landing.philosophy.i1Body!}}</p>
+        </article>
+        <article class="idea">
+          <h3 data-i18n="landing.philosophy.i2Title">{{t.landing.philosophy.i2Title}}</h3>
+          <p data-i18n="landing.philosophy.i2Body">{{t.landing.philosophy.i2Body!}}</p>
+        </article>
+        <article class="idea">
+          <h3 data-i18n="landing.philosophy.i3Title">{{t.landing.philosophy.i3Title}}</h3>
+          <p data-i18n="landing.philosophy.i3Body">{{t.landing.philosophy.i3Body!}}</p>
+        </article>
+        <article class="idea">
+          <h3 data-i18n="landing.philosophy.i4Title">{{t.landing.philosophy.i4Title}}</h3>
+          <p data-i18n="landing.philosophy.i4Body">{{t.landing.philosophy.i4Body!}}</p>
+        </article>
+        <article class="idea">
+          <h3 data-i18n="landing.philosophy.i5Title">{{t.landing.philosophy.i5Title}}</h3>
+          <p data-i18n="landing.philosophy.i5Body">{{t.landing.philosophy.i5Body!}}</p>
+        </article>
+      </div>
+      <div class="wp-inline">
+        <div class="wp-inline-text" data-i18n="landing.philosophy.whitepaperNote">{{t.landing.philosophy.whitepaperNote}}</div>
+        <div class="wp-inline-actions">
+          <a class="btn btn-primary" href="{{whitepaperUrl}}" download data-i18n="landing.ctaWhitepaper">{{t.landing.ctaWhitepaper}}</a>
+          <a class="btn btn-ghost" href="/philosophy/" data-i18n="landing.philosophy.cta">{{t.landing.philosophy.cta}}</a>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -117,7 +156,7 @@
           <div><dt data-i18n="star.date">{{t.star.date}}</dt><dd data-i18n-alt="{{sampleAlt.registeredDate}}">{{sample.registeredDate}}</dd></div>
         </div>
         {{#if sample.dedication}}
-        <div class="sample-quote">「{{sample.dedication}}」</div>
+        <div class="sample-quote"><span data-i18n="landing.quoteOpen">{{t.landing.quoteOpen}}</span>{{sample.dedication}}<span data-i18n="landing.quoteClose">{{t.landing.quoteClose}}</span></div>
         {{/if}}
         {{#if sample.isReal}}
         <p class="muted" style="padding:0 24px 20px;font-size:13.5px;">
@@ -230,6 +269,7 @@
       <br><span data-i18n="common.footer.contact">{{t.common.footer.contact}}</span><a href="mailto:{{supportEmail}}">{{supportEmail}}</a>
     </div>
     <div>
+      <a href="/philosophy/" data-i18n="common.nav.philosophy">{{t.common.nav.philosophy}}</a> ·
       <a href="/registry/" data-i18n="common.nav.registry">{{t.common.nav.registry}}</a> ·
       <a href="#faq" data-i18n="common.nav.faq">{{t.common.nav.faq}}</a>
       {{#if registryRepoUrl}}· <a href="{{registryRepoUrl}}" rel="noopener" data-i18n="common.nav.repo">{{t.common.nav.repo}}</a>{{/if}}

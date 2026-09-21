@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="{{htmlLang}}">
 <head><meta charset="utf-8"></head>
 <body style="margin:0;padding:24px 12px;background:#f5f3ee;font-family:'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif;color:#1d2330;">
   <div style="max-width:600px;margin:0 auto;background:#ffffff;border:1px solid #e6e1d8;border-radius:10px;overflow:hidden;">
@@ -13,10 +13,10 @@
         {{t.email.intro}}
       </p>
       <table style="width:100%;border-collapse:collapse;margin:0 0 20px;font-size:14px;">
-        <tr><td style="padding:8px 0;color:#8b8577;width:92px;border-bottom:1px solid #efeae0;">{{t.email.rowStar}}</td><td style="padding:8px 0;border-bottom:1px solid #efeae0;">{{starTitle}}（{{starId}}）</td></tr>
+        <tr><td style="padding:8px 0;color:#8b8577;width:92px;border-bottom:1px solid #efeae0;">{{t.email.rowStar}}</td><td style="padding:8px 0;border-bottom:1px solid #efeae0;">{{starTitle}}{{t.email.parenOpen}}{{starId}}{{t.email.parenClose}}</td></tr>
         <tr><td style="padding:8px 0;color:#8b8577;border-bottom:1px solid #efeae0;">{{t.email.rowConstellation}}</td><td style="padding:8px 0;border-bottom:1px solid #efeae0;">{{starSubtitle}}</td></tr>
         <tr><td style="padding:8px 0;color:#8b8577;border-bottom:1px solid #efeae0;">{{t.email.rowCoords}}</td><td style="padding:8px 0;border-bottom:1px solid #efeae0;">{{t.email.coordsValue}}</td></tr>
-        <tr><td style="padding:8px 0;color:#8b8577;border-bottom:1px solid #efeae0;">{{t.star.magnitude}}</td><td style="padding:8px 0;border-bottom:1px solid #efeae0;">{{magnitudeText}}（{{spectralText}}）</td></tr>
+        <tr><td style="padding:8px 0;color:#8b8577;border-bottom:1px solid #efeae0;">{{t.star.magnitude}}</td><td style="padding:8px 0;border-bottom:1px solid #efeae0;">{{magnitudeText}}{{t.email.parenOpen}}{{spectralText}}{{t.email.parenClose}}</td></tr>
         <tr><td style="padding:8px 0;color:#8b8577;border-bottom:1px solid #efeae0;">{{t.star.distance}}</td><td style="padding:8px 0;border-bottom:1px solid #efeae0;">{{distanceText}}</td></tr>
         <tr><td style="padding:8px 0;color:#8b8577;">{{t.star.date}}</td><td style="padding:8px 0;">{{registeredDate}}</td></tr>
       </table>

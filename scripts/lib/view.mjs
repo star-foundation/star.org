@@ -1,6 +1,7 @@
 import {
   starTitle, starSubtitle, formatRa, formatDec, formatMagnitude, formatDistance,
-  spectralLabel, spectralColor, skyChartSvg, constellationName, bayerLabel, starFieldSvg,
+  spectralLabel, spectralColor, formatSpectralValue, skyChartSvg, constellationName,
+  bayerLabel, starFieldSvg,
 } from './astro.mjs';
 import { formatDate, resolveDefaultLocale } from './i18n.mjs';
 
@@ -48,6 +49,11 @@ export function buildStarView({
     spectralText: star.spectral_type || '—',
     spectralLabel: spectralLabel(star.spectral_type, locale),
     spectralColor: spectralColor(star.spectral_type),
+    // 光谱型的展示值（如 "A0V（A 型主序星）" / "A0V (A-type main-sequence star)"）。
+    // 括号形态随语言变：中文用全角、英文用半角。
+    // 原先这个括号写死在 site/permanent.html 与 templates/email.* 里，
+    // 于是英文页与英文邮件上都出现了中文全角括号。
+    spectralValue: formatSpectralValue(star.spectral_type, locale),
     skyChartSvg: skyChartSvg(star, { locale }),
     starFieldSvg: starFieldSvg(slug),
     registeredAt,

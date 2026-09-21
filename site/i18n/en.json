@@ -4,6 +4,9 @@
     "tagline": "Every claim is publicly verifiable"
   },
   "email": {
+    "kvSep": ": ",
+    "parenOpen": " (",
+    "parenClose": ")",
     "heading": "Your star claim is complete",
     "greetingWithName": "Hello {{name}},",
     "greetingPlain": "Hello,",
@@ -31,7 +34,8 @@
       "registry": "Public registry",
       "faq": "FAQ",
       "claim": "Claim a star",
-      "repo": "Public repository"
+      "repo": "Public repository",
+      "philosophy": "Philosophy"
     },
     "footer": {
       "contact": "Contact: "
@@ -83,6 +87,10 @@
     "metaOgDescription": "Claim a real star and receive a PDF certificate with real astronomical data plus a permanent link. Every claim can be publicly verified.",
     "ctaBrowse": "Browse the public registry first",
     "ctaRegistry": "View the public registry",
+    "ctaPhilosophy": "Our philosophy: why we do this",
+    "quoteOpen": "“",
+    "quoteClose": "”",
+    "ctaWhitepaper": "Philosophy whitepaper (PDF)",
     "trust": {
       "title": "Why this claim can be verified",
       "lede": "The unsettling part of services like this is that you cannot verify anything: you do not know whether your name will be resold to the next person, or how long the records will survive. We address the first problem by publishing the entire registry.",
@@ -116,6 +124,24 @@
       "step3Title": "Get the email and share",
       "step3Body": "Within minutes you receive an email with the certificate and permanent link; the link renders a card when shared on social platforms."
     },
+    "philosophy": {
+      "eyebrow": "Core philosophy",
+      "title": "Why we claim stars",
+      "lede": "Star.org is not just a commemorative keepsake shop. Behind it lies a whole set of ideas about how a civilization measures itself, how the universe gets developed, and how each person takes part — written up as five ideas and a whitepaper.",
+      "i1Title": "A civilization is measured by information utilization",
+      "i1Body": "We habitually measure civilization by <strong>energy utilization</strong>: how much energy you can harness decides which rung you stand on. We propose another, equally fundamental yardstick — <strong>information utilization</strong>, the degree to which a civilization grasps true information about the universe. By this measure Earth is at <strong>Information Civilization, Level One</strong>: we have only just begun to record and share the universe's information planet-wide.",
+      "i2Title": "The universe has three ores; we mine the information ore",
+      "i2Body": "The universe holds three fundamentally different resources: <strong>information ore, energy ore, and matter ore</strong>. Energy ore and matter ore both require enormous industrial and spacefaring capacity to touch. Only information ore asks not for a starship but for <strong>attention</strong> — the one resource every person can start on immediately. So that is what we develop.",
+      "i3Title": "The key to a bond with a star is the right to name",
+      "i3Body": "The biggest bottleneck in developing space is that it makes ordinary people feel it has nothing to do with them. To involve all of humanity, each person first needs a real bond with the sky — <strong>the right to name</strong>. Name and claim a real star, and it stops being a point of light on a backdrop and becomes “my star.” (This is a personal bond of emotion and memory, not official IAU naming.)",
+      "i4Title": "Whoever pays attention is developing it",
+      "i4Body": "To “develop” information ore is not to dig it open but to <strong>observe, record, understand, and tell</strong> it. So whoever observes or attends to a star's information is developing that star's information ore, and therefore holds a certain <strong>information right</strong> over it. We make that record public, transparent and independently verifiable.",
+      "i5Title": "Not in body — but in information and imagination",
+      "i5Body": "Our bodies cannot reach the distant stars, but our <strong>information and imagination</strong> can. <em>The Three-Body Problem</em>, <em>Star Trek</em>, and the starfields of every game turn human attention and imagination toward the cosmos — a special mode of mining information ore that completes the mining of real celestial data.",
+      "cta": "Read the full philosophy",
+      "whitepaperCta": "Download the philosophy whitepaper (PDF)",
+      "whitepaperNote": "Typeset in TeX · Chinese and English editions"
+    },
     "buy": {
       "title": "Claim a star of your own",
       "lede": "{{price}} · {{priceNote}}. Checkout is handled by Lemon Squeezy as the Merchant of Record, and supports ordinary fiat payment methods such as credit cards.",
@@ -139,6 +165,42 @@
       "a7": "The system randomly assigns one unclaimed star from the pool, so everyone has the same chance and nobody can know in advance which star they will get. Every claim therefore corresponds to a real, naked-eye star (fainter ones are easier to see away from light pollution), and it removes the hesitation and waiting that a \"pick your star\" step would introduce."
     },
     "footerDisclaimer": "{{siteName}} provides a commemorative, publicly verifiable star claim service. It does not constitute official naming by the International Astronomical Union (IAU) and confers no naming right over any celestial body. Astronomical data shown on certificates comes from public catalogues."
+  },
+  "philosophy": {
+    "metaTitle": "Core philosophy",
+    "metaDescription": "The five core ideas of Star.org: a civilization's level is defined by information utilization rather than energy utilization (Earth is currently Information Civilization, Level One); the universe holds information, energy and matter ore; the right to name is the key to a bond with a star; whoever pays attention is developing it and holds an information right; our bodies cannot reach the stars, but our information and imagination can. Includes the philosophy whitepaper (PDF).",
+    "metaOgDescription": "Civilization level is defined by information utilization; the universe has three ores and we mine the information ore; naming is the key to a bond with a star; whoever pays attention is developing it. Includes the philosophy whitepaper (PDF).",
+    "eyebrow": "Star.org core philosophy",
+    "title": "The height of a civilization is also decided by how much of the universe it can see clearly",
+    "lede": "Humanity already measures the height of a civilization by its energy. We want to establish how much of the universe we understand as a measure in its own right. The five ideas below are not parallel slogans but a single chain of reasoning that joins end to end: from the yardstick, to the resource, to the participants, to the rights, and finally to another way of reaching the cosmos.",
+    "whitepaperTitle": "The philosophy whitepaper",
+    "whitepaperLede": "The full argument — all five ideas, the comparison table of the three ores, and the summary chain — has been typeset into a whitepaper with TeX. We suggest reading the whitepaper first, then coming back to this web summary.",
+    "whitepaperEn": "Download the English Edition (PDF)",
+    "whitepaperZh": "Download the Chinese Edition (PDF)",
+    "whitepaperNote": "Both editions have identical content, are A4, and are ready to print.",
+    "s1Title": "1. Civilization level: from energy utilization to information utilization",
+    "s1Body": "The most commonly cited yardstick for civilization is <strong>energy utilization</strong>: how much energy a civilization can harness determines its place on the cosmic ladder. From burning wood and coal, to nuclear fission, to the hypothetical Dyson sphere that wraps a star, the scale is a magnitude of energy. This yardstick carries a hidden premise — it measures what a civilization can <em>do</em>, not what it <em>knows</em>. Star.org proposes another, equally fundamental yardstick: <strong>information utilization</strong>, the degree to which a civilization grasps true information about the universe and can turn it into understanding and action. It measures a civilization's cognitive frontier, not its power ceiling. The two are not opposed: energy decides whether a civilization can move, information decides whether it can see.",
+    "s1Note": "By information utilization, Earth is currently at “Information Civilization, Level One”: we have only just begun to systematically record and share the universe's information planet-wide, and the celestial bodies we can see, measure and describe are an extremely small patch relative to the whole cosmos. This is the starting point, not the endpoint.",
+    "s2Title": "2. Three kinds of ore in the universe: information, energy, matter",
+    "s2Body": "If we treat the universe as a treasure to be developed, it consists of three fundamentally different resources. <strong>Energy ore</strong> is the energy that can be harnessed, and demands engineering and industrial capacity. <strong>Matter ore</strong> is physical substance that can be collected or manufactured, and demands the ability to reach and extract. <strong>Information ore</strong> is information about celestial bodies and phenomena — position, magnitude, distance, spectrum, motion, history, even the stories behind them — and demands not a starship but <strong>attention</strong>. The difference among the three is not how precious they are but <strong>the barrier to entry</strong>: energy and matter ore are out of reach for an individual, while information ore is open to everyone.",
+    "s2Note": "Star.org focuses on developing information ore, because among the three it is the only resource that lets all of humanity get started immediately, without first colonizing the cosmos.",
+    "s3Title": "3. How to mobilize all of humanity: a bond with the stars, and the right to name",
+    "s3Body": "The grand narrative of humanity developing the cosmos tends to make ordinary people feel that it is a matter for astronauts, scientists and billionaires. When something has no concrete connection to an individual, it generates no real drive to participate. Among all the ways of forging a bond, we hold that the most fundamental and most moving is <strong>the right to name</strong>: to name a star is humanity's oldest and most instinctive act of cognition, and once a name is given, that star stops being a point of light on a backdrop and becomes “my star” — a concrete, identifiable, callable sense of belonging.",
+    "s3Note": "An important clarification: “naming / claiming” here is a personal bond of emotion and cognition — an observation and memorial marker that a namer establishes for a real celestial body. It does not constitute, and does not claim to be, a naming right granted by the International Astronomical Union (IAU) or any other official body.",
+    "s4Title": "4. Information rights: whoever attends, develops — and therefore holds",
+    "s4Body": "For a star's information ore, to “develop” is not to dig it open but to <strong>observe, record, understand and tell</strong> it. Three steps follow. <strong>Attention = development</strong>: every act of attention is an act of extraction from that star's information ore. <strong>Development = contribution</strong>: the attention, observation, stories and memory a person invests are real and indelible. <strong>Investment = right</strong>: whoever pays attention to a star holds a certain right over its information — one that can be marked, recorded and preserved long-term.",
+    "s4Note": "This right is an identifiable, recordable and preservable bond of attention; a record of developing that star's information ore; and a memorial and emotional belonging that belongs to the namer. It is not physical possession of the star itself, not exclusive control of all astronomical data about it (the real data belongs to the scientific commons and to all humanity), and not a transferable financial instrument whose value can grow. The site does not treat a star as property to be handed over, does not turn it into a financial product, and does not present it as something that will gain in value.",
+    "s5Title": "5. Not in body — but in information and imagination",
+    "s5Body": "Physically, the human body is confined to Earth; for any foreseeable future, energy ore and matter ore are beyond the reach of the vast majority of people. But what defines a person or a civilization is not only where its body resides, but <strong>how far its information has reached and how far its imagination extends</strong>. The science fiction of <em>The Three-Body Problem</em>, the film and television of <em>Star Trek</em>, and the starfields of games all turn human attention and imagination toward the cosmos. They extract not a gram of matter and not a wisp of energy, yet they mine the most precious thing of all: humanity's understanding and imagination of who we are and where in the universe we stand.",
+    "s5Note": "Imagination needs real celestial information as its soil, and real information needs imagination to give it meaning. Claiming a real star is mining that star's information ore; being stirred toward the sky by science fiction and games is also mining humanity's collective information ore — different veins of the same ore.",
+    "chainTitle": "How the five ideas form one line",
+    "chainLede": "From the yardstick, to the resource, to the participants, to the rights, and finally to another way of reaching the cosmos.",
+    "ctaTitle": "Turn the philosophy into a concrete star",
+    "ctaLede": "On the product side the philosophy comes down to something very simple: claim a real, existing star, receive a certificate carrying real astronomical data and a permanent link, and have that record be public and independently verifiable.",
+    "ctaClaim": "Claim a star",
+    "ctaRegistry": "Browse the public registry",
+    "ctaHome": "Back to home",
+    "footerDisclaimer": "{{siteName}} provides a commemorative, publicly verifiable star claiming service. It does not constitute official naming by the International Astronomical Union (IAU), and does not represent any celestial naming right."
   },
   "notfound": {
     "metaTitle": "Page not found",

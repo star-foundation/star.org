@@ -10,6 +10,7 @@
   "scripts": {
     "build:pool": "node scripts/build-pool.mjs",
     "build:site": "node scripts/build-site.mjs",
+    "build:whitepaper": "bash docs/whitepaper/build.sh",
     "allocate": "node scripts/allocate.mjs",
     "register": "node scripts/register.mjs",
     "manual-order": "node scripts/manual-order.mjs",

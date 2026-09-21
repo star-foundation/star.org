@@ -314,6 +314,30 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
     projectBase: `/${cfg.site.registryRepoUrl.split('/').filter(Boolean).pop() || 'star.org'}/`,
   };
 
+  // 白皮书下载入口：两种语言的 PDF 都在，但**按当前语言决定哪个是主按钮**——
+  // 中文页主推中文版，英文页主推英文版。URL 本身与语言无关（同一个文件），
+  // 只有按钮顺序与文案随语言变。
+  //
+  // 定义位置必须在 landingScope 之前：landingScope 内部会调用它。
+  const whitepaperScope = (pageLocale, pageT) => {
+    const zh = {
+      url: '/assets/whitepaper/star-org-whitepaper-zh.pdf',
+      key: 'philosophy.whitepaperZh',
+      label: pageT.philosophy.whitepaperZh,
+    };
+    const en = {
+      url: '/assets/whitepaper/star-org-whitepaper-en.pdf',
+      key: 'philosophy.whitepaperEn',
+      label: pageT.philosophy.whitepaperEn,
+    };
+    const primary = pageLocale === 'zh' ? zh : en;
+    return {
+      whitepaperUrl: primary.url,
+      wpPrimary: primary,
+      wpSecondary: primary === zh ? en : zh,
+    };
+  };
+
   // 落地页
   // 示例区的文案里带 {{count}} / {{slug}} / {{ident}}，这些值只有拿到 sample 之后才知道，
   // 所以落地页用自己那一份目录（在基础变量上补这三个值），不从 common.t 复用。
@@ -331,6 +355,7 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
     const pageTAlt = interpolateCatalog(loadCatalogs()[pageAltLocale], pageSampleVars);
     return {
       ...common,
+      ...whitepaperScope(pageLocale, pageT),
       locale: pageLocale,
       altLocale: pageAltLocale,
       htmlLang: htmlLang(pageLocale),
@@ -365,6 +390,41 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
     });
     ensureDir(path.join(outDir, hiddenEntrySegment));
     writeFileAtomic(path.join(outDir, hiddenEntrySegment, 'index.html'), relativize(hidden, 1));
+  }
+
+  // 核心理念页：五条理念的完整网页版 + 白皮书（PDF）下载入口。
+  // 白皮书是站点的思想源头，所以在导航、落地页 hero 与独立页面三处都给了入口。
+  const philosophyHtml = renderPage('philosophy.html', {
+    ...common,
+    t: pageCatalog(),
+    tAltFlat: flattenCatalog(pageCatalogAlt()),
+    ...whitepaperScope(locale, t),
+  });
+  ensureDir(path.join(outDir, 'philosophy'));
+  writeFileAtomic(path.join(outDir, 'philosophy', 'index.html'), relativize(philosophyHtml, 1));
+
+  // 理念页的中文默认入口（与落地页同样按 hiddenEntryPath 隐藏）
+  if (hiddenEntrySegment) {
+    const philosophyHidden = renderPage('philosophy.html', {
+      ...common,
+      locale: altLocale,
+      altLocale: locale,
+      htmlLang: htmlLang(altLocale),
+      ogLocale: ogLocale(altLocale),
+      selfLangName: loadCatalogs()[altLocale].common.lang.name,
+      altLangName: loadCatalogs()[locale].common.lang.name,
+      altTitle: `${cfg.site.name} · ${loadCatalogs()[locale].brand.tagline}`,
+      t: pageCatalogFor(altLocale),
+      tAltFlat: flattenCatalog(pageCatalogFor(locale)),
+      ...whitepaperScope(altLocale, pageCatalogFor(altLocale)),
+      showLanguageToggle: false,
+      noindex: true,
+    });
+    ensureDir(path.join(outDir, hiddenEntrySegment, 'philosophy'));
+    writeFileAtomic(
+      path.join(outDir, hiddenEntrySegment, 'philosophy', 'index.html'),
+      relativize(philosophyHidden, 2),
+    );
   }
 
   // 认领页（三个申请入口统一指向这里；表单在这里填写姓名/献词/匿名）
@@ -556,13 +616,17 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
   );
   const urls = [
     `${cfg.site.baseUrl}/`,
+    `${cfg.site.baseUrl}/philosophy/`,
     `${cfg.site.baseUrl}/register/`,
     `${cfg.site.baseUrl}/registry/`,
     ...records.map((record) => registrationUrl(record.slug)),
     // 中文默认入口也要能被搜索引擎收录（与英文页用 hreflang 互链）；
     // 隐藏中文时反过来——被隐藏的语言不该出现在 sitemap 里。
     ...(showLanguageToggle
-      ? records.map((record) => `${cfg.site.baseUrl}/${hiddenEntrySegment || 'zh'}/s/${record.slug}/`)
+      ? [
+        `${cfg.site.baseUrl}/${hiddenEntrySegment || 'zh'}/philosophy/`,
+        ...records.map((record) => `${cfg.site.baseUrl}/${hiddenEntrySegment || 'zh'}/s/${record.slug}/`),
+      ]
       : []),
   ];
   writeFileAtomic(
@@ -593,7 +657,7 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
 
   return {
     outDir,
-    pages: pages + 2,
+    pages: pages + 3,
     registryCount: index.count,
     available,
     soldOut,

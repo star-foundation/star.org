@@ -1,0 +1,120 @@
+% =====================================================================
+%  Star.org 白皮书 · 共享排版样式
+% =====================================================================
+%  用法：语言源文件先 \input{preamble.tex}，再写正文。
+%  字体使用仓库内置的 Noto Sans/Serif SC 子集（fonts/），
+%  渲染不依赖运行环境是否安装中文字体（见 DECISIONS D10）。
+% =====================================================================
+
+\usepackage{fontspec}
+\usepackage{xeCJK}
+
+% ---- 字体：仓库内置的 Noto Sans/Serif SC 子集 ----
+% 路径相对于编译工作目录（docs/whitepaper/）。字体随仓库内置，
+% 渲染结果不再依赖运行环境是否安装中文字体（DECISIONS D10）。
+% 子集覆盖 CJK 统一表意文字 U+4E00–U+9FFF 全区间（见 fonts/manifest.json）。
+% 内置子集只有 Regular 一个字重，AutoFakeBold 用于合成粗体，
+% 否则 \bfseries 会静默回退到 Regular、标题看不出层级。
+\setCJKmainfont[Path=../../fonts/,AutoFakeBold=2.5]{NotoSerifSC-Regular.subset.otf}
+\setCJKsansfont[Path=../../fonts/,AutoFakeBold=2.5]{NotoSansSC-Regular.subset.otf}
+\setCJKmonofont[Path=../../fonts/]{NotoSansSC-Regular.subset.otf}
+% 拉丁字母与数字沿用 TeX 自带的 Latin Modern（任何 TeX Live 环境都有），
+% 不依赖系统是否安装 Helvetica 一类的西文字体。
+
+\usepackage{geometry}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{fancyhdr}
+\usepackage{setspace}
+\usepackage{parskip}
+\usepackage{caption}
+\usepackage{ragged2e}
+\usepackage{microtype}
+\usepackage[hidelinks]{hyperref}
+
+% ---- 页面 ----
+\geometry{a4paper, top=26mm, bottom=24mm, left=24mm, right=24mm}
+
+% ---- 配色（与站点一致的深蓝 + 金）----
+\definecolor{ink}{HTML}{111827}
+\definecolor{inksoft}{HTML}{4B5563}
+\definecolor{inkfaint}{HTML}{6B7280}
+\definecolor{accent}{HTML}{1E3A8A}
+\definecolor{gold}{HTML}{B08430}
+\definecolor{line}{HTML}{D8DEE9}
+\definecolor{surface}{HTML}{F6F7FB}
+
+% ---- 页眉页脚 ----
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+\fancyhead[L]{\footnotesize\color{inkfaint}\sffamily Star.org}
+\fancyhead[R]{\footnotesize\color{inkfaint}\sffamily\WHTITLE}
+\fancyfoot[C]{\footnotesize\color{inkfaint}\thepage}
+
+% ---- 标题样式（不依赖 titlesec / sectsty）----
+\makeatletter
+\renewcommand{\section}{\@startsection{section}{1}{0pt}%
+  {22pt plus 4pt minus 2pt}{10pt plus 2pt minus 2pt}%
+  {\normalfont\sffamily\Large\bfseries\color{accent}}}
+\renewcommand{\subsection}{\@startsection{subsection}{2}{0pt}%
+  {16pt plus 3pt minus 2pt}{7pt plus 2pt minus 2pt}%
+  {\normalfont\sffamily\large\bfseries\color{ink}}}
+\renewcommand{\subsubsection}{\@startsection{subsubsection}{3}{0pt}%
+  {12pt plus 2pt minus 2pt}{6pt plus 1pt minus 1pt}%
+  {\normalfont\sffamily\normalsize\bfseries\color{inksoft}}}
+\makeatother
+
+% 章标题前不加首行缩进，段落间距由 parskip 控制
+\setlength{\parindent}{0pt}
+
+% ---- 引用块（核心主张）：左侧金色竖线 + 浅底 ----
+\newcommand{\claim}[1]{%
+  \par\vspace{6pt}%
+  \noindent\begin{minipage}{\linewidth}%
+    \setlength{\fboxsep}{12pt}%
+    \colorbox{surface}{%
+      \begin{minipage}{\dimexpr\linewidth-2\fboxsep\relax}%
+        \color{accent}\bfseries\sffamily #1%
+      \end{minipage}}%
+  \end{minipage}\par\vspace{8pt}%
+}
+
+% ---- 一句话结语块 ----
+\newcommand{\takeaway}[1]{%
+  \par\vspace{8pt}\noindent\begin{minipage}{\linewidth}%
+    \setlength{\fboxsep}{14pt}%
+    \colorbox{accent}{%
+      \begin{minipage}{\dimexpr\linewidth-2\fboxsep\relax}%
+        \color{white}#1%
+      \end{minipage}}%
+  \end{minipage}\par\vspace{10pt}%
+}
+
+% ---- 表格统一样式 ----
+\newcommand{\wtable}[1]{%
+  \par\vspace{4pt}\noindent\small #1\par\vspace{6pt}%
+}
+
+% 目录条目字号
+\renewcommand{\contentsname}{\sffamily\Large\bfseries\color{accent}\WHTOCNAME}
+
+% 英文日期：ctexart 下 \today 输出中文格式（2026 年 9 月 21 日），英文版单独用这个
+\newcommand{\WHdateEN}{%
+  \ifcase\month\or January\or February\or March\or April\or May\or June\or
+  July\or August\or September\or October\or November\or December\fi
+  \space\the\day,\space\the\year}
+
+% hyperref 书签与元数据
+\hypersetup{
+  colorlinks=true,
+  linkcolor=accent,
+  urlcolor=accent,
+  pdftitle={\WHTITLE},
+  pdfauthor={Star.org},
+  pdfsubject={\WHSUBJECT},
+}

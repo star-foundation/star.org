@@ -5,7 +5,7 @@
 认领一颗真实存在的恒星，获得包含真实天文数据的 PDF 证书与永久链接。
 所有认领记录同步到公开认领表，**任何人都可以自行核实一颗恒星是否已被认领过**。
 
-本仓库是《Star.org MVP 技术需求说明书 v0.2》全 GitHub 托管方案的可运行实现：
+本仓库是《Star.org MVP 技术需求说明书 v0.4》全 GitHub 托管方案的可运行实现：
 没有自建服务器、没有独立数据库、没有 Vercel/Supabase，全部功能压缩进 GitHub 生态
 （GitHub Pages + GitHub Actions），外部只依赖 Lemon Squeezy（收款）与邮件服务（有免费额度）。
 
@@ -20,7 +20,7 @@
 |---|---|---|
 | 恒星候选库 | `data/stars_pool.json`，800 颗来自 HYG 星表的真实恒星（视星等 −1.44 ~ 4.4） | 技术 4.1 |
 | 分配与查重 | `scripts/allocate.mjs`：均匀随机抽取 + mkdir 原子锁 + 拿锁后重读候选库 + 确定性 slug 幂等 | 技术 4.2 / TC-ALLOC-01~08 |
-| 落地页 | `site/index.html`：价值主张 / 信任背书 / 真实样例 / 购买入口 / FAQ | PRD 4.1 / TC-LP-01~05 |
+| 落地页 | `site/index.html`：价值主张 / 核心理念区块 / 信任背书 / 真实样例 / 购买入口 / FAQ | PRD 4.1 / TC-LP-01~05 |
 | PDF 证书 | `templates/certificate.html` + 无头 Chrome 渲染 → `certificates/{slug}.pdf` | 技术 4.5 / TC-PDF-01~05 |
 | 永久链接页 | 每条认领生成 `/s/{slug}/`，含 OG 卡片与分享按钮 | 技术 4.6 / TC-PAGE-01~05 |
 | OG 分享图 | `scripts/lib/artifacts.mjs` 渲染 1200×630 PNG → `og/{slug}.png` | 技术 4.6 |
@@ -30,6 +30,8 @@
 | 内置中文字体 | `fonts/`——约 12.5MB 的裁剪子集，渲染不再依赖运行环境（见 `DECISIONS.md` D10） | — |
 | 异常处理 | 售罄告警、失败告警、人工补单、订单对账 | PRD 6 / TC-ERR-01~04 |
 | 合规控制 | `scripts/check-compliance.mjs` 扫描禁用措辞与收款渠道，CI 强制通过 | 技术 5 / TC-COMP-01~04 |
+| 核心理念页 | `/philosophy/`：五条理念的完整网页版 + 白皮书（PDF）下载，白皮书入口同时在落地页 hero 与导航 | TC-PHIL-01~05 |
+| 核心理念白皮书 | `docs/whitepaper/*.tex`（TeX 源码）→ `site/assets/whitepaper/*.pdf`（中 / 英两版，随仓库提交） | TC-PHIL-03 |
 
 ## 2. 架构
 
@@ -61,8 +63,10 @@ data/registrations/*.json     公开认领记录（不含任何隐私字段）
 data/registry-index.json      公开认领表索引（供页面与外部程序读取）
 certificates/{slug}.pdf       证书
 og/{slug}.png                 OG 分享图
-site/                         站点源文件（落地页 / 认领表 / 永久页 / 404 / 资源）
+site/                         站点源文件（落地页 / 核心理念页 / 认领表 / 永久页 / 404 / 资源）
 site/i18n/{en,zh}.json        全部界面文案（唯一来源）
+site/assets/whitepaper/       核心理念白皮书 PDF（中 / 英，构建产物，随仓库提交）
+docs/whitepaper/              白皮书 TeX 源码 + build.sh（编译产物写到 site/assets/whitepaper/）
 fonts/                        内置中文字体子集 + 清单 + OFL 许可证
 templates/                    证书、OG 图、邮件模板
 scripts/                      构建与业务脚本（见下）
@@ -76,6 +80,7 @@ docs/                         产品 / 技术 / 测试文档 + 部署与运维�
 
 ```bash
 npm run build:pool       # 从 HYG 星表重建候选库（--input <csv> --limit 800 --max-mag 6.5）
+npm run build:whitepaper # 用 xelatex 编译核心理念白皮书（中 / 英）→ site/assets/whitepaper/
 npm run allocate         # 只做分配（stdin 传订单 JSON）
 npm run register         # 全链路：分配 → 证书 → OG 图 → 记录 → 邮件
 npm run build:site       # 生成 _site/ 静态站点
@@ -83,7 +88,7 @@ npm run serve            # 本地预览 _site/
 npm run demo             # 一键本地演示（见第 5 节）
 npm run verify           # 认领表自检（查重 / 隐私字段 / 产物哈希）
 npm run check            # CI 强制的全部检查：自检 + 合规 + 密钥 + 上线就绪
-npm test                 # 全部测试用例（82 个，含防超卖并发测试 3 轮）
+npm test                 # 全部测试用例（93 个，含防超卖并发测试 3 轮）
 npm run test:concurrency # 只跑并发防超卖测试
 node scripts/fetch-fonts.mjs --check   # 校验内置字体与清单一致
 node scripts/rerender-artifacts.mjs --dry-run   # 按站点当前默认语言重渲染既有证书与 OG 图
@@ -144,7 +149,7 @@ npm run build:site && npm run serve
 ### 5.4 跑测试与自检
 
 ```bash
-npm test                # 82 个用例，约 1-2 分钟（含防超卖并发测试 3 轮）
+npm test                # 93 个用例，约 1-2 分钟（含防超卖并发测试 3 轮）
 npm run check           # 认领表自检 + 合规扫描 + 密钥扫描 + 上线就绪检查
 ```
 
@@ -165,6 +170,31 @@ npm run check           # 认领表自检 + 合规扫描 + 密钥扫描 + 上线
 进度追踪：用浏览器打开 `docs/star-org-checklist.html`。默认勾选状态即代码仓库的真实实现进度，
 每条都标注了对应文件或测试编号；页面顶部的"下一步"面板会自动汇总仍需人工完成的环节
 （外部账号、真实收款、真实域名相关）。
+
+### 5.6 核心理念与白皮书
+
+站点的思想源头写在两份同源文档里，并已落到网站与 PDF：
+
+- `docs/Star.org-核心理念.md`（中文）/ `docs/Star.org-Core-Philosophy.md`（英文）——五条核心理念的完整论述；
+- `docs/whitepaper/*.tex` → `site/assets/whitepaper/*.pdf`——同一份内容的 A4 排版白皮书，中 / 英两版。
+
+网站上共三处入口（白皮书刻意放在"最关键的位置"）：
+
+1. **落地页 hero 动作区**：核心理念入口按钮；
+2. **导航栏**：`核心理念` / `Philosophy`；
+3. **`/philosophy/` 理念页**：白皮书下载卡片排在五条理念**之前**（正文第一屏）。
+
+白皮书用 `xelatex` 编译，字体是仓库内置的 Noto Sans/Serif SC 子集（`fonts/`），
+因此本机不需要安装任何中文字体（与证书渲染同一套做法，见 `DECISIONS.md` D10）。
+CI 不保证装 TeX，所以 **PDF 作为交付物随仓库提交**，`npm run build:site` 只是把它复制进 `_site/`：
+
+```bash
+npm run build:whitepaper   # 需要本机有 xelatex；改完 .tex 后重新生成 PDF
+```
+
+白皮书 PDF 里刻意使用了"不做金融化"这类表述——它属于 `docs/` 与排版产物，
+而合规禁用词扫描的对象是站点公开文案（`site/**` 里的 html/txt/json/css/js/xml/svg）；
+`docs/` 与 `.tex` 本就不在扫描范围内（这些文件必须能讨论那些词本身）。
 
 ## 7. 几个容易误读的设计决定
 
