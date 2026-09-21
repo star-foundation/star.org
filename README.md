@@ -92,7 +92,7 @@ npm run serve            # preview _site/ locally
 npm run demo             # one-command local demo (see section 5)
 npm run verify           # registry self-check (duplicates / private fields / artifact hashes)
 npm run check            # everything CI enforces: verify + compliance + secrets + launch readiness
-npm test                 # full test suite (95 tests, including 3 rounds of the oversell concurrency test)
+npm test                 # full test suite (96 tests, including 3 rounds of the oversell concurrency test)
 npm run test:concurrency # only the oversell concurrency test
 node scripts/fetch-fonts.mjs --check   # verify bundled fonts match their manifest
 node scripts/rerender-artifacts.mjs --dry-run    # re-render existing certificates/OG images in the site's current default language
@@ -159,7 +159,7 @@ Afterwards use `git status` to find and delete those demo files — do not commi
 ### 5.4 Tests and self-checks
 
 ```bash
-npm test                # 95 tests, roughly 1-2 minutes (includes 3 rounds of the oversell concurrency test)
+npm test                # 96 tests, roughly 1-2 minutes (includes 3 rounds of the oversell concurrency test)
 npm run check           # registry self-check + compliance scan + secrets scan + launch readiness
 ```
 

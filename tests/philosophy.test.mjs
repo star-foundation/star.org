@@ -153,3 +153,31 @@ test('TC-PHIL-05 白皮书 PDF 链接的文案随语言切换（中文页主推�
   assert.ok(/中文/.test(zh), '中文目录里的中文版按钮应提到"中文"');
   assert.match(en, /English/i, '英文目录里的英文版按钮应提到 English');
 });
+
+test('TC-PHIL-14 落地页 FAQ 含理念问答，且等级问题给出可复算的判据', () => {
+  const catalogs = flatCatalogs({ reload: true });
+  const keys = [];
+  for (let n = 8; n <= 11; n += 1) keys.push(`landing.faq.q${n}`, `landing.faq.a${n}`);
+
+  for (const locale of LOCALES) {
+    for (const key of keys) {
+      assert.equal(typeof catalogs[locale][key], 'string', `[${locale}] 缺少 ${key}`);
+      assert.ok(catalogs[locale][key].length > 0, `[${locale}] ${key} 为空`);
+    }
+  }
+
+  // 等级那一问必须给出判据与可复算的数字，而不是一句「因为我们是初创」：
+  // 信息触达（可观测宇宙约 460 亿光年）与实体触达（旅行者一号约 172 AU）的对比。
+  const zh = catalogs.zh['landing.faq.a8'];
+  const en = catalogs.en['landing.faq.a8'];
+  // 中文写「460 亿光年」，英文写「46 billion light-years」，数值写法不同，逐语言断言
+  for (const [locale, text, levelWord, universePattern] of [
+    ['zh', zh, '一级', /460\s*亿光年/],
+    ['en', en, 'Level One', /46\s*billion light-years/],
+  ]) {
+    assert.ok(text.includes(levelWord), `[${locale}] 等级问答需给出等级结论`);
+    assert.match(text, universePattern, `[${locale}] 需给出可观测宇宙尺度`);
+    assert.match(text, /172\s*AU/, `[${locale}] 需给出旅行者一号距离`);
+    assert.match(text, /0\.06%/, `[${locale}] 需给出两者比值`);
+  }
+});
