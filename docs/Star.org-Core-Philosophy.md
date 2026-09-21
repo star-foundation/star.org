@@ -31,21 +31,32 @@ In plain terms: **how much of the universe we have cognitively covered, and how 
 
 The two scales are not mutually exclusive but complementary: energy determines whether a civilization can move; information determines whether it can see. Star.org chooses to center on the information side — because it is closer to "people," and closer to the part that every ordinary person can take part in.
 
-### 1.3 Earth Today: Information Civilization, Level One
+### 1.3 Earth Is Not Yet at Level One
 
 Measured against this scale, Star.org gives Earth's present stage a designation:
 
-> **Earth is currently at "Information Civilization, Level One."**
+> **Earth has not yet reached "Information Civilization, Level One." Team estimate: about Level 0.7 (an estimate, not a measurement).**
 
-"Level One" means something quite plain: we have only just begun to **systematically and planet-wide** record and share information about the universe. The celestial bodies we can see, measure, and describe remain an extremely small patch relative to the whole cosmos; and our grasp of that information mostly stays at the level of "knowing its position, brightness, and distance." **This is the starting point of information utilization — not its endpoint.**
+Why place the threshold for Level One on **participation** rather than on "how much we know"? Three reasons:
 
-Calling Earth "Information Civilization, Level One" is not a put-down but an attempt to supply **a coordinate system one can climb** — so that we know exactly which rung we stand on, and what the next rung depends on.
+1. **The word "utilization" already contains "use."** Information held by a few and never used is not being highly utilized. Putting Level One on participation is more faithful to the term than putting it on stock.
+2. **It removes a contradiction.** Humanity's **depth** is not low (see 1.5). If Level One described "knowing little," then "depth is moderate to high" and "only Level One" would both be true and would fight each other. Placed on participation, they stop conflicting: our depth can be high while our participation is low.
+3. **It points the level at a goal that can actually be reached.** Level One is not a grade but a threshold line, and crossing it requires all of humanity to take part rather than waiting for a technical breakthrough.
 
-### 1.4 Why "Level One": the observation–action loop criterion
+**On the 0.7: this is a team estimate, not a measurement.** Turning the level into a measurement requires first making the threshold for Level One observable — for instance, "the share of the population that has formed and maintains a relationship with at least one real star" — and then counting it. On a strict reading ("can point out and name at least one real star"), that share is probably only one or two in ten worldwide; on a stricter one ("is actively observing a particular star right now"), it may be under 1%. Until the criterion is fixed, any specific number is an estimate. We label it as such rather than dressing an estimate up as a measurement.
 
-"Level One" should not be a humble phrase; it should be a criterion **anyone can recompute**: whether a civilization's **reach of observation and reach of action are symmetric**.
+### 1.4 The Thresholds for Level One and Level Two
 
-Put the two kinds of "reach" side by side:
+The levels only mean something once both are written down:
+
+| Level | Definition | Criterion |
+|---|---|---|
+| **Level One** | **participation on the observation side is complete** | nearly all of the population can, and does, form and maintain an ongoing relationship with at least one real celestial body. **Claiming and naming is one observable proxy for this, not the criterion itself** |
+| **Level Two** | **observation and action have closed the loop** | information reach ≈ action reach; understanding of the universe converts into capability, or forms a self-correcting, systematic cognitive loop |
+
+There is one circularity that must be avoided here: **if Level One were defined as "all of humanity has claimed a star" while the claiming is provided by a single organisation, the yardstick would collapse into that organisation's product penetration.** So the criterion belongs on a **product-neutral** observation axis — "the share of the population maintaining an ongoing cognitive relationship with at least one specific celestial body" — and claiming is only one observable form of it.
+
+So how far off is Level Two? Look at the gap between the two kinds of "reach":
 
 | Direction | Farthest reach |
 |---|---|
@@ -53,11 +64,7 @@ Put the two kinds of "reach" side by side:
 | **Matter** (the things we send out) | Voyager 1 is about **172 AU** (roughly 0.0027 light-years), about **0.06%** of the way to the nearest star (Proxima Centauri, about 4.24 light-years) |
 | **Their ratio** | about **13 orders of magnitude** |
 
-Our eyes already reach the edge of the universe; our hands are still in our own backyard. **Seeing without being able to act is the defining feature of Level One.**
-
-That also lets us write down the threshold for Level Two:
-
-> **Level Two = observation and action have closed the loop** (information reach ≈ action reach), or the civilization has formed a self-correcting, systematic cognitive loop over the universe's information.
+Our eyes already reach the edge of the universe; our hands are still in our own backyard. Level Two is therefore still far off — and that is not "we know little"; it is that **a loop is still missing between knowing and doing**.
 
 ### 1.5 The level is not a scalar: at least four axes
 
@@ -67,10 +74,10 @@ Compressing "information utilization" into a single number makes it easy to abus
 |---|---|---|
 | **Coverage** | how much of the universe we have sampled | **Very low**: Gaia has measured about 1.8 billion stars, while the Milky Way holds hundreds of billions; about 6,400 exoplanets are confirmed against hundreds of billions of stars (about 10⁻⁸) |
 | **Depth** | how well we understand what we sampled | **Moderate to high**: QED's prediction of the electron magnetic moment matches experiment to more than ten significant digits, and the universe's age and main composition are measured to around one percent — yet 95% of the energy density still has only names (dark matter, dark energy) |
-| **Participation** | how many people in the civilization actually use this information | **Moderate**: about 6 billion people can go online and query astronomical databases, but very few ever look |
+| **Participation** | how many people actually form and keep a relationship with this information | **Low** (**the Level One threshold sits on this axis** — see 1.3): about 6 billion people can go online and query astronomical databases, but very few ever do |
 | **Closure** | whether observation turns into action | **Not formed**: see 1.4 |
 
-Writing it as a vector rather than a number guards against self-deception: **when we say "Level One", we mean "the loop is not closed", not "we know little."** By depth alone we are not low; by coverage alone we are near zero — both can be true at once, and any single number must hide one of them.
+Writing it as a vector rather than a number guards against self-deception: **"not yet Level One" says "participation is incomplete", not "we know little"; it is "Level Two is far off" that says "the loop is not closed."** By depth alone we are not low; by coverage alone we are near zero; by participation we are still far from "all of humanity" — all of these can be true at once, and any single number must hide most of them.
 
 (On the figures: Voyager 1's distance is the 2026 measured value; the observable universe's comoving radius of about 46.1–46.6 billion light-years follows from Planck cosmological parameters; the exoplanet count is NASA Exoplanet Archive data for September 2026; the internet-user figure is the ITU 2025 estimate. Such numbers are updated as observations improve — readers are welcome to recompute them.)
 
@@ -258,3 +265,4 @@ Energy utilization        Information utilization (Star.org's yardstick)
 | 2026-09-20 | Added a **fifth** core idea: we cannot reach the distant stars in body, but **we can in information and imagination**. Science fiction (*The Three-Body Problem*), film and television (*Star Trek*), and games are a special mode of mining information ore, and they complete the "mining of real celestial data." The "five ideas in one line" diagram and the one-sentence summary were updated accordingly. |
 | 2026-09-21 | Paired with the Chinese version and the TeX typeset whitepaper: English translation completed, and the document now links to the bilingual whitepaper PDFs under `docs/whitepaper/`. |
 | 2026-09-21 | **Whitepaper v1.1: turning "Level One" from rhetoric into a criterion.** Added §1.4, "Why `Level One`: the observation–action loop criterion" — information reach of about 46 billion light-years against matter reach of about 172 AU (roughly 0.0027 light-years, about 0.06% of the way to the nearest star), a gap of about 13 orders of magnitude; this lets us state the threshold for Level Two as loop closure. Added §1.5, "The level is not a scalar: at least four axes" (coverage / depth / participation / closure), with a per-axis self-assessment for Earth. All figures were source-checked (Voyager 1 measured 2026; Planck comoving radius; NASA Exoplanet Archive 2026-09; ITU 2025). The conclusion now carries the homepage mission line. |
+| 2026-09-21 | **Whitepaper v1.2: "Level One" moves from a statement about the present to a threshold to be crossed.** Level One = complete participation on the observation side (nearly all of humanity in an ongoing relationship with at least one real celestial body); Earth has **not yet reached** it, with a team estimate of about **0.7** (explicitly labelled an estimate, not a measurement). Level Two = closure of the observation–action loop. Sections 1.3–1.4 were rewritten accordingly and now carry the circularity warning — **Level One must not be defined as one's own product penetration**; the criterion belongs on a product-neutral observation axis. The four-axis self-assessment in 1.5 is retained, with participation moved to "Low" and noted as the axis the Level One threshold sits on. **⚠ The site copy has not been synchronised**: the homepage eyebrow, FAQ question 8 and the philosophy page's first section still say Earth is at Level One, while the whitepaper is served for download from that same site — the two now contradict each other and need a single coordinated pass (this round deliberately changed documents only). |
