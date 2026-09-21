@@ -486,3 +486,16 @@ footer.site .disclaimer { max-width: 620px; line-height: 1.8; }
 /* 首页 banner 里的理念 / 白皮书入口：主 CTA 之下的一行小按钮，
    不与购买按钮抢视觉重心，但都留在 banner 内。 */
 .hero-phil { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+
+/* 首页 banner 收尾的使命句：比正文略重、用衬线体，与按钮区拉开一层。
+   它是号召语而不是按钮，所以不加边框、不做交互态。 */
+.hero-mission {
+  margin: 22px 0 0;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+  max-width: 660px;
+  font-family: var(--serif);
+  font-size: clamp(15px, 1.8vw, 17px);
+  line-height: 1.7;
+  color: var(--ink-soft);
+}

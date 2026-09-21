@@ -181,3 +181,24 @@ test('TC-PHIL-14 落地页 FAQ 含理念问答，且等级问题给出可复算�
     assert.match(text, /0\.06%/, `[${locale}] 需给出两者比值`);
   }
 });
+
+test('TC-PHIL-15 首页 banner 收尾的使命句：两种语言齐备，且位于 hero 内', () => {
+  const catalogs = flatCatalogs({ reload: true });
+  for (const locale of LOCALES) {
+    const value = catalogs[locale]['landing.mission'];
+    assert.equal(typeof value, 'string', `[${locale}] 缺少落地页使命句 landing.mission`);
+    assert.ok(value.length > 0, `[${locale}] landing.mission 为空`);
+  }
+  // 使命句的两个要素：动作（认领并观测 / claim and observe）与集体目标（信息文明等级）
+  assert.match(catalogs.zh['landing.mission'], /观测/, '中文使命句需含"观测"');
+  assert.match(catalogs.zh['landing.mission'], /信息文明等级/, '中文使命句需含集体目标');
+  assert.match(catalogs.en['landing.mission'], /observ/i, '英文使命句需含 observe');
+  assert.match(catalogs.en['landing.mission'], /information civilization level/i, '英文使命句需含集体目标');
+
+  // 它必须在 hero（banner）内，而不是散落在页面别处
+  const landing = readFileSync(path.join(ROOT, 'site', 'index.html'), 'utf8');
+  const idx = landing.indexOf('hero-mission');
+  const firstSectionEnd = landing.indexOf('</section>');
+  assert.ok(idx > -1, '落地页需渲染使命句');
+  assert.ok(idx < firstSectionEnd, '使命句需位于 hero（banner）内');
+});
