@@ -474,3 +474,11 @@ footer.site .disclaimer { max-width: 620px; line-height: 1.8; }
   background: transparent;
 }
 .wp-card .btn-ghost:hover { color: #fff; border-color: #fff; }
+
+/* 白皮书卡片现在位于核心理念页的 hero（banner）内部：
+   hero 的 .lede 已有 30px 下边距，这里不再叠加，只收紧卡片内部排版。 */
+.hero .wp-card { margin-top: 4px; }
+/* 窄屏时按钮从竖排改为横排换行，避免在 banner 里被挤成细长条 */
+@media (max-width: 560px) {
+  .wp-card-actions { flex-direction: row; flex-wrap: wrap; }
+}

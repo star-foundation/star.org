@@ -40,23 +40,21 @@
       <p class="lede" data-i18n="philosophy.lede">
         {{t.philosophy.lede}}
       </p>
-    </div>
-  </section>
 
-  <!-- Whitepaper download: deliberately placed in the first screen of body content -->
-  <section id="whitepaper">
-    <div class="wrap">
-      <div class="wp-card">
+      <!-- The whitepaper lives inside the banner: visible as soon as the page opens,
+           and the buttons open the PDF in the browser. Deliberately no `download`
+           attribute — that forces a file download instead of in-page viewing. -->
+      <div class="wp-card" id="whitepaper">
         <div class="wp-card-text">
           <h2 data-i18n="philosophy.whitepaperTitle">{{t.philosophy.whitepaperTitle}}</h2>
           <p class="section-lede" data-i18n="philosophy.whitepaperLede">{{t.philosophy.whitepaperLede}}</p>
           <p class="wp-note" data-i18n="philosophy.whitepaperNote">{{t.philosophy.whitepaperNote}}</p>
         </div>
         <div class="wp-card-actions">
-          <a class="btn btn-primary" href="{{wpPrimary.url}}" download>
+          <a class="btn btn-primary" href="{{wpPrimary.url}}" target="_blank" rel="noopener">
             <span data-i18n="{{wpPrimary.key}}">{{wpPrimary.label}}</span>
           </a>
-          <a class="btn btn-ghost" href="{{wpSecondary.url}}" download>
+          <a class="btn btn-ghost" href="{{wpSecondary.url}}" target="_blank" rel="noopener">
             <span data-i18n="{{wpSecondary.key}}">{{wpSecondary.label}}</span>
           </a>
         </div>

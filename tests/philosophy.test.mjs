@@ -47,25 +47,59 @@ test('TC-PHIL-01 两种语言的核心理念文案键齐备且一一对应', () 
   assert.deepEqual(zhKeys, enKeys, '中英 philosophy.* 键集合必须一致');
 });
 
-test('TC-PHIL-02 落地页与理念页都把白皮书放在关键位置（hero + 导航 + 正文第一屏）', () => {
+test('TC-PHIL-02 白皮书位于核心理念页的 hero（banner）内，且排在理念条目之前', () => {
   const landing = readFileSync(path.join(ROOT, 'site', 'index.html'), 'utf8');
   const philosophy = readFileSync(path.join(ROOT, 'site', 'philosophy.html'), 'utf8');
 
-  // 落地页：hero 动作区有理念入口，正文有哲学区块与白皮书下载
+  // 落地页：hero 动作区有理念入口，正文有哲学区块与白皮书入口
   assert.ok(landing.includes('href="/philosophy/"'), '落地页需有核心理念入口');
   assert.ok(landing.includes('id="philosophy"'), '落地页需有核心理念区块');
-  assert.ok(landing.includes('href="{{whitepaperUrl}}"'), '落地页需下载白皮书（locale 感知）');
+  assert.ok(landing.includes('href="{{whitepaperUrl}}"'), '落地页需给出白皮书入口（locale 感知）');
 
-  // 理念页：白皮书卡片必须排在理念条目之前（"最关键的位置"＝正文第一屏）
+  // 理念页：白皮书必须在 hero 横幅**内部**——也就是页面上第一个 </section> 之前。
+  // 这是"放到 banner 中"的可断言形式：不再是自己一个 section。
   const wpIndex = philosophy.indexOf('id="whitepaper"');
+  const firstSectionEnd = philosophy.indexOf('</section>');
   const ideasIndex = philosophy.indexOf('id="ideas"');
-  assert.ok(wpIndex > -1, '理念页需有白皮书区块');
-  assert.ok(ideasIndex > -1, '理念页需有五条理念区块');
-  assert.ok(wpIndex < ideasIndex, '白皮书区块必须排在五条理念之前');
+  assert.ok(wpIndex > -1, '理念页需有白皮书块');
+  assert.ok(firstSectionEnd > -1 && ideasIndex > -1, '理念页结构异常');
+  assert.ok(wpIndex < firstSectionEnd, '白皮书必须在 hero（banner）内部，而不是独立 section');
+  assert.ok(wpIndex < ideasIndex, '白皮书必须排在五条理念之前');
 
   // 两个 PDF 都要给到，且用 locale 感知的主/次按钮
   assert.ok(philosophy.includes('{{wpPrimary.url}}'), '主按钮需为 locale 感知');
   assert.ok(philosophy.includes('{{wpSecondary.url}}'), '次按钮需为 locale 感知');
+});
+
+test('TC-PHIL-12 白皮书在浏览器里直接打开，而不是强制下载', async () => {
+  // 带 download 属性的链接会触发文件下载，而不是用浏览器自带的 PDF 阅读器打开。
+  // 断言落在**构建产物**上：模板里的 href 是 {{...}} 占位符，只有产物才有真实 URL。
+  const out = mkdtempSync(path.join(os.tmpdir(), 'starorg-wp-open-'));
+  try {
+    mkdirSync(path.join(out, 'og'), { recursive: true });
+    writeFileSync(path.join(out, 'og', 'default.png'), 'stub');
+    const { buildSite } = await import('../scripts/build-site.mjs');
+    await buildSite({ outDir: out, clean: false });
+
+    const pages = ['philosophy/index.html', 'index.html'];
+    let found = 0;
+    for (const rel of pages) {
+      const html = readFileSync(path.join(out, rel), 'utf8');
+      for (const match of html.matchAll(/<a\b[^>]*href="[^"]*\/assets\/whitepaper\/[^"]*"[^>]*>/g)) {
+        found += 1;
+        assert.ok(!/\sdownload(\s|>|=)/.test(match[0]),
+          `${rel} 的白皮书链接不得带 download 属性：${match[0]}`);
+        assert.ok(/target="_blank"/.test(match[0]),
+          `${rel} 的白皮书链接需 target="_blank"（在浏览器里打开）：${match[0]}`);
+        assert.ok(/rel="noopener"/.test(match[0]),
+          `${rel} 的白皮书链接需 rel="noopener"：${match[0]}`);
+      }
+    }
+    // 理念页 2 个（中/英主次按钮）+ 落地页 1 个，共 3 处
+    assert.equal(found, 3, `白皮书入口数量异常（实际 ${found}）`);
+  } finally {
+    rmSync(out, { recursive: true, force: true });
+  }
 });
 
 test('TC-PHIL-03 白皮书 PDF 已提交且体量合理（不是空文件或错误页）', () => {
