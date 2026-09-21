@@ -3,6 +3,10 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { createSandbox, runScript, readJson, chromeAvailable, copy } from './helpers.mjs';
+// 模板会把目录值做 HTML 转义后再渲染（{{t.x}} → escapeHtml），
+// 所以断言「页面里含某段文案」时要比较转义后的形式，
+// 否则任何带撇号 / 引号 / & 的文案都会被误判成没渲染出来。
+import { escapeHtml } from '../scripts/lib/template.mjs';
 
 const hasChrome = chromeAvailable();
 const skip = hasChrome ? false : '未检测到 Chrome/Chromium，跳过需要渲染的端到端用例';
@@ -102,7 +106,7 @@ test('TC-LP-01~04 / TC-PAGE-01~05 / TC-REG-01~05 站点构建与公开认领表'
     const out = sandbox.siteOut;
     // 落地页（TC-LP-01 / TC-LP-02）
     const landing = readFileSync(path.join(out, 'index.html'), 'utf8');
-    assert.ok(landing.includes(copy('brand.tagline')), '落地页需含一句话价值主张');
+    assert.ok(landing.includes(escapeHtml(copy('brand.tagline'))), '落地页需含一句话价值主张');
     // 三个申请入口统一指向认领页，姓名/献词在认领页填完，认领页再带 checkout[custom] 跳结算
     assert.ok(landing.includes('register/'), '购买入口需指向认领页 /register/');
     const register = readFileSync(path.join(out, 'register', 'index.html'), 'utf8');

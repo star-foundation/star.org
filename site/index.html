@@ -35,7 +35,7 @@
 <main>
   <section class="hero plain">
     <div class="wrap">
-      <div class="eyebrow" data-i18n="landing.eyebrow">{{t.landing.eyebrow}}</div>
+      <div class="eyebrow" data-i18n="landing.heroEyebrow">{{t.landing.heroEyebrow}}</div>
       <h1 data-i18n="brand.tagline">{{t.brand.tagline}}</h1>
       <p class="lede" data-i18n="landing.lede">
         {{t.landing.lede}}
@@ -49,12 +49,17 @@
         <span class="btn btn-primary is-disabled" data-i18n="{{entryLabelKey}}">{{entryLabel}}</span>
         <a class="btn btn-ghost" href="/registry/" data-i18n="landing.ctaRegistry">{{t.landing.ctaRegistry}}</a>
         {{/unless}}
-        <a class="btn btn-ghost" href="/philosophy/" data-i18n="landing.ctaPhilosophy">{{t.landing.ctaPhilosophy}}</a>
       </div>
       <div class="price-note">{{priceDisplay}} · {{priceNote}}</div>
       {{#unless checkoutReady}}
       <div class="notice"><span data-i18n="{{entryMessageKey}}">{{entryMessage}}</span>{{#if soldOut}}<span data-i18n="state.soldOutNote">{{t.state.soldOutNote}}</span>{{/if}}</div>
       {{/unless}}
+      <!-- Philosophy and the whitepaper also live inside the banner: visible on load,
+           and the PDF opens in the browser rather than downloading. -->
+      <div class="hero-phil">
+        <a class="btn btn-ghost btn-sm" href="/philosophy/" data-i18n="landing.ctaPhilosophy">{{t.landing.ctaPhilosophy}}</a>
+        <a class="btn btn-ghost btn-sm" href="{{whitepaperUrl}}" target="_blank" rel="noopener" data-i18n="landing.ctaWhitepaper">{{t.landing.ctaWhitepaper}}</a>
+      </div>
     </div>
   </section>
 
@@ -86,10 +91,9 @@
         </article>
       </div>
       <div class="wp-inline">
-        <div class="wp-inline-text" data-i18n="landing.philosophy.whitepaperNote">{{t.landing.philosophy.whitepaperNote}}</div>
+        <div class="wp-inline-text" data-i18n="landing.philosophy.readNote">{{t.landing.philosophy.readNote}}</div>
         <div class="wp-inline-actions">
-          <a class="btn btn-primary" href="{{whitepaperUrl}}" target="_blank" rel="noopener" data-i18n="landing.ctaWhitepaper">{{t.landing.ctaWhitepaper}}</a>
-          <a class="btn btn-ghost" href="/philosophy/" data-i18n="landing.philosophy.cta">{{t.landing.philosophy.cta}}</a>
+          <a class="btn btn-primary" href="/philosophy/" data-i18n="landing.philosophy.cta">{{t.landing.philosophy.cta}}</a>
         </div>
       </div>
     </div>

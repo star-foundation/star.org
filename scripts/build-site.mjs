@@ -262,6 +262,15 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
   const entryLabel = t.state[soldOut ? 'soldOut' : 'checkoutPending'];
   const entryMessage = t.state[soldOut ? 'soldOutMessage' : 'checkoutPendingMessage'];
 
+  // 购买入口的状态文案必须按**页面语言**再取一遍。
+  // common.entryLabel/entryMessage 取的是默认语言（英文），而中文隐藏入口页
+  // 没有语言切换按钮、也不内嵌另一种语言目录，直接复用 common 会让中文页上
+  // 出现英文的「Checkout coming soon」。所以每渲染一种语言就重新解析一次。
+  const entryStateFor = (pageT) => ({
+    entryLabel: pageT.state[soldOut ? 'soldOut' : 'checkoutPending'],
+    entryMessage: pageT.state[soldOut ? 'soldOutMessage' : 'checkoutPendingMessage'],
+  });
+
   const latest = records[0] ?? null;
   // 认领进度（公开认领表与付款等待页共用）：已认领 / 候选库总数
   const poolTotal = pool.stars.length || 1;
@@ -365,6 +374,7 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
       altTitle: `${cfg.site.name} · ${loadCatalogs()[pageAltLocale].brand.tagline}`,
       t: pageT,
       tAltFlat: flattenCatalog(pageTAlt),
+      ...entryStateFor(pageT),
       sample: pageSample,
       sampleAlt: sampleView(cfg, records, pageAltLocale),
       registryPreview: index.entries.slice(0, 5),
@@ -399,6 +409,7 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
     t: pageCatalog(),
     tAltFlat: flattenCatalog(pageCatalogAlt()),
     ...whitepaperScope(locale, t),
+    ...entryStateFor(pageCatalog()),
   });
   ensureDir(path.join(outDir, 'philosophy'));
   writeFileAtomic(path.join(outDir, 'philosophy', 'index.html'), relativize(philosophyHtml, 1));
@@ -417,6 +428,7 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
       t: pageCatalogFor(altLocale),
       tAltFlat: flattenCatalog(pageCatalogFor(locale)),
       ...whitepaperScope(altLocale, pageCatalogFor(altLocale)),
+      ...entryStateFor(pageCatalogFor(altLocale)),
       showLanguageToggle: false,
       noindex: true,
     });

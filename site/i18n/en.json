@@ -1,7 +1,7 @@
 {
   "_comment": "English copy catalog. Keys must match zh.json exactly — validateCatalogs() fails the build otherwise. Terminology: claim (= 认领), dedication (= 献词), claim registry (= 公开认领表). Never use \"name a star\" or \"own/ownership\": this product is explicitly not an IAU naming service and is not a sale of ownership.",
   "brand": {
-    "tagline": "Every claim is publicly verifiable"
+    "tagline": "Mine the universe's information ore"
   },
   "email": {
     "kvSep": ": ",
@@ -82,12 +82,13 @@
   },
   "landing": {
     "eyebrow": "A publicly verifiable star claim",
-    "lede": "Claim a real star for a milestone, a dedication, or someone you are thinking of. You get a certificate carrying real astronomical data, and a permanent link you can keep sharing.",
-    "metaDescription": "Claim a real star and receive a PDF certificate with real astronomical data plus a permanent link. Every claim is written to a public registry that anyone can check for duplicates.",
-    "metaOgDescription": "Claim a real star and receive a PDF certificate with real astronomical data plus a permanent link. Every claim can be publicly verified.",
+    "heroEyebrow": "Information civilization, level one",
+    "lede": "Claim a real star and keep watching it — naming it and attending to it is how its information ore gets mined. Earth is at Information Civilization, Level One: we have only just begun to record what the universe holds. You get a certificate with real astronomical data and a permanent link you can keep sharing.",
+    "metaDescription": "Earth is at Information Civilization, Level One. Claim a real star — naming it and attending to it is how its information ore gets mined. You receive a PDF certificate with real astronomical data plus a permanent link, and every claim is publicly verifiable.",
+    "metaOgDescription": "The universe has three ores; we mine the information one. Claim a real star, receive a PDF certificate with real astronomical data plus a permanent link.",
     "ctaBrowse": "Browse the public registry first",
     "ctaRegistry": "View the public registry",
-    "ctaPhilosophy": "Our philosophy: why we do this",
+    "ctaPhilosophy": "Our philosophy",
     "quoteOpen": "“",
     "quoteClose": "”",
     "ctaWhitepaper": "Philosophy whitepaper (PDF)",
@@ -139,8 +140,7 @@
       "i5Title": "Not in body — but in information and imagination",
       "i5Body": "Our bodies cannot reach the distant stars, but our <strong>information and imagination</strong> can. <em>The Three-Body Problem</em>, <em>Star Trek</em>, and the starfields of every game turn human attention and imagination toward the cosmos — a special mode of mining information ore that completes the mining of real celestial data.",
       "cta": "Read the full philosophy",
-      "whitepaperCta": "Download the philosophy whitepaper (PDF)",
-      "whitepaperNote": "Typeset in TeX · Chinese and English editions"
+      "readNote": "The full argument lives on the philosophy page — all five ideas, the comparison table of the three ores, and the TeX-typeset whitepaper."
     },
     "buy": {
       "title": "Claim a star of your own",
