@@ -6,6 +6,12 @@ Claim a real star and receive a PDF certificate carrying real astronomical data 
 permanent link. Every claim is written to a public registry, so **anyone can verify for
 themselves that a star has been claimed only once**.
 
+> **Positioning: the sale is the means, the structure is the end.**
+> Star.org does not sell stars, and is not merely a commemorative keepsake shop — it aims to build a verifiable, permanently citable, openly inspectable structure for "what humanity has recorded."
+> Claiming a star is the first kind of record on that structure, and currently its only source of funding; **neither the product's form nor the compliance framework changes**.
+> Three boundaries: (1) **we do not hold the information, we only register and trace it** — a registrar, not an owner; (2) **information with no owner can be carried, information with an owner requires consent** — the sky and the physical Earth have no owner, while a mind's information does and can only be registered by that mind or with its consent (see §4.4 of the philosophy document); (3) **the product is a keepsake, the structure is a public good** — what you pay for is a commemorative claim record, while the registry, data format and whitepaper are public, login-free and freely citable.
+> The full argument is in `docs/Star.org-Core-Philosophy.md` §8.
+
 This repository is a runnable implementation of the fully GitHub-hosted plan in the
 *Star.org MVP Technical Requirements v0.4*: no self-hosted server, no separate database,
 no Vercel or Supabase. Everything is compressed into the GitHub ecosystem — GitHub Pages
