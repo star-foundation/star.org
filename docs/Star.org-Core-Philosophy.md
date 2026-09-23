@@ -122,6 +122,41 @@ This also relocates idea five (imagination): it is no longer a special case of "
 
 ---
 
+### 2.2 From ore to capability: information organising power (the founder's "information energy")
+
+Information ore is a **resource**; developing it yields a **capability**. That capability has been missing a name in this framework, so the body of this document calls it **information organising power**:
+
+> **Information organising power = the capacity of information to organise matter and energy.** It measures how much matter and energy a piece of information can mobilise, arrange and drive — not how much energy that information itself contains.
+
+**Why the concept is needed — three observations:**
+
+1. **Humans consume very little energy in their own bodies, yet wield enormous power.** Average metabolic power is about 100 W, so eight billion people amount to roughly 0.8 TW — against about 20 TW of global primary energy consumption. **Human bodies account for only about 4% of the energy humanity actually commands**; the rest is ancient sunlight that information knows how to unlock. A blue whale, or a forest, holds far more biomass energy and commands nothing comparable.
+2. **Between people, biological energy differs hardly at all; influence differs enormously.** Human genomes differ by about 0.1% and metabolic power by at most a few times, yet impact on the world can differ by 10⁹. The difference is not in the body but in two places: the information an individual holds, and **how much of other people's energy and matter that person's organising power can mobilise.**
+3. **Travel takes away and leaves behind neither matter nor energy.** You eat, breathe, excrete, buy and sell, and matter and energy are roughly conserved. What you actually take away is a **rearranged nervous system**; what you actually leave behind is a **changed scene** (judgements, conversations, objects, decisions). The conserved quantities barely move; what moves is **pattern** — and measuring it in energy or matter will never find it.
+
+**Its physical footing (this is not a metaphor):** information really can be converted into work.
+
+- **Landauer's principle**: erasing n bits costs at least k·ln n in entropy.
+- **The Szilard engine / Maxwell's demon**: knowing one bit lets you extract up to kT·ln2 of work.
+
+**But the limit must be stated**: at 300 K, kT·ln2 ≈ 2.9×10⁻²¹ J per bit. Taken as literal energy, organising power is negligible — which is exactly what **confirms** observation 1: humans consume very little. The weight of the concept therefore lies in **organisation and leverage**, not in the thermodynamic content of a bit.
+
+**On the naming (important):**
+
+- **The founder arrived at this concept independently on 17 April while travelling, and named it "information energy (信息能)".** They do not claim to have invented the phrase (it has been used before), only this independent arrival. The body of this document uses the neutral term **information organising power** and keeps that name alongside it, credited.
+- **The terminology risk has to be stated**: as a physics term, `information energy` does not exist in mainstream physics, so the name is unoccupied — but in Chinese the same phrase has already been used in **wellness and energy-product marketing**, as well as by independent writers who treat information as the "order" of material systems. The name is therefore **unoccupied but not clean**: used bare, it invites readers to file the idea under wellness and pseudoscience. This framework has nothing to do with those uses.
+- Nor is this "repeating someone else": multiple discovery is the norm in the history of concepts, and the basic definition of information still has no consensus (well over a hundred definitions are on record). "Arrived at independently" is a defensible description.
+
+**Where it sits in the framework:**
+
+> information ore (resource) → development → **information organising power (capability)** → determines information utilization and civilization level (yardstick)
+
+This also gives §1.3's "Level One = participation on the observation side complete" a causal reading: complete participation means **the civilization's total organising power has crossed a threshold**.
+
+> **Status note**: this section has **not yet been added to the whitepaper** (the latest is v1.3, which does not contain it). Here the `.md` and the whitepaper are deliberately out of step until the wording is settled.
+
+---
+
 ## 3. How to Mobilize All of Humanity to Develop Space: The Bond Between People and Stars, and "the Right to Name"
 
 ### 3.1 The Biggest Bottleneck in Space Development Is That It Feels Unrelated to Everyone
@@ -301,3 +336,4 @@ Energy utilization        Information utilization (Star.org's yardstick)
 | 2026-09-21 | **Whitepaper v1.1: turning "Level One" from rhetoric into a criterion.** Added §1.4, "Why `Level One`: the observation–action loop criterion" — information reach of about 46 billion light-years against matter reach of about 172 AU (roughly 0.0027 light-years, about 0.06% of the way to the nearest star), a gap of about 13 orders of magnitude; this lets us state the threshold for Level Two as loop closure. Added §1.5, "The level is not a scalar: at least four axes" (coverage / depth / participation / closure), with a per-axis self-assessment for Earth. All figures were source-checked (Voyager 1 measured 2026; Planck comoving radius; NASA Exoplanet Archive 2026-09; ITU 2025). The conclusion now carries the homepage mission line. |
 | 2026-09-21 | **Whitepaper v1.2: "Level One" moves from a statement about the present to a threshold to be crossed.** Level One = complete participation on the observation side (nearly all of humanity in an ongoing relationship with at least one real celestial body); Earth has **not yet reached** it, with a team estimate of about **0.7** (explicitly labelled an estimate, not a measurement). Level Two = closure of the observation–action loop. Sections 1.3–1.4 were rewritten accordingly and now carry the circularity warning — **Level One must not be defined as one's own product penetration**; the criterion belongs on a product-neutral observation axis. The four-axis self-assessment in 1.5 is retained, with participation moved to "Low" and noted as the axis the Level One threshold sits on. **⚠ The site copy has not been synchronised**: the homepage eyebrow, FAQ question 8 and the philosophy page's first section still say Earth is at Level One, while the whitepaper is served for download from that same site — the two now contradict each other and need a single coordinated pass (this round deliberately changed documents only). |
 | 2026-09-21 | **Whitepaper v1.3: information ore has two veins.** Added §2.1, "Information ore has two veins: the sky and the mind" — look to space and there are countless stars, look to Earth and there are countless living beings, and the ideas, papers and imagination inside every mind are information ore waiting to be developed too. The two veins differ in **how they are mined** (the sky by attention, the mind by expression and listening) and in **whether they have an owner** (the sky has none; a mind does). Idea five (imagination) is accordingly restated from "another way of mining" to **the bridge between the two veins**, closing the framework into a loop: the sky → attention → minds → expression → shared information → attention → the sky. On that basis §4.4, "The sky has no owner; a mind does", was added: the rule in 4.1 applies to the sky only, and transplanting it to minds would imply that reading your paper counts as developing your ore — unacceptable. In a mind's ore the thinker is the origin, and another's development is premised on expression and consent. **Boundary**: Star.org mines vein A only and does not turn the mind's information ore into a product. |
+| 2026-09-21 | **Added §2.2, "From ore to capability: information organising power (the founder's 'information energy')" — docs only; the whitepaper is deliberately untouched.** The framework had a resource (information ore) and a yardstick (information utilization / level) but no name for the capability in between: **information organising power = the capacity of information to organise matter and energy.** Supported by three observations (human bodies account for only about 4% of the energy humanity commands; genomes differ by about 0.1% while influence differs by 10⁹; travel exchanges pattern rather than matter or energy), and given a rigorous footing (Landauer's principle; the Szilard engine / Maxwell's demon — information is convertible into work, yet at 300 K kT·ln2 ≈ 2.9×10⁻²¹ J per bit, so the weight lies in organisation and leverage, not in a bit's thermodynamic content). **The founder arrived at this independently on 17 April while travelling and named it "information energy"**; the body of the text uses the neutral term and credits that name alongside it, together with the terminology risk — the phrase is unoccupied in mainstream physics but has already been used in Chinese wellness and energy-product marketing, so bare use invites misreading. **This section is not yet in the whitepaper; the .md and the whitepaper are intentionally out of step here.** |
