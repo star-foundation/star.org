@@ -1,0 +1,30 @@
+{
+  "slug": "tg4tmvyvkp",
+  "star_id": "HIP-58948",
+  "owner_display_name": "Anna",
+  "anonymous": false,
+  "locale": null,
+  "dedication_message": "Hello NiHao!",
+  "registered_at": "2026-09-23T03:11:25.673Z",
+  "star": {
+    "id": "HIP-58948",
+    "hip": 58948,
+    "hd": 104979,
+    "proper_name": null,
+    "bayer": "Omi",
+    "flam": "9",
+    "constellation": "Vir",
+    "ra": 181.302254,
+    "dec": 8.732985,
+    "magnitude": 4.12,
+    "spectral_type": "G8III",
+    "distance_ly": 163.2
+  },
+  "artifacts": {
+    "certificate": "certificates/tg4tmvyvkp.pdf",
+    "certificate_sha256": "2cfe99577b16da42ba040ed62d32c77bc324b8c4dedfb89efe49e81e98f2c1ed",
+    "og_image": "og/tg4tmvyvkp.png",
+    "og_sha256": "e40a973e13de3e964215ca386a1f4adb94d6f14ee672bec3e2be7763794bbc5b",
+    "certificate_public": true
+  }
+}

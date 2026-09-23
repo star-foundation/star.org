@@ -1,9 +1,20 @@
 {
-  "generated_at": "2026-09-20T13:22:02.175Z",
-  "count": 14,
-  "unique_stars": 14,
+  "generated_at": "2026-09-23T03:11:46.327Z",
+  "count": 15,
+  "unique_stars": 15,
   "duplicates": [],
   "entries": [
+    {
+      "slug": "tg4tmvyvkp",
+      "star_id": "HIP-58948",
+      "star_name": null,
+      "constellation": "Vir",
+      "magnitude": 4.12,
+      "owner_display_name": "Anna",
+      "anonymous": false,
+      "registered_at": "2026-09-23T03:11:25.673Z",
+      "dedication_message": "Hello NiHao!"
+    },
     {
       "slug": "bq4nrzh5z8",
       "star_id": "HIP-111169",
