@@ -94,7 +94,7 @@ npm run serve            # 本地预览 _site/
 npm run demo             # 一键本地演示（见第 5 节）
 npm run verify           # 认领表自检（查重 / 隐私字段 / 产物哈希）
 npm run check            # CI 强制的全部检查：自检 + 合规 + 密钥 + 上线就绪
-npm test                 # 全部测试用例（97 个，含防超卖并发测试 3 轮）
+npm test                 # 全部测试用例（100 个，含防超卖并发测试 3 轮）
 npm run test:concurrency # 只跑并发防超卖测试
 node scripts/fetch-fonts.mjs --check   # 校验内置字体与清单一致
 node scripts/rerender-artifacts.mjs --dry-run   # 按站点当前默认语言重渲染既有证书与 OG 图
@@ -155,7 +155,7 @@ npm run build:site && npm run serve
 ### 5.4 跑测试与自检
 
 ```bash
-npm test                # 97 个用例，约 1-2 分钟（含防超卖并发测试 3 轮）
+npm test                # 100 个用例，约 1-2 分钟（含防超卖并发测试 3 轮）
 npm run check           # 认领表自检 + 合规扫描 + 密钥扫描 + 上线就绪检查
 ```
 
