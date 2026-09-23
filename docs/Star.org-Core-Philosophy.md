@@ -79,6 +79,8 @@ Compressing "information utilization" into a single number makes it easy to abus
 
 Writing it as a vector rather than a number guards against self-deception: **"not yet Level One" says "participation is incomplete", not "we know little"; it is "Level Two is far off" that says "the loop is not closed."** By depth alone we are not low; by coverage alone we are near zero; by participation we are still far from "all of humanity" — all of these can be true at once, and any single number must hide most of them.
 
+**These four axes should each be computed for both veins (see 2.1).** The mind's vein will only score lower on coverage and depth — we do not even have a reliable account of how much ore is there, or where.
+
 (On the figures: Voyager 1's distance is the 2026 measured value; the observable universe's comoving radius of about 46.1–46.6 billion light-years follows from Planck cosmological parameters; the exoplanet count is NASA Exoplanet Archive data for September 2026; the internet-user figure is the ITU 2025 estimate. Such numbers are updated as observations improve — readers are welcome to recompute them.)
 
 ---
@@ -99,6 +101,24 @@ The difference among the three is not "how precious" they are, but **the barrier
 - **The barrier to information ore is far lower**: what it demands is not a starship but **attention**. An ordinary person need only be willing to look up, to observe, to care about a particular star — and he is already participating in the development of the universe's information ore.
 
 **Star.org focuses on developing information ore** — because among the three, it is the only resource that lets all of humanity get started immediately, without first colonizing the cosmos.
+
+### 2.1 Information ore has two veins: the sky and the mind
+
+Information ore is not only overhead. **Look to space and there are countless stars; look to Earth and there are countless living beings** — and inside every living being's mind sits information that exists nowhere else: a thought, a paper, a stretch of imagination. That too is information ore, and it too is waiting to be developed.
+
+| | Vein A: the sky | Vein B: the mind |
+|---|---|---|
+| **Where the ore is** | information about celestial bodies: position, spectrum, motion, history | information inside minds: ideas, papers, imagination |
+| **How it is mined** | **attention** — anyone may look; a star does not mind | **expression and listening** — a thought cannot be seen, only said, written, read, answered |
+| **Whether it has an owner** | **no**. A star has no stake | **yes**. The thinker is the origin (see 4.4) |
+
+This also relocates idea five (imagination): it is no longer a special case of "another way of mining" but **the bridge between the two veins** — imagination is a product of vein B and, at the same time, the reason people turn their attention back to the sky. The whole framework closes into a loop:
+
+> the sky → attention → minds → expression → shared information → attention → the sky
+
+**A supporting observation**: we can determine the age of the universe to two parts in a thousand, and match the theory of the electron's magnetic moment to experiment across more than ten significant digits — yet we cannot say how a thought grows out of neurons. **The mine closest to us is the least developed one**: we understand light from 13.8 billion years ago better than we understand how the brain beside us produces an idea.
+
+**A boundary (important)**: Star.org mines vein A only. Turning the mind's information ore into a product would run straight into "who owns your thoughts" — the domain of intellectual property and personal rights, not of commemorative keepsakes. We write vein B into the philosophy without turning it into a product.
 
 ---
 
@@ -174,6 +194,20 @@ Anyone who wants to verify "whether this star has been claimed, and by whom," ca
 
 ---
 
+### 4.4 A rule that has to be added: the sky has no owner; a mind does
+
+The core claim of 4.1 is that "whoever observes or pays attention to a star's information is developing that star's information ore, and this act of development gives that person a certain kind of right over that information." That rule **applies to vein A (the sky) only**; it cannot be transplanted to vein B.
+
+The difference is stake: **a star has no stake; a mind does.**
+
+Carried over to minds, "whoever attends, develops, and therefore holds" would mean: **anyone who reads your paper may claim to have "developed" your information ore and to hold a right over it.** That is neither true nor acceptable. So vein B needs a rule of its own:
+
+> **The sky has no owner; a mind does.** In the information ore of a mind, **the thinker is the origin**; another's development is premised on **expression and consent**, and cannot be unilateral.
+
+This limit does not stop at humans. We said "living beings" — animals, and any mind we cannot yet converse with — and **they cannot give consent**, so their information ore cannot be claimed unilaterally; all that can be done is to let it be expressed by them, or on their behalf.
+
+Seen from the other side, this is exactly what shows the framework is not decoration: **it forces us to write a separate rule for the ore inside minds**, and that rule is derived from the framework itself rather than pasted on from outside.
+
 ## 5. We Cannot Reach the Stars in Body, but We Can in Information and Imagination: Another Mode of Development
 
 ### 5.1 A Fundamental Constraint: We Cannot Reach the Stars
@@ -215,7 +249,7 @@ This explains why Star.org both handles "the claiming and recording of real cele
 - A person claiming a **real** star is mining that star's information ore;
 - A person stirred toward the sky by science fiction, a game, or a story is likewise **mining humanity's collective information ore.**
 
-**The two are not opposed; they are different veins of the same information ore.** Star.org's standpoint is that every vein should point in the same direction: **to turn more people's attention and imagination toward that real sky overhead — traceable, verifiable, and above them all.**
+**The two are not opposed: the first mines vein A (the sky) and the second mines vein B (the mind), and imagination is precisely the bridge between them (see 2.1).** Star.org's standpoint is that both veins should point in the same direction: **to turn more people's attention and imagination toward that real sky overhead — traceable, verifiable, and above them all.**
 
 ---
 
@@ -266,3 +300,4 @@ Energy utilization        Information utilization (Star.org's yardstick)
 | 2026-09-21 | Paired with the Chinese version and the TeX typeset whitepaper: English translation completed, and the document now links to the bilingual whitepaper PDFs under `docs/whitepaper/`. |
 | 2026-09-21 | **Whitepaper v1.1: turning "Level One" from rhetoric into a criterion.** Added §1.4, "Why `Level One`: the observation–action loop criterion" — information reach of about 46 billion light-years against matter reach of about 172 AU (roughly 0.0027 light-years, about 0.06% of the way to the nearest star), a gap of about 13 orders of magnitude; this lets us state the threshold for Level Two as loop closure. Added §1.5, "The level is not a scalar: at least four axes" (coverage / depth / participation / closure), with a per-axis self-assessment for Earth. All figures were source-checked (Voyager 1 measured 2026; Planck comoving radius; NASA Exoplanet Archive 2026-09; ITU 2025). The conclusion now carries the homepage mission line. |
 | 2026-09-21 | **Whitepaper v1.2: "Level One" moves from a statement about the present to a threshold to be crossed.** Level One = complete participation on the observation side (nearly all of humanity in an ongoing relationship with at least one real celestial body); Earth has **not yet reached** it, with a team estimate of about **0.7** (explicitly labelled an estimate, not a measurement). Level Two = closure of the observation–action loop. Sections 1.3–1.4 were rewritten accordingly and now carry the circularity warning — **Level One must not be defined as one's own product penetration**; the criterion belongs on a product-neutral observation axis. The four-axis self-assessment in 1.5 is retained, with participation moved to "Low" and noted as the axis the Level One threshold sits on. **⚠ The site copy has not been synchronised**: the homepage eyebrow, FAQ question 8 and the philosophy page's first section still say Earth is at Level One, while the whitepaper is served for download from that same site — the two now contradict each other and need a single coordinated pass (this round deliberately changed documents only). |
+| 2026-09-21 | **Whitepaper v1.3: information ore has two veins.** Added §2.1, "Information ore has two veins: the sky and the mind" — look to space and there are countless stars, look to Earth and there are countless living beings, and the ideas, papers and imagination inside every mind are information ore waiting to be developed too. The two veins differ in **how they are mined** (the sky by attention, the mind by expression and listening) and in **whether they have an owner** (the sky has none; a mind does). Idea five (imagination) is accordingly restated from "another way of mining" to **the bridge between the two veins**, closing the framework into a loop: the sky → attention → minds → expression → shared information → attention → the sky. On that basis §4.4, "The sky has no owner; a mind does", was added: the rule in 4.1 applies to the sky only, and transplanting it to minds would imply that reading your paper counts as developing your ore — unacceptable. In a mind's ore the thinker is the origin, and another's development is premised on expression and consent. **Boundary**: Star.org mines vein A only and does not turn the mind's information ore into a product. |
