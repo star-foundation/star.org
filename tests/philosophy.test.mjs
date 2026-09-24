@@ -5,6 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { ROOT, copy } from './helpers.mjs';
 import { flatCatalogs, LOCALES } from '../scripts/lib/i18n.mjs';
+import { escapeHtml } from '../scripts/lib/template.mjs';
 
 const WHITEPAPER_DIR = path.join(ROOT, 'site', 'assets', 'whitepaper');
 const WHITEPAPER_FILES = ['star-org-whitepaper-zh.pdf', 'star-org-whitepaper-en.pdf'];
@@ -217,5 +218,39 @@ test('TC-PHIL-15 核心理念就是首页主视觉：hero 由理念标题与导�
     const idx = home.indexOf(`data-i18n="${key}"`);
     assert.ok(idx > -1, `首页需渲染 ${key}`);
     assert.ok(idx < firstSectionEnd, `${key} 需位于 hero（banner）内`);
+  }
+});
+
+test('TC-PHIL-16 首页 FAQ：只渲染理念与服务/合规问答，购买流程问答不再出现', async () => {
+  const out = mkdtempSync(path.join(os.tmpdir(), 'starorg-faq-'));
+  try {
+    mkdirSync(path.join(out, 'og'), { recursive: true });
+    writeFileSync(path.join(out, 'og', 'default.png'), 'stub');
+    const { buildSite } = await import('../scripts/build-site.mjs');
+    await buildSite({ outDir: out, clean: false });
+    const html = readFileSync(path.join(out, 'index.html'), 'utf8');
+
+    // 购买流程问答（付款时效 / 个人信息 / 为什么不能挑星）：文案键保留在目录里，
+    // 但公开购买关闭期间不在首页渲染。
+    for (const n of [5, 6, 7]) {
+      assert.ok(
+        !html.includes(escapeHtml(copy(`landing.faq.q${n}`))),
+        `首页不应再渲染 landing.faq.q${n}（购买流程问答）`,
+      );
+    }
+
+    // 理念问答与两问合规声明（IAU 澄清、退款政策）必须仍在页面上
+    for (const n of [1, 2, 3, 4, 8, 9, 10, 11]) {
+      assert.ok(
+        html.includes(escapeHtml(copy(`landing.faq.q${n}`))),
+        `首页应保留 landing.faq.q${n}`,
+      );
+    }
+
+    // q1~q4 + q8~q11 共 8 条
+    const details = html.match(/<details/g) || [];
+    assert.equal(details.length, 8, `首页 FAQ 应为 8 条，实际 ${details.length}`);
+  } finally {
+    rmSync(out, { recursive: true, force: true });
   }
 });
