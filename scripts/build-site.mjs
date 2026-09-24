@@ -121,10 +121,14 @@ export function relativize(html, depth) {
 }
 
 /**
- * 落地页「你会拿到什么」展示的内容。
+ * 示例恒星视图：内置示例优先，也是默认 OG 分享图的数据来源。
  *
- * 优先展示**最近一条真实认领**（含认领人与献词）——既是社会证明，也让访客在购买前
- * 看到真实交付物，而不是一个虚构样例。没有认领记录时回退到内置示例并明确标注「示例数据」。
+ * 首页自 D12 起只讲理念，不再展示"最近一次认领"样例，所以目前只有
+ * buildDefaultOg() 用内置示例调用它（传空 records）。`records[0]` 那条分支
+ * （展示最近一条真实认领）保留着：恢复首页样例区时它会直接用上。
+ *
+ * 有真实认领时展示**最近一条真实认领**（含认领人与献词）——既是社会证明，也让
+ * 访客看到真实交付物，而不是一个虚构样例；没有认领记录时回退到内置示例。
  */
 function sampleView(cfg, records = [], locale = 'zh') {
   const latest = records[0] ?? null;
@@ -227,6 +231,11 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
   // 购买入口有三种状态，文案必须分开：售罄（补货后自动恢复）与「通道尚未接入」
   // 是两件完全不同的事，混用会让访客以为候选库空了，而实际库存是充足的。
   const checkoutPending = !checkoutConfigured;
+  // 公开购买总开关（site.config.json → product.purchaseEnabled）。关掉它只关「对外露出」：
+  // 站点的任何页面都不再出现认领/结算入口与价格文案，但认领页、结算链路和订单流程
+  // 原样保留（关入口、不拆业务），重新打开时不需要改任何模板或脚本。
+  const purchaseEnabled = cfg.product?.purchaseEnabled === true;
+  const purchaseOpen = purchaseEnabled && checkoutConfigured && !soldOut;
 
   // ---- 文案层（阶段 1 起：文案唯一来源是 site/i18n/*.json）----
   const locale = resolveDefaultLocale();
@@ -262,15 +271,6 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
   const entryLabel = t.state[soldOut ? 'soldOut' : 'checkoutPending'];
   const entryMessage = t.state[soldOut ? 'soldOutMessage' : 'checkoutPendingMessage'];
 
-  // 购买入口的状态文案必须按**页面语言**再取一遍。
-  // common.entryLabel/entryMessage 取的是默认语言（英文），而中文隐藏入口页
-  // 没有语言切换按钮、也不内嵌另一种语言目录，直接复用 common 会让中文页上
-  // 出现英文的「Checkout coming soon」。所以每渲染一种语言就重新解析一次。
-  const entryStateFor = (pageT) => ({
-    entryLabel: pageT.state[soldOut ? 'soldOut' : 'checkoutPending'],
-    entryMessage: pageT.state[soldOut ? 'soldOutMessage' : 'checkoutPendingMessage'],
-  });
-
   const latest = records[0] ?? null;
   // 认领进度（公开认领表与付款等待页共用）：已认领 / 候选库总数
   const poolTotal = pool.stars.length || 1;
@@ -293,6 +293,8 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
     checkoutReady,
     checkoutConfigured,
     checkoutPending,
+    purchaseEnabled,
+    purchaseOpen,
     soldOut,
     entryLabel,
     entryLabelKey,
@@ -327,7 +329,7 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
   // 中文页主推中文版，英文页主推英文版。URL 本身与语言无关（同一个文件），
   // 只有按钮顺序与文案随语言变。
   //
-  // 定义位置必须在 landingScope 之前：landingScope 内部会调用它。
+  // 定义位置必须在 homeScope 之前：homeScope 内部会调用它。
   const whitepaperScope = (pageLocale, pageT) => {
     const zh = {
       url: '/assets/whitepaper/star-org-whitepaper-zh.pdf',
@@ -347,21 +349,20 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
     };
   };
 
-  // 落地页
-  // 示例区的文案里带 {{count}} / {{slug}} / {{ident}}，这些值只有拿到 sample 之后才知道，
-  // 所以落地页用自己那一份目录（在基础变量上补这三个值），不从 common.t 复用。
-  // 抽成函数是因为隐藏语言入口页要用同一套结构再渲染一遍（只是换成另一种语言）。
-  const landingScope = (pageLocale, pageAltLocale) => {
-    const pageSample = sampleView(cfg, records, pageLocale);
-    const pageSampleVars = {
-      ...vars,
-      count: index.count,
-      slug: pageSample.slug,
-      ident: pageSample.simbadIdent,
-    };
-    const pageKey = pageSample.isReal ? 'Real' : 'Sample';
-    const pageT = interpolateCatalog(loadCatalogs()[pageLocale], pageSampleVars);
-    const pageTAlt = interpolateCatalog(loadCatalogs()[pageAltLocale], pageSampleVars);
+  // 首页 = 核心理念页（DECISIONS D12）。
+  //
+  // 原先的落地页（主视觉卖点 / 信任区块 / 样例 / 认领流程 / 购买区 / 价格）整体下线：
+  // 公开购买入口关闭期间，首页只讲「我们为什么做这件事」，不放任何认领、结算入口
+  // 与价格文案。FAQ 留在首页——它是 IAU 澄清与退款政策的对外承载页
+  // （check-compliance.mjs 的 IAU_DISCLAIMER_RENDERED / REFUND_POLICY_RENDERED 依赖它）。
+  //
+  // 抽成函数是因为三个入口要用同一套结构渲染：`/`、`/philosophy/` 别名、以及隐藏的中文入口。
+  const homeScope = (pageLocale, pageAltLocale, {
+    canonicalUrl = `${cfg.site.baseUrl}/`,
+    noindex = false,
+  } = {}) => {
+    const pageT = pageCatalogFor(pageLocale);
+    const pageTAlt = pageCatalogFor(pageAltLocale);
     return {
       ...common,
       ...whitepaperScope(pageLocale, pageT),
@@ -374,63 +375,33 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
       altTitle: `${cfg.site.name} · ${loadCatalogs()[pageAltLocale].brand.tagline}`,
       t: pageT,
       tAltFlat: flattenCatalog(pageTAlt),
-      ...entryStateFor(pageT),
-      sample: pageSample,
-      sampleAlt: sampleView(cfg, records, pageAltLocale),
-      registryPreview: index.entries.slice(0, 5),
-      sampleLedeKey: `landing.sample.lede${pageKey}`,
-      sampleLede: pageT.landing.sample[`lede${pageKey}`],
-      sampleKickerKey: `landing.sample.kicker${pageKey}`,
-      sampleKicker: pageT.landing.sample[`kicker${pageKey}`],
-      sampleSimbadKey: 'landing.sample.verifySimbad',
-      sampleSimbadText: pageT.landing.sample.verifySimbad,
+      canonicalUrl,
+      noindex,
     };
   };
-  const landing = renderPage('index.html', landingScope(locale, altLocale));
-  writeFileAtomic(path.join(outDir, 'index.html'), relativize(landing, 0));
+  const home = renderPage('index.html', homeScope(locale, altLocale));
+  writeFileAtomic(path.join(outDir, 'index.html'), relativize(home, 0));
+
+  // /philosophy/ 保留为首页的别名：理念已是首页，但对外分享过的 /philosophy/ 地址继续可用。
+  // canonical 指回首页，也不进 sitemap——同一份内容不该被当成两个页面收录。
+  const philosophyAlias = renderPage('index.html', homeScope(locale, altLocale));
+  ensureDir(path.join(outDir, 'philosophy'));
+  writeFileAtomic(path.join(outDir, 'philosophy', 'index.html'), relativize(philosophyAlias, 1));
 
   // 隐藏语言入口（site.config.json → language.hiddenEntryPath，如 /zh/）：
   // 另一种语言的默认语言页面，noindex、不进 sitemap、不被任何公开页面链接，
   // 只有知道地址的人才能进入。switcher 同样不渲染——它本身就是"隐藏"的那一侧。
   if (hiddenEntrySegment) {
     const hidden = renderPage('index.html', {
-      ...landingScope(altLocale, locale),
+      ...homeScope(altLocale, locale, { noindex: true }),
       showLanguageToggle: false,
-      noindex: true,
     });
     ensureDir(path.join(outDir, hiddenEntrySegment));
     writeFileAtomic(path.join(outDir, hiddenEntrySegment, 'index.html'), relativize(hidden, 1));
-  }
 
-  // 核心理念页：五条理念的完整网页版 + 白皮书（PDF）下载入口。
-  // 白皮书是站点的思想源头，所以在导航、落地页 hero 与独立页面三处都给了入口。
-  const philosophyHtml = renderPage('philosophy.html', {
-    ...common,
-    t: pageCatalog(),
-    tAltFlat: flattenCatalog(pageCatalogAlt()),
-    ...whitepaperScope(locale, t),
-    ...entryStateFor(pageCatalog()),
-  });
-  ensureDir(path.join(outDir, 'philosophy'));
-  writeFileAtomic(path.join(outDir, 'philosophy', 'index.html'), relativize(philosophyHtml, 1));
-
-  // 理念页的中文默认入口（与落地页同样按 hiddenEntryPath 隐藏）
-  if (hiddenEntrySegment) {
-    const philosophyHidden = renderPage('philosophy.html', {
-      ...common,
-      locale: altLocale,
-      altLocale: locale,
-      htmlLang: htmlLang(altLocale),
-      ogLocale: ogLocale(altLocale),
-      selfLangName: loadCatalogs()[altLocale].common.lang.name,
-      altLangName: loadCatalogs()[locale].common.lang.name,
-      altTitle: `${cfg.site.name} · ${loadCatalogs()[locale].brand.tagline}`,
-      t: pageCatalogFor(altLocale),
-      tAltFlat: flattenCatalog(pageCatalogFor(locale)),
-      ...whitepaperScope(altLocale, pageCatalogFor(altLocale)),
-      ...entryStateFor(pageCatalogFor(altLocale)),
+    const philosophyHidden = renderPage('index.html', {
+      ...homeScope(altLocale, locale, { noindex: true }),
       showLanguageToggle: false,
-      noindex: true,
     });
     ensureDir(path.join(outDir, hiddenEntrySegment, 'philosophy'));
     writeFileAtomic(
@@ -439,7 +410,9 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
     );
   }
 
-  // 认领页（三个申请入口统一指向这里；表单在这里填写姓名/献词/匿名）
+  // 认领页：公开购买关闭期间不再被任何页面链接、自身 noindex，也不进 sitemap。
+  // 但页面与表单、checkout-url 纯函数、订单链路全部照常生成与工作——"关入口、不拆业务"：
+  // 把 product.purchaseEnabled 改回 true 并配好结算链接，导航里的入口会自动回来。
   const registerHtml = renderPage('register.html', {
     ...common,
     t: pageCatalog(),
@@ -628,18 +601,19 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
   );
   const urls = [
     `${cfg.site.baseUrl}/`,
-    `${cfg.site.baseUrl}/philosophy/`,
-    `${cfg.site.baseUrl}/register/`,
     `${cfg.site.baseUrl}/registry/`,
     ...records.map((record) => registrationUrl(record.slug)),
     // 中文默认入口也要能被搜索引擎收录（与英文页用 hreflang 互链）；
     // 隐藏中文时反过来——被隐藏的语言不该出现在 sitemap 里。
     ...(showLanguageToggle
       ? [
-        `${cfg.site.baseUrl}/${hiddenEntrySegment || 'zh'}/philosophy/`,
+        `${cfg.site.baseUrl}/${hiddenEntrySegment || 'zh'}/`,
         ...records.map((record) => `${cfg.site.baseUrl}/${hiddenEntrySegment || 'zh'}/s/${record.slug}/`),
       ]
       : []),
+    // 不进 sitemap 的页面：/philosophy/ 是首页别名（canonical 已指回首页），
+    // /register/ 是认领入口（公开购买关闭期间不对外露出，页面自身 noindex），
+    // /thanks/ 是付款后的过渡页。
   ];
   writeFileAtomic(
     path.join(outDir, 'sitemap.xml'),
@@ -656,25 +630,35 @@ export async function buildSite({ outDir = PATHS.out, clean = true } = {}) {
   } else {
     warnings.push('未配置自定义域名，跳过 CNAME（GitHub Pages 默认域名下无法使用 star.org 永久链接）');
   }
-  if (checkoutPending) {
+  if (!purchaseEnabled) {
     warnings.push(
-      '未配置结算链接，落地页购买入口显示为「购买通道接入中」；'
+      '公开购买入口已关闭（site.config.json → product.purchaseEnabled = false）：'
+      + '站点不再露出任何认领/结算链接与价格文案；'
+      + '认领页 /register/ 与结算链路仍保留可用，只是不再对外链接、自身 noindex。'
+      + '要重新开启：把 product.purchaseEnabled 设为 true，并配置结算链接，'
+      + '再执行 npm run check:launch 核对上线前还缺哪些配置',
+    );
+  } else if (checkoutPending) {
+    warnings.push(
+      '已开启公开购买，但未配置结算链接，认领页会显示为「购买通道接入中」；'
       + '设置 LEMON_SQUEEZY_CHECKOUT_URL（或 site.config.json 的 product.checkoutUrl）后自动开启，'
       + '执行 npm run check:launch 可查看上线前还缺哪些配置',
     );
   }
-  if (soldOut) warnings.push('候选库已售罄，落地页购买入口自动下线（补货后自动恢复）');
+  if (soldOut) warnings.push('候选库已售罄，购买入口自动下线（补货后自动恢复）');
 
   const ogDefault = await buildDefaultOg(cfg, outDir, locale);
 
   return {
     outDir,
-    pages: pages + 3,
+    pages: pages + 6,
     registryCount: index.count,
     available,
     soldOut,
     checkoutReady,
     checkoutPending,
+    purchaseEnabled,
+    purchaseOpen,
     entryLabel,
     ogDefault: ogDefault.status,
     warnings,
@@ -686,11 +670,13 @@ async function main() {
   console.log(`站点已生成：${result.outDir}`);
   console.log(`  页面数：${result.pages}（含认领永久页 ${result.registryCount} 个）`);
   console.log(`  候选库剩余：${result.available} 颗`);
-  const entryState = result.checkoutReady
-    ? '已开启'
-    : result.soldOut
-      ? '已下线（候选库售罄，补货后自动恢复）'
-      : '接入中（未配置结算链接，见 npm run check:launch）';
+  const entryState = !result.purchaseEnabled
+    ? '已关闭（product.purchaseEnabled = false，认领页保留但不对外链接）'
+    : result.purchaseOpen
+      ? '已开启'
+      : result.soldOut
+        ? '已下线（候选库售罄，补货后自动恢复）'
+        : '接入中（未配置结算链接，见 npm run check:launch）';
   console.log(`  购买入口：${entryState}`);
   for (const warning of result.warnings) console.log(`  ⚠ ${warning}`);
 }

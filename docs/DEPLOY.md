@@ -61,8 +61,10 @@ git push -u origin main
 | `SITE_BASE_URL` | `https://star.org` |
 | `LEMON_SQUEEZY_CHECKOUT_URL` | `https://xxx.lemonsqueezy.com/checkout/buy/xxxxxxxx` |
 
-> `LEMON_SQUEEZY_CHECKOUT_URL` 为空时，落地页购买入口自动显示为"暂时关闭"，
+> `LEMON_SQUEEZY_CHECKOUT_URL` 为空时，认领页的购买入口自动显示为"通道接入中"，
 > 候选库售罄时也会自动下线入口（对应 PRD 6 的售罄场景）。
+> 但要让入口**对外露出**，还需要把 `product.purchaseEnabled` 设为 `true`
+> （当前为 `false`：站点只讲核心理念，不露出任何购买入口，见 `DECISIONS.md` D12）。
 
 ## 3. Lemon Squeezy 配置
 
@@ -82,20 +84,21 @@ git push -u origin main
    - Events：`order_created`
    - Signing secret：保存好，Zapier 侧可用于校验（可选但推荐）
 
-### 落地页购买入口的三种状态
+### 公开购买入口：总开关 + 三种状态
 
-落地页 CTA 不是简单的"开/关"，构建时按下面三种情况分别出文案，避免把
-"还没接支付"说成"候选库空了"：
+公开购买入口由 `site.config.json → product.purchaseEnabled` 控制总开关（当前为 `false`：
+站点不露出任何购买/认领链接与价格文案，`/register/` 仍然生成、仍然可用，但不被任何页面链接、
+自身 `noindex`、不进 sitemap）。开关为 `true` 时，构建期再按下面三种情况分别出文案，
+避免把"还没接支付"说成"候选库空了"：
 
-| 状态 | 触发条件 | 落地页表现 |
+| 状态 | 触发条件 | 表现 |
 | --- | --- | --- |
-| 已开启 | 结算链接已配置且候选库有货 | 按钮「认领一颗星 · US$29」直接跳结算页 |
-| 购买通道接入中 | 候选库有货，但结算链接为空 | 按钮置灰「购买通道接入中」+ 说明文案 |
-| 候选库已售罄 | 候选库可用数为 0 | 按钮置灰「候选库已售罄」+ 补货说明（补货后自动恢复） |
+| 已开启 | `purchaseEnabled=true` 且结算链接已配置且候选库有货 | 导航出现「认领一颗星」→ `/register/`，认领页渲染表单 |
+| 购买通道接入中 | `purchaseEnabled=true`，候选库有货，但结算链接为空 | 首页不出现入口（构建会告警）；认领页显示「购买通道接入中」+ 说明文案 |
+| 候选库已售罄 | 候选库可用数为 0 | 入口下线；认领页显示「候选库已售罄」+ 补货说明（补货后自动恢复） |
 
-对应的文案在 `site.config.json` 的 `policy.soldOutMessage` 与
-`policy.checkoutPendingMessage`；结算链接来自仓库变量
-`LEMON_SQUEEZY_CHECKOUT_URL`（优先）或 `product.checkoutUrl`。
+状态文案来自文案目录 `site/i18n/*.json` 的 `state.*` 键（自 D9 起配置里不保留第二份）；
+结算链接来自仓库变量 `LEMON_SQUEEZY_CHECKOUT_URL`（优先）或 `product.checkoutUrl`。
 
 配置完成后执行：
 
@@ -175,8 +178,9 @@ Events 只勾 `order_created`，Signing secret 保存好（Zapier 侧可用于�
 | `anonymous` | **`meta.custom_data.anonymous`（下单前表单，勾选为 true）** | 勾选后公开记录与页面不显示称呼 |
 
 > **下单前表单（推荐）**：Lemon Squeezy 结算页不收集"认领人姓名/献词/匿名"这类自定义字段
-> （需求一直挂在 LS 的反馈板上未实现）。所以落地页内置了一个认领表单（`site/index.html` 的
-> `data-registration-form`），提交后把这三个值通过 `?checkout[custom][display_name]=...` 等参数
+> （需求一直挂在 LS 的反馈板上未实现）。所以站内有一个认领表单（`site/register.html` 的
+> `data-registration-form`，公开购买关闭期间不对外链接），提交后把这三个值通过
+> `?checkout[custom][display_name]=...` 等参数
 > 拼进结算 URL —— 它们就会出现在 webhook 的 `meta.custom_data` 里。URL 构建逻辑在
 > `site/assets/js/checkout-url.mjs`（纯函数，已单测）。没用表单时 `display_name` 回退到
 > `data.attributes.user_name`（持卡人姓名）。
@@ -300,7 +304,7 @@ npm run check:launch     # 上线就绪：结算链接 / SLUG 密钥 / 邮件通
 - [ ] 用 Lemon Squeezy 测试卡完成一笔完整下单，5 分钟内收到邮件（TC-PAY-01 / TC-MAIL-01）
 - [ ] 仓库里出现本次认领的 commit，且记录中没有邮箱（TC-REG-02 / TC-REG-03）
 - [ ] 永久链接页面的 OG 卡片在 X 上正常显示（TC-PAGE-02）
-- [ ] 落地页在手机上正常展示、购买按钮可点（TC-LP-05）
+- [ ] 首页在手机上正常展示（TC-LP-05）；若要对外销售，先把 `product.purchaseEnabled` 设为 `true`，再检查购买按钮可点
 - [ ] Lemon Squeezy 切换到正式模式，完成一笔真实小额自测订单
 - [ ] 清理测试阶段产生的认领记录与产物（`data/registrations`、`certificates`、`og`、候选库 status 复位）
 

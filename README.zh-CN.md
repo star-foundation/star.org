@@ -26,7 +26,7 @@
 |---|---|---|
 | 恒星候选库 | `data/stars_pool.json`，800 颗来自 HYG 星表的真实恒星（视星等 −1.44 ~ 4.4） | 技术 4.1 |
 | 分配与查重 | `scripts/allocate.mjs`：均匀随机抽取 + mkdir 原子锁 + 拿锁后重读候选库 + 确定性 slug 幂等 | 技术 4.2 / TC-ALLOC-01~08 |
-| 落地页 | `site/index.html`：价值主张 / 核心理念区块 / 信任背书 / 真实样例 / 购买入口 / FAQ | PRD 4.1 / TC-LP-01~05 |
+| 首页（核心理念） | `site/index.html`：理念主视觉 + 白皮书 + 五条理念 + FAQ。公开购买入口已关闭（`product.purchaseEnabled = false`，见 `DECISIONS.md` D12） | PRD 4.1 / TC-LP-01~05 |
 | PDF 证书 | `templates/certificate.html` + 无头 Chrome 渲染 → `certificates/{slug}.pdf` | 技术 4.5 / TC-PDF-01~05 |
 | 永久链接页 | 每条认领生成 `/s/{slug}/`，含 OG 卡片与分享按钮 | 技术 4.6 / TC-PAGE-01~05 |
 | OG 分享图 | `scripts/lib/artifacts.mjs` 渲染 1200×630 PNG → `og/{slug}.png` | 技术 4.6 |
@@ -36,14 +36,14 @@
 | 内置中文字体 | `fonts/`——约 12.5MB 的裁剪子集，渲染不再依赖运行环境（见 `DECISIONS.md` D10） | — |
 | 异常处理 | 售罄告警、失败告警、人工补单、订单对账 | PRD 6 / TC-ERR-01~04 |
 | 合规控制 | `scripts/check-compliance.mjs` 扫描禁用措辞与收款渠道，CI 强制通过 | 技术 5 / TC-COMP-01~04 |
-| 核心理念页 | `/philosophy/`：五条理念的完整网页版 + 白皮书（PDF）下载，白皮书入口同时在落地页 hero 与导航 | TC-PHIL-01~05 |
+| 核心理念别名页 | `/philosophy/`：首页的别名（同一模板渲染，canonical 指回 `/`，不进 sitemap） | TC-PHIL-01~05 |
 | 核心理念白皮书 | `docs/whitepaper/*.tex`（TeX 源码）→ `site/assets/whitepaper/*.pdf`（中 / 英两版，随仓库提交） | TC-PHIL-03 |
 
 ## 2. 架构
 
 ```
-落地页 (GitHub Pages)
-   │ 点击购买
+首页 (GitHub Pages) —— 当前就是核心理念页；公开购买入口处于关闭状态
+   │ 点击购买（仅当 product.purchaseEnabled = true，见 DECISIONS.md D12）
    ▼
 Lemon Squeezy 托管结算（Merchant of Record，仅法币）
    │ Webhook（支付成功）
@@ -69,7 +69,7 @@ data/registrations/*.json     公开认领记录（不含任何隐私字段）
 data/registry-index.json      公开认领表索引（供页面与外部程序读取）
 certificates/{slug}.pdf       证书
 og/{slug}.png                 OG 分享图
-site/                         站点源文件（落地页 / 核心理念页 / 认领表 / 永久页 / 404 / 资源）
+site/                         站点源文件（首页＝核心理念 / 认领表 / 永久页 / 认领页 / 404 / 资源）
 site/i18n/{en,zh}.json        全部界面文案（唯一来源）
 site/assets/whitepaper/       核心理念白皮书 PDF（中 / 英，构建产物，随仓库提交）
 docs/whitepaper/              白皮书 TeX 源码 + build.sh（编译产物写到 site/assets/whitepaper/）
@@ -115,8 +115,9 @@ npm run demo
 它会做三件事：在临时沙盒里跑一笔**真实的完整认领**（分配恒星 → 渲染证书 PDF 与 OG 图 →
 写入认领记录 → 邮件落盘），用这份数据构建静态站点，然后启动本地预览。
 
-浏览器打开 http://127.0.0.1:4321/ 就能看到落地页、公开认领表，以及这一笔认领的永久链接页、
-证书 PDF 和分享图。邮件不会真发（`EMAIL_PROVIDER=outbox`），写入沙盒的 `outbox/` 目录。
+浏览器打开 http://127.0.0.1:4321/ 就能看到核心理念首页、公开认领表，以及这一笔认领的永久链接页、
+证书 PDF 和分享图。认领页 `/register/` 仍然生成、仍然可用，只是公开购买关闭期间没有任何页面链接它。
+邮件不会真发（`EMAIL_PROVIDER=outbox`），写入沙盒的 `outbox/` 目录。
 
 演示数据全部写在系统临时目录（形如 `/tmp/starorg-demo`），**不会写入仓库的
 `data/registrations/`、`certificates/`、`og/`**，可以反复随便跑。
@@ -138,7 +139,8 @@ npm run build:site      # 生成 _site/
 npm run serve           # http://127.0.0.1:4321/
 ```
 
-此时认领表是空的、购买入口显示为"准备中"（`site.config.json` 里还没填结算链接），
+此时认领表是空的、站点完全不露出购买入口（`site.config.json` 的 `product.purchaseEnabled = false`，
+所以 `/register/` 会生成但不被任何页面链接，也不进 sitemap），
 适合改文案 / 样式时快速预览。改完 `site/` 下的文件重新执行 `npm run build:site` 再刷新即可。
 
 ### 5.3 写进仓库（模拟真实订单落库）
@@ -186,9 +188,9 @@ npm run check           # 认领表自检 + 合规扫描 + 密钥扫描 + 上线
 
 网站上共三处入口（白皮书刻意放在"最关键的位置"）：
 
-1. **落地页 hero 动作区**：核心理念入口按钮；
+1. **首页 hero**：首页本身就是核心理念页，白皮书卡片就在这个 banner 里；
 2. **导航栏**：`核心理念` / `Philosophy`；
-3. **`/philosophy/` 理念页**：白皮书下载卡片排在五条理念**之前**（正文第一屏）。
+3. **`/philosophy/` 别名页**：同一份内容，保留它是为了让"首页变理念页"之前分享出去的链接继续可用。
 
 白皮书用 `xelatex` 编译，字体是仓库内置的 Noto Sans/Serif SC 子集（`fonts/`），
 因此本机不需要安装任何中文字体（与证书渲染同一套做法，见 `DECISIONS.md` D10）。
@@ -218,7 +220,8 @@ npm run build:whitepaper   # 需要本机有 xelatex；改完 .tex 后重新生�
 
 - 禁用措辞（投资 / 升值 / 资产 / 交易 / 所有权凭证 / 数字货币等）由 `check-compliance.mjs` 扫描，
   命中即 CI 失败；
-- 落地页必须包含"非 IAU 官方命名"澄清与退款政策，由同一脚本校验——且**按语言分别校验**，
-  因为两种语言同处一个 HTML 文件，只扫一遍会让一种语言的文案满足另一种语言的规则；
+- 首页必须包含"非 IAU 官方命名"澄清与退款政策，由同一脚本校验——且**按语言分别校验**，
+  因为两种语言同处一个 HTML 文件，只扫一遍会让一种语言的文案满足另一种语言的规则。
+  这也是 FAQ 必须留在首页的原因（见 `DECISIONS.md` D12）；
 - 收款渠道只允许 Lemon Squeezy（法币），扫描到任何数字货币渠道域名即失败；
 - 公开认领记录中不得出现邮箱、订单号等隐私字段，由 `verify-registry.mjs` 校验（含正则扫描）。

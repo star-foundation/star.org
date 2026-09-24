@@ -47,28 +47,33 @@ test('TC-PHIL-01 两种语言的核心理念文案键齐备且一一对应', () 
   assert.deepEqual(zhKeys, enKeys, '中英 philosophy.* 键集合必须一致');
 });
 
-test('TC-PHIL-02 白皮书位于核心理念页的 hero（banner）内，且排在理念条目之前', () => {
-  const landing = readFileSync(path.join(ROOT, 'site', 'index.html'), 'utf8');
-  const philosophy = readFileSync(path.join(ROOT, 'site', 'philosophy.html'), 'utf8');
+test('TC-PHIL-02 首页即核心理念页：白皮书在 hero（banner）内，且排在理念条目之前', () => {
+  // 阶段调整（DECISIONS D12）：核心理念不再是独立页面，而是站点首页。
+  // 模板只剩 site/index.html 一份，/philosophy/ 由构建器渲染成它的别名。
+  const home = readFileSync(path.join(ROOT, 'site', 'index.html'), 'utf8');
 
-  // 落地页：hero 动作区有理念入口，正文有哲学区块与白皮书入口
-  assert.ok(landing.includes('href="/philosophy/"'), '落地页需有核心理念入口');
-  assert.ok(landing.includes('id="philosophy"'), '落地页需有核心理念区块');
-  assert.ok(landing.includes('href="{{whitepaperUrl}}"'), '落地页需给出白皮书入口（locale 感知）');
+  // 首页 hero 就是理念主视觉
+  assert.ok(home.includes('data-i18n="philosophy.eyebrow"'), '首页 hero 应是核心理念');
+  assert.ok(home.includes('data-i18n="philosophy.title"'), '首页 hero 需渲染理念标题');
+  assert.ok(home.includes('data-i18n="philosophy.lede"'), '首页 hero 需渲染理念导语');
 
-  // 理念页：白皮书必须在 hero 横幅**内部**——也就是页面上第一个 </section> 之前。
+  // 白皮书必须在 hero 横幅**内部**——也就是页面上第一个 </section> 之前。
   // 这是"放到 banner 中"的可断言形式：不再是自己一个 section。
-  const wpIndex = philosophy.indexOf('id="whitepaper"');
-  const firstSectionEnd = philosophy.indexOf('</section>');
-  const ideasIndex = philosophy.indexOf('id="ideas"');
-  assert.ok(wpIndex > -1, '理念页需有白皮书块');
-  assert.ok(firstSectionEnd > -1 && ideasIndex > -1, '理念页结构异常');
+  const wpIndex = home.indexOf('id="whitepaper"');
+  const firstSectionEnd = home.indexOf('</section>');
+  const ideasIndex = home.indexOf('id="ideas"');
+  assert.ok(wpIndex > -1, '首页需有白皮书块');
+  assert.ok(firstSectionEnd > -1 && ideasIndex > -1, '首页结构异常');
   assert.ok(wpIndex < firstSectionEnd, '白皮书必须在 hero（banner）内部，而不是独立 section');
   assert.ok(wpIndex < ideasIndex, '白皮书必须排在五条理念之前');
 
   // 两个 PDF 都要给到，且用 locale 感知的主/次按钮
-  assert.ok(philosophy.includes('{{wpPrimary.url}}'), '主按钮需为 locale 感知');
-  assert.ok(philosophy.includes('{{wpSecondary.url}}'), '次按钮需为 locale 感知');
+  assert.ok(home.includes('{{wpPrimary.url}}'), '主按钮需为 locale 感知');
+  assert.ok(home.includes('{{wpSecondary.url}}'), '次按钮需为 locale 感知');
+
+  // 公开购买关闭期间首页不露出入口；但要保留"能重新开启"的开关（模板里不能写死）
+  assert.ok(home.includes('{{#if purchaseOpen}}'), '认领入口必须由 purchaseOpen 开关控制');
+  assert.ok(!home.includes('price-note'), '首页不得展示价格');
 });
 
 test('TC-PHIL-12 白皮书在浏览器里直接打开，而不是强制下载', async () => {
@@ -95,8 +100,8 @@ test('TC-PHIL-12 白皮书在浏览器里直接打开，而不是强制下载', 
           `${rel} 的白皮书链接需 rel="noopener"：${match[0]}`);
       }
     }
-    // 理念页 2 个（中/英主次按钮）+ 落地页 1 个，共 3 处
-    assert.equal(found, 3, `白皮书入口数量异常（实际 ${found}）`);
+    // 首页 2 个（中/英主次按钮）+ /philosophy/ 别名页 2 个，共 4 处
+    assert.equal(found, 4, `白皮书入口数量异常（实际 ${found}）`);
   } finally {
     rmSync(out, { recursive: true, force: true });
   }
@@ -115,7 +120,7 @@ test('TC-PHIL-03 白皮书 PDF 已提交且体量合理（不是空文件或错�
   }
 });
 
-test('TC-PHIL-04 构建产物含理念页，白皮书被复制进 _site，且路径为相对路径', async () => {
+test('TC-PHIL-04 构建产物：首页即理念页，白皮书被复制进 _site，且路径为相对路径', async () => {
   const out = mkdtempSync(path.join(os.tmpdir(), 'starorg-phil-'));
   try {
     // 预置 OG 图，避免为了渲染默认分享图去启动浏览器
@@ -124,24 +129,35 @@ test('TC-PHIL-04 构建产物含理念页，白皮书被复制进 _site，且路
     const { buildSite } = await import('../scripts/build-site.mjs');
     await buildSite({ outDir: out, clean: false });
 
+    // 首页（深度 0）：根绝对路径改写成 ./
+    const home = readFileSync(path.join(out, 'index.html'), 'utf8');
+    assert.ok(!/(href|src)="\/(?!\/)/.test(home), '首页不应残留根绝对路径');
+    assert.ok(home.includes('href="./assets/whitepaper/'), '首页的白皮书链接需为相对路径');
+    assert.ok(home.includes(copy('philosophy.title')), '首页应渲染核心理念标题');
+    assert.ok(home.includes(copy('landing.faq.title')), '首页需保留 FAQ（IAU 澄清与退款政策的承载处）');
+
+    // /philosophy/ 保留为首页别名：canonical 指回首页，深度 1 上跳一级
     const philosophy = readFileSync(path.join(out, 'philosophy', 'index.html'), 'utf8');
-    // 深度 1 的页面：根绝对路径必须被改写成上跳一级
-    assert.ok(!/(href|src)="\/(?!\/)/.test(philosophy), '理念页不应残留根绝对路径');
-    assert.ok(philosophy.includes('href="../assets/whitepaper/'), '理念页的白皮书链接需上跳一级');
+    assert.ok(philosophy.includes('rel="canonical" href="https://star.org/"'), '别名页的 canonical 需指回首页');
+    assert.ok(!/(href|src)="\/(?!\/)/.test(philosophy), '别名页不应残留根绝对路径');
+    assert.ok(philosophy.includes('href="../assets/whitepaper/'), '别名页的白皮书链接需上跳一级');
 
     // 两种语言的 PDF 都要落进产物
     for (const file of WHITEPAPER_FILES) {
       assert.ok(existsSync(path.join(out, 'assets', 'whitepaper', file)), `产物缺少 ${file}`);
     }
 
-    // sitemap 要收录理念页
+    // sitemap 收录首页与认领表；/philosophy/ 是别名，不重复收录
     const sitemap = readFileSync(path.join(out, 'sitemap.xml'), 'utf8');
-    assert.ok(sitemap.includes('/philosophy/'), 'sitemap 需收录 /philosophy/');
+    assert.ok(sitemap.includes('<loc>https://star.org/</loc>'), 'sitemap 需收录首页');
+    assert.ok(!sitemap.includes('/philosophy/'), '首页别名不应重复收录进 sitemap');
 
-    // 隐藏语言入口：中文理念页存在且 noindex
-    const zh = readFileSync(path.join(out, 'zh', 'philosophy', 'index.html'), 'utf8');
-    assert.ok(zh.includes('noindex'), '隐藏的中文理念页需标记 noindex');
-    assert.ok(!/(href|src)="\/(?!\/)/.test(zh), '中文理念页不应残留根绝对路径');
+    // 隐藏语言入口：中文首页与中文别名页都存在且 noindex
+    for (const rel of [['zh', 'index.html'], ['zh', 'philosophy', 'index.html']]) {
+      const zh = readFileSync(path.join(out, ...rel), 'utf8');
+      assert.ok(zh.includes('noindex'), '隐藏的中文页面需标记 noindex');
+      assert.ok(!/(href|src)="\/(?!\/)/.test(zh), '中文页面不应残留根绝对路径');
+    }
   } finally {
     rmSync(out, { recursive: true, force: true });
   }
@@ -182,23 +198,24 @@ test('TC-PHIL-14 落地页 FAQ 含理念问答，且等级问题给出可复算�
   }
 });
 
-test('TC-PHIL-15 首页 banner 收尾的使命句：两种语言齐备，且位于 hero 内', () => {
+test('TC-PHIL-15 核心理念就是首页主视觉：hero 由理念标题与导语承担', () => {
   const catalogs = flatCatalogs({ reload: true });
   for (const locale of LOCALES) {
-    const value = catalogs[locale]['landing.mission'];
-    assert.equal(typeof value, 'string', `[${locale}] 缺少落地页使命句 landing.mission`);
-    assert.ok(value.length > 0, `[${locale}] landing.mission 为空`);
+    for (const key of ['philosophy.eyebrow', 'philosophy.title', 'philosophy.lede', 'philosophy.whitepaperTitle']) {
+      assert.equal(typeof catalogs[locale][key], 'string', `[${locale}] 缺少 ${key}`);
+      assert.ok(catalogs[locale][key].length > 0, `[${locale}] ${key} 为空`);
+    }
   }
-  // 使命句的两个要素：动作（认领并观测 / claim and observe）与集体目标（信息文明等级）
-  assert.match(catalogs.zh['landing.mission'], /观测/, '中文使命句需含"观测"');
-  assert.match(catalogs.zh['landing.mission'], /信息文明等级/, '中文使命句需含集体目标');
-  assert.match(catalogs.en['landing.mission'], /observ/i, '英文使命句需含 observe');
-  assert.match(catalogs.en['landing.mission'], /information civilization level/i, '英文使命句需含集体目标');
+  // 集体目标（信息文明等级）改由理念第一条与 FAQ 承担，不再单列一句使命句
+  assert.match(catalogs.zh['philosophy.s1Note'], /信息文明一级/, '中文理念需含等级门槛');
+  assert.match(catalogs.en['philosophy.s1Note'], /Level One/i, '英文理念需含等级门槛');
 
-  // 它必须在 hero（banner）内，而不是散落在页面别处
-  const landing = readFileSync(path.join(ROOT, 'site', 'index.html'), 'utf8');
-  const idx = landing.indexOf('hero-mission');
-  const firstSectionEnd = landing.indexOf('</section>');
-  assert.ok(idx > -1, '落地页需渲染使命句');
-  assert.ok(idx < firstSectionEnd, '使命句需位于 hero（banner）内');
+  // 理念三件套必须在 hero（banner）内，而不是散落在页面别处
+  const home = readFileSync(path.join(ROOT, 'site', 'index.html'), 'utf8');
+  const firstSectionEnd = home.indexOf('</section>');
+  for (const key of ['philosophy.eyebrow', 'philosophy.title', 'philosophy.lede']) {
+    const idx = home.indexOf(`data-i18n="${key}"`);
+    assert.ok(idx > -1, `首页需渲染 ${key}`);
+    assert.ok(idx < firstSectionEnd, `${key} 需位于 hero（banner）内`);
+  }
 });

@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{{siteName}} · {{t.brand.tagline}}</title>
-<meta name="description" content="{{t.landing.metaDescription}}">
-<link rel="canonical" href="{{baseUrl}}/">
+<meta name="description" content="{{t.philosophy.metaDescription}}">
+<link rel="canonical" href="{{canonicalUrl}}">
 {{#if noindex}}<meta name="robots" content="noindex, nofollow">{{/if}}
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="{{siteName}}">
 <meta property="og:title" content="{{siteName}} · {{t.brand.tagline}}">
-<meta property="og:description" content="{{t.landing.metaOgDescription}}">
-<meta property="og:url" content="{{baseUrl}}/">
+<meta property="og:description" content="{{t.philosophy.metaOgDescription}}">
+<meta property="og:url" content="{{canonicalUrl}}">
 <meta property="og:image" content="{{defaultOgImage}}">
 <meta property="og:locale" content="{{ogLocale}}">
 <meta name="twitter:card" content="summary_large_image">
@@ -23,197 +23,94 @@
   <div class="wrap nav">
     <div class="brand"><a href="/">{{siteName}}</a></div>
     <nav class="nav-links">
-      <a href="/philosophy/" data-i18n="common.nav.philosophy">{{t.common.nav.philosophy}}</a>
+      <a href="/" data-i18n="common.nav.philosophy">{{t.common.nav.philosophy}}</a>
       <a href="/registry/" data-i18n="common.nav.registry">{{t.common.nav.registry}}</a>
       <a href="#faq" data-i18n="common.nav.faq">{{t.common.nav.faq}}</a>
-      {{#if checkoutReady}}<a class="btn btn-primary btn-sm" href="/register/" data-i18n="common.nav.claim">{{t.common.nav.claim}}</a>{{/if}}
+      {{#if purchaseOpen}}<a class="btn btn-primary btn-sm" href="/register/" data-i18n="common.nav.claim">{{t.common.nav.claim}}</a>{{/if}}
       {{#if showLanguageToggle}}<button class="lang-toggle" type="button" data-lang-toggle data-self-name="{{selfLangName}}" data-alt-name="{{altLangName}}" aria-label="{{t.common.lang.switchAria}}">{{altLangName}}</button>{{/if}}
     </nav>
   </div>
 </header>
 
 <main>
+  <!-- The homepage IS the philosophy page: state why we do this before any deliverable.
+       Templates must stay ASCII-only (tests/english-only.test.mjs scans them for CJK). -->
   <section class="hero plain">
     <div class="wrap">
-      <div class="eyebrow" data-i18n="landing.heroEyebrow">{{t.landing.heroEyebrow}}</div>
-      <h1 data-i18n="brand.tagline">{{t.brand.tagline}}</h1>
-      <p class="lede" data-i18n="landing.lede">
-        {{t.landing.lede}}
+      <div class="eyebrow" data-i18n="philosophy.eyebrow">{{t.philosophy.eyebrow}}</div>
+      <h1 data-i18n="philosophy.title">{{t.philosophy.title}}</h1>
+      <p class="lede" data-i18n="philosophy.lede">
+        {{t.philosophy.lede}}
       </p>
-      <div class="hero-actions">
-        {{#if checkoutReady}}
-        <a class="btn btn-primary" href="/register/" data-i18n="common.nav.claim">{{t.common.nav.claim}}</a>
-        <a class="btn btn-ghost" href="/registry/" data-i18n="landing.ctaBrowse">{{t.landing.ctaBrowse}}</a>
-        {{/if}}
-        {{#unless checkoutReady}}
-        <span class="btn btn-primary is-disabled" data-i18n="{{entryLabelKey}}">{{entryLabel}}</span>
-        <a class="btn btn-ghost" href="/registry/" data-i18n="landing.ctaRegistry">{{t.landing.ctaRegistry}}</a>
-        {{/unless}}
+
+      <!-- The whitepaper lives inside the banner: visible as soon as the page opens,
+           and the buttons open the PDF in the browser. Deliberately no `download`
+           attribute — that forces a file download instead of in-page viewing. -->
+      <div class="wp-card" id="whitepaper">
+        <div class="wp-card-text">
+          <h2 data-i18n="philosophy.whitepaperTitle">{{t.philosophy.whitepaperTitle}}</h2>
+          <p class="section-lede" data-i18n="philosophy.whitepaperLede">{{t.philosophy.whitepaperLede}}</p>
+          <p class="wp-note" data-i18n="philosophy.whitepaperNote">{{t.philosophy.whitepaperNote}}</p>
+        </div>
+        <div class="wp-card-actions">
+          <a class="btn btn-primary" href="{{wpPrimary.url}}" target="_blank" rel="noopener">
+            <span data-i18n="{{wpPrimary.key}}">{{wpPrimary.label}}</span>
+          </a>
+          <a class="btn btn-ghost" href="{{wpSecondary.url}}" target="_blank" rel="noopener">
+            <span data-i18n="{{wpSecondary.key}}">{{wpSecondary.label}}</span>
+          </a>
+        </div>
       </div>
-      <div class="price-note">{{priceDisplay}} · {{priceNote}}</div>
-      {{#unless checkoutReady}}
-      <div class="notice"><span data-i18n="{{entryMessageKey}}">{{entryMessage}}</span>{{#if soldOut}}<span data-i18n="state.soldOutNote">{{t.state.soldOutNote}}</span>{{/if}}</div>
-      {{/unless}}
-      <!-- Philosophy and the whitepaper also live inside the banner: visible on load,
-           and the PDF opens in the browser rather than downloading. -->
-      <div class="hero-phil">
-        <a class="btn btn-ghost btn-sm" href="/philosophy/" data-i18n="landing.ctaPhilosophy">{{t.landing.ctaPhilosophy}}</a>
-        <a class="btn btn-ghost btn-sm" href="{{whitepaperUrl}}" target="_blank" rel="noopener" data-i18n="landing.ctaWhitepaper">{{t.landing.ctaWhitepaper}}</a>
-      </div>
-      <!-- Mission line: the collective ask that closes the banner -->
-      <p class="hero-mission" data-i18n="landing.mission">{{t.landing.mission}}</p>
     </div>
   </section>
 
-  <section id="philosophy">
+  <section id="ideas">
     <div class="wrap">
-      <div class="eyebrow" data-i18n="landing.philosophy.eyebrow">{{t.landing.philosophy.eyebrow}}</div>
-      <h2 data-i18n="landing.philosophy.title">{{t.landing.philosophy.title}}</h2>
-      <p class="section-lede" data-i18n="landing.philosophy.lede">{{t.landing.philosophy.lede}}</p>
       <div class="ideas">
         <article class="idea">
-          <h3 data-i18n="landing.philosophy.i1Title">{{t.landing.philosophy.i1Title}}</h3>
-          <p data-i18n="landing.philosophy.i1Body">{{t.landing.philosophy.i1Body!}}</p>
+          <h2 data-i18n="philosophy.s1Title">{{t.philosophy.s1Title}}</h2>
+          <p data-i18n="philosophy.s1Body">{{t.philosophy.s1Body!}}</p>
+          <p class="idea-note" data-i18n="philosophy.s1Note">{{t.philosophy.s1Note!}}</p>
         </article>
         <article class="idea">
-          <h3 data-i18n="landing.philosophy.i2Title">{{t.landing.philosophy.i2Title}}</h3>
-          <p data-i18n="landing.philosophy.i2Body">{{t.landing.philosophy.i2Body!}}</p>
+          <h2 data-i18n="philosophy.s2Title">{{t.philosophy.s2Title}}</h2>
+          <p data-i18n="philosophy.s2Body">{{t.philosophy.s2Body!}}</p>
+          <p class="idea-note" data-i18n="philosophy.s2Note">{{t.philosophy.s2Note!}}</p>
         </article>
         <article class="idea">
-          <h3 data-i18n="landing.philosophy.i3Title">{{t.landing.philosophy.i3Title}}</h3>
-          <p data-i18n="landing.philosophy.i3Body">{{t.landing.philosophy.i3Body!}}</p>
+          <h2 data-i18n="philosophy.s3Title">{{t.philosophy.s3Title}}</h2>
+          <p data-i18n="philosophy.s3Body">{{t.philosophy.s3Body!}}</p>
+          <p class="idea-note" data-i18n="philosophy.s3Note">{{t.philosophy.s3Note!}}</p>
         </article>
         <article class="idea">
-          <h3 data-i18n="landing.philosophy.i4Title">{{t.landing.philosophy.i4Title}}</h3>
-          <p data-i18n="landing.philosophy.i4Body">{{t.landing.philosophy.i4Body!}}</p>
+          <h2 data-i18n="philosophy.s4Title">{{t.philosophy.s4Title}}</h2>
+          <p data-i18n="philosophy.s4Body">{{t.philosophy.s4Body!}}</p>
+          <p class="idea-note" data-i18n="philosophy.s4Note">{{t.philosophy.s4Note!}}</p>
         </article>
         <article class="idea">
-          <h3 data-i18n="landing.philosophy.i5Title">{{t.landing.philosophy.i5Title}}</h3>
-          <p data-i18n="landing.philosophy.i5Body">{{t.landing.philosophy.i5Body!}}</p>
+          <h2 data-i18n="philosophy.s5Title">{{t.philosophy.s5Title}}</h2>
+          <p data-i18n="philosophy.s5Body">{{t.philosophy.s5Body!}}</p>
+          <p class="idea-note" data-i18n="philosophy.s5Note">{{t.philosophy.s5Note!}}</p>
         </article>
-      </div>
-      <div class="wp-inline">
-        <div class="wp-inline-text" data-i18n="landing.philosophy.readNote">{{t.landing.philosophy.readNote}}</div>
-        <div class="wp-inline-actions">
-          <a class="btn btn-primary" href="/philosophy/" data-i18n="landing.philosophy.cta">{{t.landing.philosophy.cta}}</a>
-        </div>
       </div>
     </div>
   </section>
 
-  <section id="trust">
-    <div class="wrap">
-      <h2 data-i18n="landing.trust.title">{{t.landing.trust.title}}</h2>
-      <p class="section-lede" data-i18n="landing.trust.lede">
-        {{t.landing.trust.lede}}
-      </p>
-      <div class="grid grid-3">
-        <div class="card">
-          <div class="num">{{registryCount}}</div>
-          <div class="stat" data-i18n="landing.trust.claimedLabel">{{t.landing.trust.claimedLabel}}</div>
-          <p class="muted" style="font-size:14px;margin:12px 0 0;" data-i18n="landing.trust.claimedNote">
-            {{t.landing.trust.claimedNote}}
-          </p>
-        </div>
-        <div class="card">
-          <div class="num">{{availableCount}}</div>
-          <div class="stat" data-i18n="landing.trust.availableLabel">{{t.landing.trust.availableLabel}}</div>
-          <p class="muted" style="font-size:14px;margin:12px 0 0;" data-i18n="landing.trust.availableNote">
-            {{t.landing.trust.availableNote}}
-          </p>
-        </div>
-        <div class="card">
-          <div class="num">0</div>
-          <div class="stat" data-i18n="landing.trust.noLoginLabel">{{t.landing.trust.noLoginLabel}}</div>
-          <p class="muted" style="font-size:14px;margin:12px 0 0;" data-i18n="landing.trust.noLoginNote">
-            {{t.landing.trust.noLoginNote}}
-          </p>
-        </div>
-      </div>
-      <p style="margin-top:24px;">
-        <a class="btn btn-ghost" href="/registry/" data-i18n="landing.trust.ctaRegistry">{{t.landing.trust.ctaRegistry}}</a>
-        {{#if registryDirUrl}}<a class="btn btn-ghost" href="{{registryDirUrl}}" rel="noopener" data-i18n="landing.trust.ctaRaw">{{t.landing.trust.ctaRaw}}</a>{{/if}}
-      </p>
-    </div>
-  </section>
-
-  <section id="sample">
-    <div class="wrap">
-      {{#if sample.isReal}}
-      <h2 data-i18n="landing.sample.titleReal">{{t.landing.sample.titleReal}}</h2>
-      <p class="section-lede" data-i18n="{{sampleLedeKey}}">{{sampleLede}}</p>
-      {{/if}}
-      {{#unless sample.isReal}}
-      <h2 data-i18n="landing.sample.titleSample">{{t.landing.sample.titleSample}}</h2>
-      <p class="section-lede" data-i18n="landing.sample.ledeSample">{{t.landing.sample.ledeSample}}</p>
-      {{/unless}}
-      <div class="sample">
-        <div class="sample-head">
-          <div class="kicker" data-i18n="{{sampleKickerKey}}">{{sampleKicker}}</div>
-          <h3 data-i18n-alt="{{sampleAlt.starTitle}}">{{sample.starTitle}}</h3>
-          <div class="sub" data-i18n-alt="{{sampleAlt.starSubtitle}}">{{sample.starSubtitle}}</div>
-        </div>
-        <div class="sample-body">
-          <div><dt data-i18n="star.ra">{{t.star.ra}}</dt><dd class="mono">{{sample.raText}}</dd></div>
-          <div><dt data-i18n="star.dec">{{t.star.dec}}</dt><dd class="mono">{{sample.decText}}</dd></div>
-          <div><dt data-i18n="star.magnitude">{{t.star.magnitude}}</dt><dd data-i18n-alt="{{sampleAlt.magnitudeText}}">{{sample.magnitudeText}}</dd></div>
-          <div><dt data-i18n="star.distance">{{t.star.distance}}</dt><dd data-i18n-alt="{{sampleAlt.distanceText}}">{{sample.distanceText}}</dd></div>
-          <div><dt data-i18n="star.claimer">{{t.star.claimer}}</dt><dd>{{sample.displayName}}</dd></div>
-          <div><dt data-i18n="star.date">{{t.star.date}}</dt><dd data-i18n-alt="{{sampleAlt.registeredDate}}">{{sample.registeredDate}}</dd></div>
-        </div>
-        {{#if sample.dedication}}
-        <div class="sample-quote"><span data-i18n="landing.quoteOpen">{{t.landing.quoteOpen}}</span>{{sample.dedication}}<span data-i18n="landing.quoteClose">{{t.landing.quoteClose}}</span></div>
-        {{/if}}
-        {{#if sample.isReal}}
-        <p class="muted" style="padding:0 24px 20px;font-size:13.5px;">
-          <a href="{{sample.permalink}}" data-i18n="landing.sample.viewFull">{{t.landing.sample.viewFull}}</a>
-          {{#if sample.simbadUrl}}· <a href="{{sample.simbadUrl}}" target="_blank" rel="noopener noreferrer" data-i18n="{{sampleSimbadKey}}">{{sampleSimbadText}}</a>{{/if}}
-        </p>
-        {{/if}}
-      </div>
-      <p style="margin-top:20px;">
-        {{#if latestUrl}}<a class="btn btn-ghost" href="{{latestUrl}}" data-i18n="landing.sample.viewOneReal">{{t.landing.sample.viewOneReal}}</a>{{/if}}
-        <a class="btn btn-ghost" href="/registry/" data-i18n="landing.sample.browseAll">{{t.landing.sample.browseAll}}</a>
-      </p>
-    </div>
-  </section>
-
-  <section id="how">
-    <div class="wrap">
-      <h2 data-i18n="landing.how.title">{{t.landing.how.title}}</h2>
-      <div class="steps" style="margin-top:26px;">
-        <div class="step">
-          <h3 data-i18n="landing.how.step1Title">{{t.landing.how.step1Title}}</h3>
-          <p class="muted" style="font-size:14.5px;" data-i18n="landing.how.step1Body">{{t.landing.how.step1Body}}</p>
-        </div>
-        <div class="step">
-          <h3 data-i18n="landing.how.step2Title">{{t.landing.how.step2Title}}</h3>
-          <p class="muted" style="font-size:14.5px;" data-i18n="landing.how.step2Body">{{t.landing.how.step2Body}}</p>
-        </div>
-        <div class="step">
-          <h3 data-i18n="landing.how.step3Title">{{t.landing.how.step3Title}}</h3>
-          <p class="muted" style="font-size:14.5px;" data-i18n="landing.how.step3Body">{{t.landing.how.step3Body}}</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="buy">
+  <section id="chain">
     <div class="wrap narrow center">
-      <h2 data-i18n="landing.buy.title">{{t.landing.buy.title}}</h2>
-      <p class="section-lede" style="margin-left:auto;margin-right:auto;" data-i18n="landing.buy.lede">
-        {{t.landing.buy.lede}}
-      </p>
-      {{#if checkoutReady}}
-      <a class="btn btn-primary" href="/register/" data-i18n="common.nav.claim">{{t.common.nav.claim}}</a>
-      <p class="muted" style="margin-top:14px;font-size:14px;" data-i18n="landing.buy.nextNote">
-        {{t.landing.buy.nextNote}}
-      </p>
-      {{/if}}
-      {{#unless checkoutReady}}
-      <span class="btn btn-primary is-disabled" data-i18n="{{entryLabelKey}}">{{entryLabel}}</span>
-      <p class="muted" style="margin-top:14px;font-size:14px;" data-i18n="{{entryMessageKey}}">{{entryMessage}}</p>
-      {{/unless}}
+      <h2 data-i18n="philosophy.chainTitle">{{t.philosophy.chainTitle}}</h2>
+      <p class="section-lede" style="margin-left:auto;margin-right:auto;" data-i18n="philosophy.chainLede">{{t.philosophy.chainLede}}</p>
+      <div class="chain">
+        <span class="chain-node" data-i18n="landing.philosophy.i1Title">{{t.landing.philosophy.i1Title}}</span>
+        <span class="chain-arrow">→</span>
+        <span class="chain-node" data-i18n="landing.philosophy.i2Title">{{t.landing.philosophy.i2Title}}</span>
+        <span class="chain-arrow">→</span>
+        <span class="chain-node" data-i18n="landing.philosophy.i3Title">{{t.landing.philosophy.i3Title}}</span>
+        <span class="chain-arrow">→</span>
+        <span class="chain-node" data-i18n="landing.philosophy.i4Title">{{t.landing.philosophy.i4Title}}</span>
+        <span class="chain-arrow">→</span>
+        <span class="chain-node" data-i18n="landing.philosophy.i5Title">{{t.landing.philosophy.i5Title}}</span>
+      </div>
     </div>
   </section>
 
@@ -299,7 +196,7 @@
       <br><span data-i18n="common.footer.contact">{{t.common.footer.contact}}</span><a href="mailto:{{supportEmail}}">{{supportEmail}}</a>
     </div>
     <div>
-      <a href="/philosophy/" data-i18n="common.nav.philosophy">{{t.common.nav.philosophy}}</a> ·
+      <a href="/" data-i18n="common.nav.philosophy">{{t.common.nav.philosophy}}</a> ·
       <a href="/registry/" data-i18n="common.nav.registry">{{t.common.nav.registry}}</a> ·
       <a href="#faq" data-i18n="common.nav.faq">{{t.common.nav.faq}}</a>
       {{#if registryRepoUrl}}· <a href="{{registryRepoUrl}}" rel="noopener" data-i18n="common.nav.repo">{{t.common.nav.repo}}</a>{{/if}}
@@ -308,7 +205,6 @@
   </div>
 </footer>
 {{i18nAltScript!}}
-<script type="module" src="/assets/js/checkout-url.mjs"></script>
 <script src="/assets/js/site.js" defer></script>
 </body>
 </html>

@@ -22,6 +22,11 @@ test('TC-LP-05 移动端：所有页面声明 viewport 且样式含响应式规�
   // 这两个规则是当时的修复，锁住避免回退
   assert.match(css, /@media \(max-width: \d+px\)/, '需有窄屏断点');
   assert.match(css, /\.btn \{[^}]*white-space: nowrap/, '按钮文字不得折行');
+  // 白皮书卡片里的两条按钮各约 300px：若窄屏改回横排、或按钮区不允许收缩，
+  // 在 320~560px 下会把 banner 撑出横向滚动（实测按钮区宽 631px）。
+  assert.match(css, /\.wp-card-actions \{[^}]*flex: 0 1 auto/, '白皮书按钮区需允许被压缩');
+  assert.match(css, /\.wp-card-actions \{[^}]*min-width: 0/, '白皮书按钮区需能收缩到内容宽度以下');
+  assert.ok(!/\.wp-card-actions \{[^}]*flex-direction: row/.test(css), '白皮书按钮区在窄屏不得改回横排');
 });
 
 test('站点基础文件齐全（favicon / 交互脚本 / 站点配置）', () => {

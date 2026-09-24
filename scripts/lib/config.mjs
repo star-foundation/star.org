@@ -32,8 +32,18 @@ export function loadConfig() {
   const baseUrl = (process.env.SITE_BASE_URL || raw.site.baseUrl || '').replace(/\/+$/, '');
   const checkoutUrl = process.env.LEMON_SQUEEZY_CHECKOUT_URL || raw.product.checkoutUrl || '';
   const registryRepoUrl = process.env.REGISTRY_REPO_URL || raw.site.registryRepoUrl || '';
+  // 公开购买入口的总开关（site.config.json → product.purchaseEnabled）。
+  // 关掉它只关「对外露出」：认领页、结算链路与订单流程都原样保留，
+  // 重新打开时不需要改任何模板或脚本。环境变量可临时覆盖，便于测试与灰度。
+  const purchaseEnabled = process.env.STARORG_PURCHASE_ENABLED === undefined
+    ? raw.product.purchaseEnabled === true
+    : process.env.STARORG_PURCHASE_ENABLED === 'true';
   cached = {
     ...raw,
+    product: {
+      ...raw.product,
+      purchaseEnabled,
+    },
     site: {
       ...raw.site,
       baseUrl,

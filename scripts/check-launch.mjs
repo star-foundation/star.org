@@ -51,8 +51,16 @@ console.log('Star.org 上线就绪自检');
 console.log('');
 
 // ---- 购买入口 ----
+// 公开购买有总开关（site.config.json → product.purchaseEnabled）。关闭时
+// 「没配结算链接」不是阻塞项——站点本来就不该露出购买入口。
+const purchaseEnabled = cfg.product?.purchaseEnabled === true;
 console.log('购买入口');
-if (soldOut) {
+if (!purchaseEnabled) {
+  ok.push('公开购买入口已按配置关闭');
+  line('·', '已关闭：product.purchaseEnabled = false',
+    '站点不露出任何认领/结算链接与价格文案；/register/ 与结算链路仍保留可用，只是不被链接。');
+  console.log('      要重新开启：site.config.json → product.purchaseEnabled = true（并配好结算链接）');
+} else if (soldOut) {
   blockers.push('候选库已售罄，购买入口自动下线');
   line('⛔', '已下线：候选库没有可认领的恒星', '补货：npm run build:pool 重新生成 data/stars_pool.json');
 } else if (!checkoutConfigured) {
@@ -133,6 +141,9 @@ if (/\.github\.io(\/|$)/.test(baseUrl)) {
 // ---- 人工确认项（脚本无法自动判断）----
 console.log('');
 console.log('需要人工确认（脚本无法自动检测）');
+if (!purchaseEnabled) {
+  console.log('  · 公开购买当前是关闭的，下面这几项只在重新开启后才需要处理');
+}
 for (const item of [
   'Lemon Squeezy 结算页字段：姓名 / 邮箱 / 献词（限 100 字）/ 匿名展示开关',
   'Lemon Squeezy Webhook → Zapier/Make → repository_dispatch(star_registration) 全链路联调',

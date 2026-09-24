@@ -30,7 +30,7 @@ carry both languages, and star pages also get a Chinese-default entry at `/zh/s/
 |---|---|---|
 | Star pool | `data/stars_pool.json` — 800 real stars from the HYG catalogue (magnitude −1.44 to 4.4) | Tech 4.1 |
 | Allocation and duplicate checking | `scripts/allocate.mjs` — uniform random pick, mkdir atomic lock, pool re-read under lock, deterministic idempotent slug | Tech 4.2 / TC-ALLOC-01~08 |
-| Landing page | `site/index.html` — value proposition, philosophy section, trust section, live sample, purchase entry, FAQ | PRD 4.1 / TC-LP-01~05 |
+| Home page (core philosophy) | `site/index.html` — philosophy hero + whitepaper + the five ideas + FAQ. The public purchase entry is closed (`product.purchaseEnabled = false`, see `DECISIONS.md` D12) | PRD 4.1 / TC-LP-01~05 |
 | PDF certificate | `templates/certificate.html` rendered by headless Chrome → `certificates/{slug}.pdf` | Tech 4.5 / TC-PDF-01~05 |
 | Permanent link page | `/s/{slug}/` per claim, with an OG card and share buttons | Tech 4.6 / TC-PAGE-01~05 |
 | OG share image | `scripts/lib/artifacts.mjs` renders a 1200×630 PNG → `og/{slug}.png` | Tech 4.6 |
@@ -40,14 +40,14 @@ carry both languages, and star pages also get a Chinese-default entry at `/zh/s/
 | Bundled CJK fonts | `fonts/` — a ~12.5MB trimmed subset, so rendering does not depend on the runner | `DECISIONS.md` D10 |
 | Failure handling | Sold-out alerts, failure alerts, manual re-issue, order reconciliation | PRD 6 / TC-ERR-01~04 |
 | Compliance controls | `scripts/check-compliance.mjs` scans banned wording and payment channels; CI enforces it | Tech 5 / TC-COMP-01~04 |
-| Philosophy page | `/philosophy/` — all five core ideas plus whitepaper (PDF) downloads; also linked from the landing hero and the nav | TC-PHIL-01~05 |
+| Philosophy alias | `/philosophy/` — an alias of the home page (same template, canonical back to `/`, kept out of the sitemap) | TC-PHIL-01~05 |
 | Philosophy whitepaper | `docs/whitepaper/*.tex` (TeX source) → `site/assets/whitepaper/*.pdf` (Chinese + English, committed) | TC-PHIL-03 |
 
 ## 2. Architecture
 
 ```
-Landing page (GitHub Pages)
-   │ buy
+Home page (GitHub Pages) — currently the philosophy page; the purchase entry is closed
+   │ buy (only while product.purchaseEnabled = true, see DECISIONS.md D12)
    ▼
 Lemon Squeezy hosted checkout (Merchant of Record, fiat only)
    │ webhook (payment succeeded)
@@ -121,9 +121,10 @@ It does three things: runs a **real, complete claim** in a temporary sandbox (al
 star → render the certificate PDF and OG image → write the claim record → drop the email
 on disk), builds the static site from that data, and starts a local preview.
 
-Open http://127.0.0.1:4321/ to see the landing page, the public registry, and that claim's
-permanent page, certificate PDF and share image. No email is actually sent
-(`EMAIL_PROVIDER=outbox`); it is written to the sandbox's `outbox/` directory.
+Open http://127.0.0.1:4321/ to see the philosophy home page, the public registry, and that claim's
+permanent page, certificate PDF and share image. (The claim entry at `/register/` is still built
+and still works — it is simply not linked while the public purchase entry is closed.)
+No email is actually sent (`EMAIL_PROVIDER=outbox`); it is written to the sandbox's `outbox/` directory.
 
 All demo data lives in a system temp directory (e.g. `/tmp/starorg-demo`) and **never
 touches the repository's `data/registrations/`, `certificates/` or `og/`**, so you can run
@@ -146,8 +147,9 @@ npm run build:site      # build _site/
 npm run serve           # http://127.0.0.1:4321/
 ```
 
-The registry is empty and the purchase entry shows "coming soon" (no checkout URL in
-`site.config.json` yet). This is the fast loop for copy and styling work: edit files under
+The registry is empty and no purchase entry is shown at all: the public purchase surface is
+closed (`product.purchaseEnabled = false` in `site.config.json`), so `/register/` is built but not
+linked. This is the fast loop for copy and styling work: edit files under
 `site/`, re-run `npm run build:site`, then refresh.
 
 ### 5.3 Writing into the repository (simulating a real order)
@@ -190,9 +192,9 @@ The intellectual source of the site lives in two same-source documents, and is n
 
 The whitepaper is deliberately given the most prominent positions on the site, in three places:
 
-1. **Landing page hero** — a core-philosophy entry button;
+1. **The home page hero** — that hero *is* the core philosophy, with the whitepaper card inside it;
 2. **Navigation bar** — `Philosophy` / `核心理念`;
-3. **The `/philosophy/` page** — the whitepaper download card sits **above** the five ideas, in the first screen of body content.
+3. **The `/philosophy/` alias page** — same content, kept so links shared before the home page became the philosophy page keep working.
 
 It is compiled with `xelatex` using the repository's bundled Noto Sans/Serif SC subsets (`fonts/`), so no CJK font needs to be installed locally (the same approach as certificate rendering — see `DECISIONS.md` D10). CI does not guarantee a TeX installation, so **the PDFs are committed as deliverables** and `npm run build:site` merely copies them into `_site/`:
 
@@ -232,9 +234,10 @@ Behavior that is easy to misread lives in `docs/DECISIONS.md`. The most relevant
 
 - Banned wording (investment / appreciation / asset / trading / ownership certificate /
   digital currency, and so on) is scanned by `check-compliance.mjs`; a hit fails CI.
-- The landing page must contain the "not official IAU naming" clarification and a refund
+- The home page must contain the "not official IAU naming" clarification and a refund
   policy, verified by the same script — **per language**, because both languages share one
   HTML file and a single scan would let one language's copy satisfy the other's rules.
+  This is why the FAQ stays on the home page (see `DECISIONS.md` D12).
 - Lemon Squeezy (fiat) is the only permitted payment channel; any crypto payment host
   domain fails the scan.
 - Public claim records must never contain email addresses, order numbers or other private

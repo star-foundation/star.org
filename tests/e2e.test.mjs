@@ -104,11 +104,13 @@ test('TC-LP-01~04 / TC-PAGE-01~05 / TC-REG-01~05 站点构建与公开认领表'
     assert.equal(build.status, 0, build.stderr);
 
     const out = sandbox.siteOut;
-    // 落地页（TC-LP-01 / TC-LP-02）
+    // 首页 = 核心理念页（TC-LP-01 / DECISIONS D12）
     const landing = readFileSync(path.join(out, 'index.html'), 'utf8');
-    assert.ok(landing.includes(escapeHtml(copy('brand.tagline'))), '落地页需含一句话价值主张');
-    // 三个申请入口统一指向认领页，姓名/献词在认领页填完，认领页再带 checkout[custom] 跳结算
-    assert.ok(landing.includes('register/'), '购买入口需指向认领页 /register/');
+    assert.ok(landing.includes(escapeHtml(copy('brand.tagline'))), '首页需含一句话价值主张');
+    assert.ok(landing.includes(escapeHtml(copy('philosophy.title'))), '首页需渲染核心理念标题');
+    // 公开购买关闭期间不露出任何入口；认领页与结算链路仍然完整保留（关入口、不拆业务）
+    assert.ok(!/href="(?:\.\.\/)*\.?\/?register\/"/.test(landing), '首页不应链接到认领页');
+    assert.ok(!landing.includes('lemonsqueezy'), '首页不应出现结算链接');
     const register = readFileSync(path.join(out, 'register', 'index.html'), 'utf8');
     assert.ok(register.includes('https://star-org.lemonsqueezy.com/checkout/buy/test'), '认领页表单需携带结算链接');
     assert.ok(register.includes('name="display_name"') && register.includes('name="dedication"'), '认领页需含姓名与献词表单');

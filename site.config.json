@@ -11,7 +11,8 @@
   },
   "product": {
     "checkoutUrl": "",
-    "maxDedicationChars": 100
+    "maxDedicationChars": 100,
+    "purchaseEnabled": false
   },
   "policy": {
     "certificatesPublic": true,

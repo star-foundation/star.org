@@ -39,7 +39,7 @@ npm run verify && npm run build:site
 ## 3. 候选库售罄（TC-ALLOC-04 / TC-ERR-01）
 
 - 系统行为：分配时判定 `sold_out`，**不生成认领记录**，给 `OPERATOR_EMAIL` 发告警，流程以退出码 3 结束。
-- 站点行为：落地页购买入口自动下线，显示"恒星候选库正在补充中"。
+- 站点行为：购买入口自动下线，认领页显示"恒星候选库正在补充中"（补货后自动恢复）。当前公开购买整体关闭（`product.purchaseEnabled = false`），所以对外本来就没有入口。
 - 人工动作：
   1. 按第 2 节扩充候选库并推送；
   2. 在 Lemon Squeezy 后台找到该笔已支付订单；

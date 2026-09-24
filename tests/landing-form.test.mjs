@@ -9,6 +9,12 @@ import { renderCertificateHtml } from '../scripts/lib/render.mjs';
 const CHECKOUT_URL = 'https://store.lemonsqueezy.com/checkout/buy/test-variant';
 const NO_CHROME = { CHROME_PATH: path.join('/nonexistent', 'chrome') };
 
+/**
+ * 公开购买关闭期间（DECISIONS D12）：站点的对外页面不再露出认领入口，
+ * 但 /register/ 认领页与结算链路必须原样保留——"关入口、不拆业务"。
+ * 这几条用例就是这条边界的守卫。
+ */
+
 function build(sandbox, env = {}) {
   const result = runScript('build-site.mjs', [], { sandbox, env: { ...NO_CHROME, ...env } });
   assert.equal(result.status, 0, result.stderr);
@@ -23,7 +29,7 @@ function build(sandbox, env = {}) {
 // 取占位符之前的部分做断言：产物里那一段已被替换成实际价格。
 const copyStem = (key) => copy(key).split('{{')[0].replace(/[\s·(（]+$/, '');
 
-test('TC-LP-09 认领表单在独立的 /register/ 页面，含姓名/献词/匿名', () => {
+test('TC-LP-09 公开购买关闭时，认领页依然保留完整功能（表单 / 结算链接 / 纯函数模块）', () => {
   const sandbox = createSandbox({ availableStars: 3, poolSize: 3 });
   try {
     const { register } = build(sandbox, { LEMON_SQUEEZY_CHECKOUT_URL: CHECKOUT_URL });
@@ -39,46 +45,43 @@ test('TC-LP-09 认领表单在独立的 /register/ 页面，含姓名/献词/匿
   }
 });
 
-test('TC-LP-10 落地页不再内嵌表单，三个申请入口统一指向 /register/', () => {
+test('TC-LP-10 首页即理念页：不内嵌表单，也不再链接认领页', () => {
   const sandbox = createSandbox({ availableStars: 3, poolSize: 3 });
   try {
     const { landing } = build(sandbox, { LEMON_SQUEEZY_CHECKOUT_URL: CHECKOUT_URL });
-    assert.ok(!landing.includes('data-registration-form'), '落地页不应再内嵌表单');
-    // 构建会把根路径相对化：落地页（深度 0）上是 ./register/
-    const ctaCount = (landing.match(/href="\.?\/?register\/"/g) || []).length;
-    assert.equal(ctaCount, 3, '导航 / 主视觉 / 购买区三个入口都应指向 /register/，实际 ' + ctaCount);
-    assert.ok(!landing.includes('href="' + CHECKOUT_URL + '"'), '落地页不应再直接跳到结算页');
-    const claim = claimLabel();
-    const labels = landing.split('>' + claim + '<').length - 1;
-    assert.equal(labels, 3, '三个入口文案应统一为「' + claim + '」，实际 ' + labels);
+    assert.ok(!landing.includes('data-registration-form'), '首页不应内嵌表单');
+    assert.ok(!/href="(?:\.\.\/)*\.?\/?register\/"/.test(landing), '首页不应再链接认领页');
+    assert.ok(!landing.includes('href="' + CHECKOUT_URL + '"'), '首页不应直接跳到结算页');
+    assert.ok(!landing.includes('>' + claimLabel() + '<'), '首页不应出现认领入口按钮');
   } finally {
     sandbox.cleanup();
   }
 });
 
-test('TC-LP-11 未配置结算链接：认领页显示通道接入中且无表单，落地页也无表单', () => {
+test('TC-LP-11 未配置结算链接：认领页显示通道接入中且无表单，首页也无表单', () => {
   const sandbox = createSandbox({ availableStars: 3, poolSize: 3 });
   try {
     const { landing, register } = build(sandbox);
     assert.ok(!register.includes('data-registration-form'), '未配置时认领页不应出现表单');
     assert.ok(register.includes(copy('state.checkoutPending')), '认领页应说明通道接入中');
-    assert.ok(!landing.includes('data-registration-form'), '未配置时落地页也不应有表单');
+    assert.ok(!landing.includes('data-registration-form'), '未配置时首页也不应有表单');
   } finally {
     sandbox.cleanup();
   }
 });
 
-test('TC-LP-12 认领页收录进 sitemap', () => {
+test('TC-LP-12 公开购买关闭期间：认领页不进 sitemap，且自身 noindex', () => {
   const sandbox = createSandbox({ availableStars: 3, poolSize: 3 });
   try {
-    const { sitemap } = build(sandbox, { LEMON_SQUEEZY_CHECKOUT_URL: CHECKOUT_URL });
-    assert.ok(sitemap.includes('/register/'), 'sitemap 应包含认领页（绝对地址）');
+    const { sitemap, register } = build(sandbox, { LEMON_SQUEEZY_CHECKOUT_URL: CHECKOUT_URL });
+    assert.ok(!sitemap.includes('/register/'), '关闭期间认领页不应被搜索引擎收录');
+    assert.ok(register.includes('noindex'), '关闭期间认领页自身应标记 noindex');
   } finally {
     sandbox.cleanup();
   }
 });
 
-test('TC-LP-13 全站导航统一：每页都有「认领一颗星」→ 认领页，且不再内嵌结算链接', () => {
+test('TC-LP-13 全站导航统一：没有任何页面带认领入口，也没有页面链接到认领页', () => {
   const sandbox = createSandbox({ availableStars: 3, poolSize: 3 });
   try {
     const result = runScript('register.mjs', [], {
@@ -87,22 +90,25 @@ test('TC-LP-13 全站导航统一：每页都有「认领一颗星」→ 认领�
     });
     assert.equal(result.status, 0, result.stderr);
     const { landing, register, sitemap } = build(sandbox, { LEMON_SQUEEZY_CHECKOUT_URL: CHECKOUT_URL });
-    assert.ok(sitemap.includes('/register/'), 'sitemap 应含认领页');
+    assert.ok(!sitemap.includes('/register/'), 'sitemap 不应收录认领页');
 
     const slug = result.json.slug;
     const pages = {
       'index.html': landing,
+      'philosophy/index.html': readFileSync(path.join(sandbox.siteOut, 'philosophy', 'index.html'), 'utf8'),
       'register/index.html': register,
       'registry/index.html': readFileSync(path.join(sandbox.siteOut, 'registry', 'index.html'), 'utf8'),
       404: readFileSync(path.join(sandbox.siteOut, '404.html'), 'utf8'),
       ['s/' + slug + '/index.html']: readFileSync(path.join(sandbox.siteOut, 's', slug, 'index.html'), 'utf8'),
     };
     for (const [name, html] of Object.entries(pages)) {
-      assert.ok(html.includes('>' + claimLabel() + '<'), name + ' 导航应有统一的「' + claimLabel() + '」按钮');
-      assert.ok(/href="(?:\.\.\/)*\.?\/?register\/"/.test(html), name + ' 按钮应指向认领页');
+      // 认领页自己就是那个"入口"：页面标题就是认领文案，表单也必然携带结算链接。
+      // 这里要求的是"其余页面干净"，以及"没有任何页面链接到认领页"。
       if (name !== 'register/index.html') {
-        assert.ok(!html.includes('lemonsqueezy.com/checkout'), name + ' 不应内嵌结算链接（统一经认领页）');
+        assert.ok(!html.includes('>' + claimLabel() + '<'), name + ' 不应出现认领入口按钮');
+        assert.ok(!html.includes('lemonsqueezy.com/checkout'), name + ' 不应内嵌结算链接');
       }
+      assert.ok(!/href="(?:\.\.\/)*\.?\/?register\/"/.test(html), name + ' 不应链接到认领页');
       assert.ok(!html.includes('{{'), name + ' 不得残留模板占位符');
     }
   } finally {
@@ -122,7 +128,6 @@ test('TC-LP-14 付款完成等待页 /thanks/：可回站、带订单号提示�
     assert.ok(thanks.includes(copy('thanks.eyebrow')), '应确认付款已收到');
     assert.ok(thanks.includes('data-order-hint'), '应能展示 Lemon Squeezy 传来的订单号');
     assert.ok(thanks.includes('noindex'), '购买后过渡页应 noindex');
-    assert.ok(thanks.includes('>' + claimLabel() + '<'), '导航应与其他页统一');
     assert.ok(thanks.includes(copy('thanks.ctaRegistry')), '应提供回站入口');
     assert.ok(!thanks.includes('{{'), '不得残留占位符');
     const sitemap = readFileSync(path.join(sandbox.siteOut, 'sitemap.xml'), 'utf8');
@@ -263,72 +268,4 @@ test('TC-STAR-02 SIMBAD 链接在缺少 HIP 编号时依次回退到 HD、坐标
   );
   // HIP 优先于 HD
   assert.ok(simbadUrl({ hip: 1, hd: 2 }).includes('HIP+1'));
-});
-
-test('TC-LP-16 落地页「最近一次认领」展示真实星体、认领人与献词', () => {
-  const sandbox = createSandbox({ availableStars: 3, poolSize: 5 });
-  try {
-    const reg = runScript('register.mjs', [], {
-      sandbox,
-      input: JSON.stringify({
-        order_id: 'LATEST-1', display_name: '张三', dedication: '愿你抬头就能看见', status: 'paid',
-      }),
-    });
-    assert.equal(reg.status, 0, reg.stderr);
-    const built = runScript('build-site.mjs', [], { sandbox, env: NO_CHROME });
-    assert.equal(built.status, 0, built.stderr);
-    const html = readFileSync(path.join(sandbox.siteOut, 'index.html'), 'utf8');
-    // 断言按目录键取值，不写死中文：站点默认语言是英文，且隐藏另一种语言后
-    // 页面里不再内嵌中文目录——写死中文的断言会变成"在测内嵌目录存在"，而不是在测页面内容。
-    assert.ok(html.includes(copy('landing.sample.titleReal')), '应显示「' + copy('landing.sample.titleReal') + '」标题');
-    assert.ok(!html.includes(copy('landing.sample.titleSample')), '有真实认领时不应再回退到示例标题');
-    assert.ok(!html.includes(copy('landing.sample.kickerSample')), '有真实认领时不应再出现示例标注');
-    const latestKicker = copy('landing.sample.kickerReal').replace('{{slug}}', reg.json.slug);
-    assert.ok(html.includes(latestKicker), '应标注最新认领编号');
-    assert.ok(html.includes('张三'), '应展示认领人');
-    assert.ok(html.includes('愿你抬头就能看见'), '应展示献词');
-    const starId = String(reg.json.star_id).replace('HIP-', '');
-    assert.ok(html.includes('HIP-' + starId), '应展示真实恒星标识');
-    assert.ok(html.includes('/s/' + reg.json.slug + '/'), '应链接到该认领的永久页面');
-    assert.ok(html.includes('https://simbad.cds.unistra.fr/simbad/sim-id?Ident=HIP+' + starId), '应带 SIMBAD 核实链接');
-    assert.ok(!html.includes('Vega'), '不应再出现内置示例的恒星');
-  } finally {
-    sandbox.cleanup();
-  }
-});
-
-test('TC-LP-17 最新认领为匿名时，落地页只显示「匿名认领人」', () => {
-  const sandbox = createSandbox({ availableStars: 3, poolSize: 5 });
-  try {
-    const reg = runScript('register.mjs', [], {
-      sandbox,
-      input: JSON.stringify({
-        order_id: 'LATEST-ANON', display_name: '李四', dedication: '致自己', anonymous: true, status: 'paid',
-      }),
-    });
-    assert.equal(reg.status, 0, reg.stderr);
-    const built = runScript('build-site.mjs', [], { sandbox, env: NO_CHROME });
-    assert.equal(built.status, 0, built.stderr);
-    const html = readFileSync(path.join(sandbox.siteOut, 'index.html'), 'utf8');
-    assert.ok(html.includes(copy('star.anonymousOwner')), '匿名认领应显示「' + copy('star.anonymousOwner') + '」');
-    assert.ok(!html.includes('李四'), '匿名认领不得泄漏姓名到落地页');
-    assert.ok(html.includes('致自己'), '献词是公开内容，匿名时仍应展示');
-  } finally {
-    sandbox.cleanup();
-  }
-});
-
-test('TC-LP-18 没有任何认领时回退到内置示例并明确标注「示例数据」', () => {
-  const sandbox = createSandbox({ availableStars: 5, poolSize: 5 });
-  try {
-    const built = runScript('build-site.mjs', [], { sandbox, env: NO_CHROME });
-    assert.equal(built.status, 0, built.stderr);
-    const html = readFileSync(path.join(sandbox.siteOut, 'index.html'), 'utf8');
-    assert.ok(html.includes(copy('landing.sample.titleSample')), '无认领时应回退到示例标题');
-    assert.ok(html.includes(copy('landing.sample.ledeSample')), '回退时必须标明是示例数据');
-    assert.ok(html.includes('Vega'), '回退示例仍用内置示例恒星');
-    assert.ok(!html.includes(copy('landing.sample.titleReal')), '无认领时不应谎称有最新认领');
-  } finally {
-    sandbox.cleanup();
-  }
 });

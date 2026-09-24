@@ -137,9 +137,11 @@ test('TC-PHIL-11 中文版仍然保留中文标点（避免"去中文"伤到中�
   }
 });
 
-test('TC-PHIL-13 页面语言与购买状态文案一致（中文入口页不得出现英文状态文案）', async () => {
-  // 回归用例：common.entryLabel/entryMessage 曾经只按默认语言解析一次，
-  // 于是没有语言切换按钮的中文隐藏入口页上出现了英文的「Checkout coming soon」。
+test('TC-PHIL-13 公开购买关闭期间：任何语言的首页都不出现购买状态文案与认领入口', async () => {
+  // 回归用例 + 阶段调整（DECISIONS D12）：
+  //   原先中文入口页会混入英文的「Checkout coming soon」（状态文案只按默认语言解析一次）；
+  //   现在公开购买整体关闭，状态文案在任何语言的对外页面上都不该出现，
+  //   而中文入口页仍必须是纯中文。
   const out = mkdtempSync(path.join(os.tmpdir(), 'starorg-entry-lang-'));
   try {
     mkdirSync(path.join(out, 'og'), { recursive: true });
@@ -148,32 +150,30 @@ test('TC-PHIL-13 页面语言与购买状态文案一致（中文入口页不得
     await buildSite({ outDir: out, clean: false });
 
     const flat = flatCatalogs({ reload: true });
-    const zhLabel = flat.zh['state.checkoutPending'];
-    const enLabel = flat.en['state.checkoutPending'];
-    const zhMsg = flat.zh['state.checkoutPendingMessage'];
-    const enMsg = flat.en['state.checkoutPendingMessage'];
+    const stateValues = [
+      'state.soldOut', 'state.checkoutPending',
+      'state.soldOutMessage', 'state.checkoutPendingMessage',
+    ].flatMap((key) => LOCALES.map((locale) => flat[locale][key]));
 
-    // 中文入口页：状态文案必须是中文，且不得混入英文
-    // （理念页只渲染按钮文案、没有说明区块，所以说明只对首页做存在性断言）
-    for (const rel of ['zh/index.html', 'zh/philosophy/index.html']) {
+    for (const rel of ['index.html', 'zh/index.html', 'philosophy/index.html', 'zh/philosophy/index.html']) {
       const file = path.join(out, rel);
       if (!existsSync(file)) continue;
       const html = readFileSync(file, 'utf8');
-      assert.ok(html.includes(zhLabel), `${rel} 应包含中文状态文案「${zhLabel}」`);
-      assert.ok(!html.includes(enLabel), `${rel} 不应出现英文状态文案「${enLabel}」`);
-      assert.ok(!html.includes(enMsg), `${rel} 不应出现英文状态说明`);
+      for (const value of stateValues) {
+        assert.ok(!html.includes(value), `${rel} 不应出现购买状态文案「${value}」`);
+      }
+      assert.ok(!/href="(?:\.\.\/)*\.?\/?register\/"/.test(html), `${rel} 不应链接到认领页`);
     }
-    const zhLanding = readFileSync(path.join(out, 'zh', 'index.html'), 'utf8');
-    assert.ok(zhLanding.includes(zhMsg), 'zh/index.html 应包含中文状态说明');
 
-    // 默认语言页面：只用英文文案
-    for (const rel of ['index.html', 'philosophy/index.html']) {
-      const file = path.join(out, rel);
-      if (!existsSync(file)) continue;
-      const html = readFileSync(file, 'utf8');
-      assert.ok(html.includes(enLabel), `${rel} 应包含英文状态文案`);
-      assert.ok(!html.includes(zhLabel), `${rel} 不应出现中文状态文案`);
-    }
+    // 中文入口页仍然是纯中文：渲染中文理念标题，且 noindex
+    const zhHome = readFileSync(path.join(out, 'zh', 'index.html'), 'utf8');
+    assert.ok(zhHome.includes(flat.zh['philosophy.title']), '中文首页需渲染中文理念标题');
+    assert.ok(!zhHome.includes(flat.en['philosophy.title']), '中文首页不应出现英文理念标题');
+    assert.ok(zhHome.includes('noindex'), '中文入口页需 noindex');
+
+    // 默认语言页面：英文理念标题
+    const enHome = readFileSync(path.join(out, 'index.html'), 'utf8');
+    assert.ok(enHome.includes(flat.en['philosophy.title']), '默认语言首页需渲染英文理念标题');
   } finally {
     rmSync(out, { recursive: true, force: true });
   }

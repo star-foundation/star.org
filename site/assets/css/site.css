@@ -444,8 +444,10 @@ footer.site .disclaimer { max-width: 620px; line-height: 1.8; }
 .wp-card h2 { color: #f2efe8; margin-bottom: 10px; }
 .wp-card .section-lede { color: #b9c1d2; margin-bottom: 10px; }
 .wp-card .wp-note { margin: 0; font-size: 13px; color: #98a1b5; }
-.wp-card-actions { display: flex; flex-direction: column; gap: 12px; flex: 0 0 auto; }
-.wp-card-actions .btn { white-space: nowrap; }
+/* flex: 0 1 auto（而不是 0 0 auto）+ min-width: 0：
+   允许这块在窄屏被压缩，否则两条约 300px 的白皮书按钮会把 banner 撑出横向滚动。 */
+.wp-card-actions { display: flex; flex-direction: column; gap: 12px; flex: 0 1 auto; min-width: 0; }
+.wp-card-actions .btn { white-space: nowrap; max-width: 100%; }
 
 /* 五条理念的串联链：横向节点，窄屏换行 */
 .chain {
@@ -478,9 +480,12 @@ footer.site .disclaimer { max-width: 620px; line-height: 1.8; }
 /* 白皮书卡片现在位于核心理念页的 hero（banner）内部：
    hero 的 .lede 已有 30px 下边距，这里不再叠加，只收紧卡片内部排版。 */
 .hero .wp-card { margin-top: 4px; }
-/* 窄屏时按钮从竖排改为横排换行，避免在 banner 里被挤成细长条 */
+/* 窄屏时按钮竖排铺满卡片宽度，并允许文案换行：
+   横排两条 300px 的按钮在 320~560px 下必然溢出（实测 .wp-card-actions 宽 631px）。 */
 @media (max-width: 560px) {
-  .wp-card-actions { flex-direction: row; flex-wrap: wrap; }
+  .wp-card { padding: 22px 20px; }
+  .wp-card-actions { flex-direction: column; align-items: stretch; width: 100%; }
+  .wp-card-actions .btn { white-space: normal; }
 }
 
 /* 首页 banner 里的理念 / 白皮书入口：主 CTA 之下的一行小按钮，

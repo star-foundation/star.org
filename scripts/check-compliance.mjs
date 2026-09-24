@@ -191,22 +191,23 @@ export function checkRequiredDisclosures() {
     checks.push({
       id: 'IAU_DISCLAIMER_RENDERED',
       ok: rule.iau(text),
-      message: '构建产物的落地页需渲染出 IAU 澄清句（不只是目录里有）',
+      message: '构建产物的首页需渲染出 IAU 澄清句（不只是目录里有）',
     });
     checks.push({
       id: 'REFUND_POLICY_RENDERED',
       ok: rule.refund(text),
-      message: '构建产物的落地页需渲染出退款政策',
+      message: '构建产物的首页需渲染出退款政策',
     });
   }
 
   // ---- 结构类声明与语言无关，仍然校验产物 ----
-  const sourceLanding = readFileSync(path.join(PATHS.siteSrc, 'index.html'), 'utf8');
+  // 首页现在就是核心理念页，认领表入口在导航与页脚（不再是独立"信任背书区块"）。
+  const sourceHome = readFileSync(path.join(PATHS.siteSrc, 'index.html'), 'utf8');
   const registryHtml = builtPage('registry', 'index.html') ?? readFileSync(path.join(PATHS.siteSrc, 'registry.html'), 'utf8');
   checks.push({
     id: 'VERIFY_ENTRY',
-    ok: /href=["'][^"']*\/registry\/["']/.test(sourceLanding),
-    message: '落地页需提供公开认领表入口（信任背书区块）',
+    ok: /href=["'][^"']*\/registry\/["']/.test(sourceHome),
+    message: '首页需提供公开认领表入口（导航或页脚）',
   });
   checks.push({
     id: 'REGISTRY_NO_LOGIN_RENDERED',
