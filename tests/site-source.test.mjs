@@ -52,7 +52,8 @@ test('TC-LP-06 构建产物使用相对路径：项目子路径 /star.org/ 下�
 
     const landing = readFileSync(path.join(out, 'index.html'), 'utf8');
     assert.ok(landing.includes('href="./assets/css/site.css"'), '落地页样式需为相对路径');
-    assert.ok(landing.includes('href="./registry/"'), '落地页的认领表链接需为相对路径');
+    assert.ok(landing.includes('href="./assets/whitepaper/'), '首页的白皮书链接需为相对路径');
+    assert.ok(!landing.includes('href="./registry/"'), '首页不应露出公开认领表入口');
     assert.ok(!/(href|src)="\/(?!\/)/.test(landing), '落地页不应残留根绝对路径');
 
     const registry = readFileSync(path.join(out, 'registry', 'index.html'), 'utf8');

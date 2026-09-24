@@ -114,7 +114,8 @@ test('TC-LP-01~04 / TC-PAGE-01~05 / TC-REG-01~05 站点构建与公开认领表'
     const register = readFileSync(path.join(out, 'register', 'index.html'), 'utf8');
     assert.ok(register.includes('https://star-org.lemonsqueezy.com/checkout/buy/test'), '认领页表单需携带结算链接');
     assert.ok(register.includes('name="display_name"') && register.includes('name="dedication"'), '认领页需含姓名与献词表单');
-    assert.ok(landing.includes('/registry/'), '需提供公开认领表入口');
+    // 首页不露出公开认领表入口（理念页）；核实路径落在永久页上，见下方 TC-PAGE 断言
+    assert.ok(!landing.includes('/registry/'), '首页不应露出公开认领表入口');
     assert.ok(landing.includes('IAU'), 'FAQ 需澄清 IAU 关系');
     assert.ok(landing.includes(copy('landing.faq.q4')), 'FAQ 需含退款政策');
     assert.ok(!landing.includes('{{'), '落地页不得残留占位符');

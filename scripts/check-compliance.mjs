@@ -201,13 +201,16 @@ export function checkRequiredDisclosures() {
   }
 
   // ---- 结构类声明与语言无关，仍然校验产物 ----
-  // 首页现在就是核心理念页，认领表入口在导航与页脚（不再是独立"信任背书区块"）。
-  const sourceHome = readFileSync(path.join(PATHS.siteSrc, 'index.html'), 'utf8');
+  // 首页自 D12 起不再露出公开认领表入口（首页只讲理念）。
+  // "可自行核实"这条承诺落在永久页上：改校验永久页的核实步骤（star.verify2）
+  // 确实指向 /registry/，且两种语言都有——两处都不设这个入口，才真的失去核实路径。
   const registryHtml = builtPage('registry', 'index.html') ?? readFileSync(path.join(PATHS.siteSrc, 'registry.html'), 'utf8');
+  const verifyEntryMissing = LOCALES.filter((locale) => !/href="\/registry\/"/.test(catalogValue(locale, 'star.verify2')));
   checks.push({
     id: 'VERIFY_ENTRY',
-    ok: /href=["'][^"']*\/registry\/["']/.test(sourceHome),
-    message: '首页需提供公开认领表入口（导航或页脚）',
+    ok: verifyEntryMissing.length === 0,
+    message: '永久页的核实步骤需指向公开认领表 /registry/（首页不再露出该入口）'
+      + (verifyEntryMissing.length ? `；不通过：${verifyEntryMissing.join('、')}` : ''),
   });
   checks.push({
     id: 'REGISTRY_NO_LOGIN_RENDERED',

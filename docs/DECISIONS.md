@@ -199,6 +199,11 @@
   所以别名**不进 sitemap**，FAQ 里指向理念页的那条链接也改成指本页。
 - **`/register/` 关闭期间不进 sitemap、自身 `noindex`、不被任何页面链接**，
   但页面、表单、`checkout-url` 纯函数、订单/证书/邮件链路全部照常生成与工作。
+- **首页也不露出 `/registry/` 入口**（导航、页脚、FAQ 内联链接全部拿掉）：
+  首页只讲理念，"可自行核实"这条承诺改由**永久页**承担
+  （`star.verify2` 仍指向 `/registry/`）。`check-compliance.mjs` 的 `VERIFY_ENTRY`
+  随之改为校验 `star.verify2` 的两种语言写法，而不是首页有没有链过去。
+  其余页面（永久页 / 404 / 等待页 / 认领页）仍保留认领表入口。
 - **FAQ 必须留在首页**：`check-compliance.mjs` 的 `IAU_DISCLAIMER_RENDERED` 与
   `REFUND_POLICY_RENDERED` 校验的是构建产物 `_site/index.html` 是否渲染出 IAU 澄清与退款政策，
   FAQ 是这两段声明的承载处。搬家或删减 FAQ 都会让合规扫描直接失败。

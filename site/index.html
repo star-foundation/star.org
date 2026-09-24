@@ -24,7 +24,6 @@
     <div class="brand"><a href="/">{{siteName}}</a></div>
     <nav class="nav-links">
       <a href="/" data-i18n="common.nav.philosophy">{{t.common.nav.philosophy}}</a>
-      <a href="/registry/" data-i18n="common.nav.registry">{{t.common.nav.registry}}</a>
       <a href="#faq" data-i18n="common.nav.faq">{{t.common.nav.faq}}</a>
       {{#if purchaseOpen}}<a class="btn btn-primary btn-sm" href="/register/" data-i18n="common.nav.claim">{{t.common.nav.claim}}</a>{{/if}}
       {{#if showLanguageToggle}}<button class="lang-toggle" type="button" data-lang-toggle data-self-name="{{selfLangName}}" data-alt-name="{{altLangName}}" aria-label="{{t.common.lang.switchAria}}">{{altLangName}}</button>{{/if}}
@@ -185,7 +184,6 @@
     </div>
     <div>
       <a href="/" data-i18n="common.nav.philosophy">{{t.common.nav.philosophy}}</a> ·
-      <a href="/registry/" data-i18n="common.nav.registry">{{t.common.nav.registry}}</a> ·
       <a href="#faq" data-i18n="common.nav.faq">{{t.common.nav.faq}}</a>
       {{#if registryRepoUrl}}· <a href="{{registryRepoUrl}}" rel="noopener" data-i18n="common.nav.repo">{{t.common.nav.repo}}</a>{{/if}}
       <div class="muted" style="margin-top:8px;">© {{year}} {{siteName}}</div>
